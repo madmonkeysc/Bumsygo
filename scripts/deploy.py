@@ -47,18 +47,18 @@ if not logged_in:
 ftp.set_pasv(True)
 print("Passive mode enabled.")
 
-# 4. Change directory to /public_html/
+# 4. Change directory to /public_html/ if possible (often root is already public_html)
 try:
     ftp.cwd("/public_html")
     print("Changed directory to /public_html")
 except Exception as e:
-    print(f"Could not change directory to /public_html: {e}")
+    print(f"Note: Could not change directory to /public_html: {e}")
     try:
         ftp.cwd("public_html")
         print("Changed directory to public_html")
     except Exception as e2:
-        print(f"Could not change directory to public_html either: {e2}")
-        sys.exit(1)
+        print(f"Note: Could not change directory to public_html: {e2}. Attempting to deploy directly to the current directory.")
+
 
 # 5. Recursive upload function
 def upload_dir(local_dir):
