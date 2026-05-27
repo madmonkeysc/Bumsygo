@@ -7,16 +7,16 @@ const Songs = () => {
   useSEO({
     title: 'Canciones Mágicas y Melodías',
     description: 'Canta y baila con las canciones oficiales de Bumsy Go. Melodías educativas y divertidas para toda la familia.',
-    image: '/assets/banners/news_idara.png'
+    image: '/assets/banners/news_idara.webp'
   });
 
   const songs = [
-    { id: 1, title: 'Bumsy en el Bosque', duration: '2:15', category: 'Aventura', image: '/assets/banners/bumsy-plus.png', color: 'bg-green-50' },
-    { id: 2, title: 'La Danza de Tarta', duration: '1:45', category: 'Baile', image: '/assets/banners/news_idara.png', color: 'bg-yellow-50' },
+    { id: 1, title: 'Bumsy en el Bosque', duration: '2:15', category: 'Aventura', image: '/assets/banners/bumsy-plus.webp', color: 'bg-green-50' },
+    { id: 2, title: 'La Danza de Tarta', duration: '1:45', category: 'Baile', image: '/assets/banners/news_idara.webp', color: 'bg-yellow-50' },
     { id: 3, title: 'Colores Mágicos', duration: '2:30', category: 'Aprendizaje', image: '/assets/banners/pintar.png', color: 'bg-pink-50' },
-    { id: 4, title: 'Pipo y el Hielo', duration: '2:05', category: 'Aventura', image: '/assets/banners/news_world.png', color: 'bg-blue-50' },
-    { id: 5, title: 'Uni el Unicornio', duration: '3:00', category: 'Fantasía', image: '/assets/banners/navidad.png', color: 'bg-purple-50' },
-    { id: 6, title: 'Saltando con Pipo', duration: '1:55', category: 'Acción', image: '/assets/banners/escuela.png', color: 'bg-orange-50' },
+    { id: 4, title: 'Pipo y el Hielo', duration: '2:05', category: 'Aventura', image: '/assets/banners/news_world.webp', color: 'bg-blue-50' },
+    { id: 5, title: 'Uni el Unicornio', duration: '3:00', category: 'Fantasía', image: '/assets/banners/navidad.webp', color: 'bg-purple-50' },
+    { id: 6, title: 'Saltando con Pipo', duration: '1:55', category: 'Acción', image: '/assets/banners/escuela.webp', color: 'bg-orange-50' },
   ];
 
   return (
@@ -106,7 +106,7 @@ const Songs = () => {
               transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
               className="aspect-square bg-white rounded-full shadow-[0_50px_100px_rgba(0,0,0,0.2)] flex items-center justify-center relative overflow-hidden border-[12px] border-white"
             >
-              <img loading="lazy" src="/assets/banners/news_idara.png" alt="Album Cover" className="w-full h-full object-cover opacity-80" />
+              <img loading="lazy" src="/assets/banners/news_idara.webp" alt="Album Cover" className="w-full h-full object-cover opacity-80" />
               <div className="absolute w-24 h-24 bg-white rounded-full border-8 border-gray-100 flex items-center justify-center">
                 <Disc className="text-primary" size={48} />
               </div>

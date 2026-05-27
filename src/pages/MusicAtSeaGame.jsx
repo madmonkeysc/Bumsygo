@@ -5,9 +5,9 @@ import { ArrowLeft, RefreshCw, Trophy, Play, Music, Star, Sparkles, Heart } from
 import useSEO from '../hooks/useSEO';
 
 const SPAWN_INTERVAL = 1000;
-const BACKGROUND_IMG = '/assets/games/music_bg_realistic.png';
-const LOGO_MUSIC = '/assets/games/logo_music.png';
-const CHARACTER_BUBU = '/assets/games/bubu_full.png';
+const BACKGROUND_IMG = '/assets/games/music_bg_realistic.webp';
+const LOGO_MUSIC = '/assets/games/logo_music.webp';
+const CHARACTER_BUBU = '/assets/games/bubu_full.webp';
 
 const WIN_TARGET = 10;
 

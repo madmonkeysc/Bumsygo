@@ -36,7 +36,7 @@ const Header = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
           <img 
-            src="/assets/branding/logo.png" 
+            src="/assets/branding/logo.webp" 
             alt="Bumsy Go Logo" 
             className={`transition-all duration-300 ${isScrolled ? 'h-14' : 'h-28'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
           />

@@ -7,7 +7,7 @@ const News = () => {
   useSEO({
     title: 'Noticias y Novedades',
     description: 'Mantente al día con las últimas noticias, lanzamientos globales y colaboraciones especiales de Bumsy Go.',
-    image: '/assets/banners/news_world.png'
+    image: '/assets/banners/news_world.webp'
   });
 
   const articles = [
@@ -17,7 +17,7 @@ const News = () => {
       date: '12 de Abril, 2026',
       desc: 'Nos unimos a Idara Play para lanzar una serie de contenidos musicales únicos. ¡Disfruta del ritmo de Bumsy en todas partes!',
       category: 'Colaboración',
-      image: '/assets/banners/news_idara.png'
+      image: '/assets/banners/news_idara.webp'
     },
     {
       id: 2,
@@ -25,7 +25,7 @@ const News = () => {
       date: '8 de Abril, 2026',
       desc: 'Nuestra aplicación interactiva Bumsy Town ha alcanzado un nuevo hito global. ¡Gracias a todas las familias hispanohablantes por ser parte de esta aventura!',
       category: 'Lanzamiento',
-      image: '/assets/banners/news_world.png'
+      image: '/assets/banners/news_world.webp'
     },
     {
       id: 3,
@@ -33,7 +33,7 @@ const News = () => {
       date: '2 de Abril, 2026',
       desc: 'Disfruta de las mejores historias y leyendas en esta primera temporada, ahora disponible en nuestro canal oficial.',
       category: 'Contenido',
-      image: '/assets/banners/news_cuentos.png'
+      image: '/assets/banners/news_cuentos.webp'
     },
     {
       id: 4,
@@ -41,7 +41,7 @@ const News = () => {
       date: '25 de Marzo, 2026',
       desc: 'Prepárate para los nuevos episodios educativos que se lanzarán este mes. ¡Aprender nunca fue tan divertido!',
       category: 'Educación',
-      image: '/assets/banners/escuela.png'
+      image: '/assets/banners/escuela.webp'
     }
   ];
 
@@ -70,7 +70,7 @@ const News = () => {
                 transition={{ duration: 6, repeat: Infinity }}
                 className="w-full max-w-md aspect-square bg-white/10 rounded-full flex items-center justify-center p-12 backdrop-blur-xl border border-white/20 shadow-2xl"
               >
-                <img loading="lazy" src="/assets/banners/news_world.png" alt="Bumsy News" className="w-full h-auto drop-shadow-2xl" />
+                <img loading="lazy" src="/assets/banners/news_world.webp" alt="Bumsy News" className="w-full h-auto drop-shadow-2xl" />
               </motion.div>
             </div>
           </motion.div>

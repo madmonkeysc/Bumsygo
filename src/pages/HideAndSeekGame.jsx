@@ -6,9 +6,9 @@ import useSEO from '../hooks/useSEO';
 
 const GAME_DURATION = 30; // seconds
 const SPAWN_INTERVAL = 2000; // Slower spawn (2 seconds)
-const CHARACTER_LOLA = '/assets/games/lola_full.png';
+const CHARACTER_LOLA = '/assets/games/lola_full.webp';
 const BACKGROUND_IMG = '/assets/games/hide_bg_realistic.jpg';
-const LOGO_HIDE = '/assets/games/logo_hide.png';
+const LOGO_HIDE = '/assets/games/logo_hide.webp';
 
 // Adjusted hiding spots for the realistic forest background
 const HIDING_SPOTS = [

@@ -7,7 +7,7 @@ const Videos = () => {
   useSEO({
     title: 'Videos y Aventuras Animadas',
     description: 'Mira los episodios completos de Bumsy Go, canciones infantiles y cuentos mágicos para niños. Diversión garantizada y segura.',
-    image: '/assets/banners/news_cuentos.png'
+    image: '/assets/banners/news_cuentos.webp'
   });
 
   const categories = ['Todos', 'Musicales', 'Cuentos', 'Educativos'];
@@ -16,16 +16,16 @@ const Videos = () => {
     title: 'Bumsy y el Misterio del Bosque',
     category: 'Cuento Animado',
     duration: '12:45',
-    image: '/assets/banners/news_cuentos.png'
+    image: '/assets/banners/news_cuentos.webp'
   };
 
   const videos = [
-    { id: 1, title: 'La Canción del Abecedario', category: 'Educativo', duration: '3:20', image: '/assets/banners/escuela.png', color: 'bg-orange-50' },
-    { id: 2, title: 'Bailando con Tarta', category: 'Musical', duration: '2:15', image: '/assets/banners/news_idara.png', color: 'bg-green-50' },
-    { id: 3, title: 'Uni y las Estrellas', category: 'Cuento', duration: '5:40', image: '/assets/banners/navidad.png', color: 'bg-purple-50' },
-    { id: 4, title: 'Aprendiendo los Números', category: 'Educativo', duration: '4:10', image: '/assets/banners/escuela.png', color: 'bg-blue-50' },
-    { id: 5, title: 'El Cumpleaños de Pipo', category: 'Cuento', duration: '8:30', image: '/assets/banners/bumsy-plus.png', color: 'bg-pink-50' },
-    { id: 6, title: 'Ritmos de la Selva', category: 'Musical', duration: '2:50', image: '/assets/banners/news_idara.png', color: 'bg-emerald-50' },
+    { id: 1, title: 'La Canción del Abecedario', category: 'Educativo', duration: '3:20', image: '/assets/banners/escuela.webp', color: 'bg-orange-50' },
+    { id: 2, title: 'Bailando con Tarta', category: 'Musical', duration: '2:15', image: '/assets/banners/news_idara.webp', color: 'bg-green-50' },
+    { id: 3, title: 'Uni y las Estrellas', category: 'Cuento', duration: '5:40', image: '/assets/banners/navidad.webp', color: 'bg-purple-50' },
+    { id: 4, title: 'Aprendiendo los Números', category: 'Educativo', duration: '4:10', image: '/assets/banners/escuela.webp', color: 'bg-blue-50' },
+    { id: 5, title: 'El Cumpleaños de Pipo', category: 'Cuento', duration: '8:30', image: '/assets/banners/bumsy-plus.webp', color: 'bg-pink-50' },
+    { id: 6, title: 'Ritmos de la Selva', category: 'Musical', duration: '2:50', image: '/assets/banners/news_idara.webp', color: 'bg-emerald-50' },
   ];
 
   return (

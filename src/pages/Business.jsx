@@ -7,7 +7,7 @@ const Business = () => {
   useSEO({
     title: 'Negocios y Licenciamiento',
     description: 'Únete al éxito global de Bumsy Go. Descubre oportunidades de licenciamiento, alianzas estratégicas y expansión de marca.',
-    image: '/assets/banners/mercha.png'
+    image: '/assets/banners/mercha.webp'
   });
 
   return (
@@ -15,7 +15,7 @@ const Business = () => {
       {/* Hero Section */}
       <section 
         className="pt-40 pb-28 text-white relative overflow-hidden bg-cover bg-center bg-no-repeat min-h-[85vh] flex items-center"
-        style={{ backgroundImage: "url('/assets/branding/wallpaper_orange.png')" }}
+        style={{ backgroundImage: "url('/assets/branding/wallpaper_orange.webp')" }}
       >
         {/* Premium Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/40 pointer-events-none" />
@@ -39,7 +39,7 @@ const Business = () => {
               className="mb-10 flex justify-center"
             >
               <img 
-                src="/assets/branding/tiger_negocios.png" 
+                src="/assets/branding/tiger_negocios.webp" 
                 alt="Tiger Negocios" 
                 className="max-h-[280px] md:max-h-[420px] object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.45)] select-none hover:scale-105 transition-transform duration-500" 
               />

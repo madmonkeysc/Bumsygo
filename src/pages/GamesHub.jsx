@@ -8,7 +8,7 @@ const GamesHub = () => {
   useSEO({
     title: 'Centro de Juegos',
     description: 'Juega a los mejores juegos interactivos con Bumsy Go. Diversión garantizada para todos los niños.',
-    image: '/assets/games/magic_memory_logo.png'
+    image: '/assets/games/magic_memory_logo.webp'
   });
 
   const games = gamesData;

@@ -8,20 +8,20 @@ const Watch = () => {
   useSEO({
     title: 'Mira y Diviértete',
     description: 'Disfruta de las series originales de Bumsy, canciones infantiles y contenido educativo para niños de todas las edades.',
-    image: '/assets/banners/bumsy_28.png'
+    image: '/assets/banners/bumsy_28.webp'
   });
 
   const categories = [
-    { name: 'Canciones Infantiles', color: 'bg-pink-400', image: '/assets/banners/news_idara.png', icon: <Music /> },
-    { name: 'Cuentos Animados', color: 'bg-orange-400', image: '/assets/banners/news_cuentos.png', icon: '📖' },
-    { name: 'Aprende con Bumsy', color: 'bg-green-400', image: '/assets/banners/bumsy_skool.png', icon: '💡' },
-    { name: 'Pipa Colors', color: 'bg-yellow-400', image: '/assets/banners/pipa_colors.png', icon: <Sparkles /> },
+    { name: 'Canciones Infantiles', color: 'bg-pink-400', image: '/assets/banners/news_idara.webp', icon: <Music /> },
+    { name: 'Cuentos Animados', color: 'bg-orange-400', image: '/assets/banners/news_cuentos.webp', icon: '📖' },
+    { name: 'Aprende con Bumsy', color: 'bg-green-400', image: '/assets/banners/bumsy_skool.webp', icon: '💡' },
+    { name: 'Pipa Colors', color: 'bg-yellow-400', image: '/assets/banners/pipa_colors.webp', icon: <Sparkles /> },
   ];
 
   const featured = [
-    { title: 'Bumsy Taller Mecánico', desc: '¡Vamos a arreglar los coches con Bumsy!', image: '/assets/banners/bumsy_28.png' },
-    { title: 'Bumsy en la Escuela', desc: 'Aprende los números y colores con Bumsy.', image: '/assets/banners/escuela.png' },
-    { title: 'Cuentos con Stella', desc: 'Historias mágicas para antes de dormir.', image: '/assets/banners/news_cuentos.png' },
+    { title: 'Bumsy Taller Mecánico', desc: '¡Vamos a arreglar los coches con Bumsy!', image: '/assets/banners/bumsy_28.webp' },
+    { title: 'Bumsy en la Escuela', desc: 'Aprende los números y colores con Bumsy.', image: '/assets/banners/escuela.webp' },
+    { title: 'Cuentos con Stella', desc: 'Historias mágicas para antes de dormir.', image: '/assets/banners/news_cuentos.webp' },
   ];
 
   return (
@@ -31,7 +31,7 @@ const Watch = () => {
         {/* Background Image Scenario */}
         <div className="absolute inset-0 bg-black">
           <img 
-            src="/assets/branding/bumsyspark_escenario.png" 
+            src="/assets/branding/bumsyspark_escenario.webp" 
             alt="Escenario Bumsy Spark" 
             className="w-full h-full object-cover object-center opacity-85 select-none" 
           />
@@ -242,7 +242,7 @@ const Watch = () => {
          <div className="container mx-auto px-6 flex flex-col md:flex-row items-center gap-20">
             <div className="md:w-1/2 order-2 md:order-1 relative">
                <div className="aspect-video bg-white rounded-[80px] shadow-[0_40px_80px_rgba(8,112,184,0.15)] overflow-hidden flex items-center justify-center relative z-10 border-8 border-white">
-                 <img src="/assets/banners/bumsy-plus.png" alt="Bumsy TV" className="w-full h-full object-cover" />
+                 <img src="/assets/banners/bumsy-plus.webp" alt="Bumsy TV" className="w-full h-full object-cover" />
                </div>
                <div className="absolute -inset-10 bg-gradient-to-br from-purple-600/20 to-purple-500/20 blur-3xl -z-0 rounded-full"></div>
             </div>

@@ -41,7 +41,7 @@ const ColoringGame = () => {
   useSEO({
     title: 'Pinta Pipa',
     description: 'Diviértete llenando de color el mundo mágico de Bumsy Go.',
-    image: '/assets/games/portada_pipa.png'
+    image: '/assets/games/portada_pipa.webp'
   });
 
   const canvasRef = useRef(null);
@@ -247,7 +247,7 @@ const ColoringGame = () => {
       {/* Sidebar - Galleries */}
       <div className="w-full md:w-80 bg-white shadow-2xl z-20 flex flex-col h-auto md:h-[calc(100vh-6rem)] border-r border-gray-100 overflow-y-auto hide-scrollbar">
         <div className="p-8 border-b border-gray-100 bg-accent/5 sticky top-0 z-10 backdrop-blur-md">
-          <img src="/assets/games/logo_pipa.png" alt="Pintando con Pipa" className="h-16 object-contain mb-2" />
+          <img src="/assets/games/logo_pipa.webp" alt="Pintando con Pipa" className="h-16 object-contain mb-2" />
           <p className="font-bold text-gray-500 mt-2 text-sm">Elige un dibujo mágico</p>
         </div>
         

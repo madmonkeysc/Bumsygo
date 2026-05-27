@@ -10,7 +10,7 @@ const DIFFICULTY_LEVELS = [
   { label: 'Experto', grid: 5, icon: '🔥' }
 ];
 
-const PUZZLE_IMAGE = '/assets/games/somos_amigas.png';
+const PUZZLE_IMAGE = '/assets/games/somos_amigas.webp';
 
 const PuzzleGame = () => {
   useSEO({
@@ -166,7 +166,7 @@ const PuzzleGame = () => {
           className="flex justify-center mb-8"
         >
           <img 
-            src="/assets/games/logo_puzzle.png" 
+            src="/assets/games/logo_puzzle.webp" 
             alt="Puzles Kids Logo" 
             className="h-32 md:h-48 object-contain drop-shadow-2xl hover:scale-105 transition-transform"
           />

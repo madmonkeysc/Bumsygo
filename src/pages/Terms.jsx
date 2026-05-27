@@ -9,7 +9,7 @@ const Terms = () => {
       <section className="relative h-[60vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="/assets/branding/legal_bg.png" 
+            src="/assets/branding/legal_bg.webp" 
             alt="Legal Background" 
             className="w-full h-full object-cover"
           />
@@ -24,7 +24,7 @@ const Terms = () => {
               className="md:w-1/3 flex justify-center"
             >
               <img 
-                src="/assets/branding/flamy_legal.png" 
+                src="/assets/branding/flamy_legal.webp" 
                 alt="Flamy Legal" 
                 className="h-64 md:h-96 object-contain drop-shadow-2xl"
               />

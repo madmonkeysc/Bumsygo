@@ -216,7 +216,7 @@ const SergiRunGame = () => {
   useSEO({
     title: 'Sergi Corre — El corredor del Bosque Arcoíris',
     description: '¡Ayuda a Sergi a saltar obstáculos en el Bosque Arcoíris! Un juego de habilidad infinita para toda la familia.',
-    image: '/assets/games/poster_sergi_run.png',
+    image: '/assets/games/poster_sergi_run.webp',
   });
 
   const [screen, setScreen] = useState('cover');

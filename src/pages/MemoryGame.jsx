@@ -70,7 +70,7 @@ const MemoryGame = () => {
   useSEO({
     title: 'Memorama Mágico',
     description: 'Juega al Memorama Mágico con Bumsy y sus amigos. Diviértete, mejora tu memoria y colecciona estrellas.',
-    image: '/assets/banners/bumsy-plus.png'
+    image: '/assets/banners/bumsy-plus.webp'
   });
 
   const [cards, setCards] = useState([]);
@@ -152,7 +152,7 @@ const MemoryGame = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6 bg-white p-8 rounded-[40px] shadow-xl border-4 border-white">
           <div className="flex items-center gap-4">
-            <img src="/assets/games/magic_memory_logo.png" alt="Magic Memory Logo" className="h-20 md:h-24 object-contain drop-shadow-xl" />
+            <img src="/assets/games/magic_memory_logo.webp" alt="Magic Memory Logo" className="h-20 md:h-24 object-contain drop-shadow-xl" />
           </div>
 
           <div className="flex items-center gap-6">
@@ -194,7 +194,7 @@ const MemoryGame = () => {
                 >
                   {/* Card Back (Bumsy Logo/Pattern) */}
                   <div className="absolute inset-0 w-full h-full rounded-[30px] backface-hidden shadow-[0_15px_35px_rgba(8,112,184,0.3)] overflow-hidden border-4 border-white">
-                    <img src="/assets/games/card_back_final.png" alt="Card Back" className="w-full h-full object-cover" />
+                    <img src="/assets/games/card_back_final.webp" alt="Card Back" className="w-full h-full object-cover" />
                   </div>
 
                   {/* Card Front (Character) */}
@@ -238,7 +238,7 @@ const MemoryGame = () => {
                 className="bg-white rounded-[60px] p-12 max-w-xl w-full text-center shadow-2xl border-8 border-accent"
               >
                 <div className="flex items-center justify-center mx-auto mb-8">
-                  <img src="/assets/games/wow.png" alt="¡Wow! Ganaste" className="h-40 md:h-48 object-contain drop-shadow-2xl animate-bounce" />
+                  <img src="/assets/games/wow.webp" alt="¡Wow! Ganaste" className="h-40 md:h-48 object-contain drop-shadow-2xl animate-bounce" />
                 </div>
                 <h2 className="text-5xl md:text-6xl font-black text-primary mb-4 uppercase tracking-tighter leading-none">¡Ganaste!</h2>
                 <p className="text-xl md:text-2xl font-bold text-gray-600 mb-10">Encontraste a todos los amigos en {moves} intentos.</p>

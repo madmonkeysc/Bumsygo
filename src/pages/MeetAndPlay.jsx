@@ -7,7 +7,7 @@ const MeetAndPlay = () => {
   useSEO({
     title: 'Conoce y Juega',
     description: 'Encuentra los próximos eventos en vivo de Bumsy, shows musicales y talleres creativos para toda la familia.',
-    image: '/assets/banners/navidad.png'
+    image: '/assets/banners/navidad.webp'
   });
 
   const events = [
@@ -17,7 +17,7 @@ const MeetAndPlay = () => {
       date: '25 Abr - 30 May',
       location: 'Teatros Principales, Latam',
       desc: '¡Bumsy y sus amigos cobran vida en un escenario lleno de música, luces y magia para toda la familia!',
-      image: '/assets/banners/escuela.png',
+      image: '/assets/banners/escuela.webp',
       color: 'bg-primary'
     },
     {
@@ -26,7 +26,7 @@ const MeetAndPlay = () => {
       date: '15 de Mayo',
       location: 'Galería Central, Ciudad de México',
       desc: 'Ven a conocer a Tarta y Uni en persona, tómate una foto y llévate un recuerdo inolvidable en nuestro festival.',
-      image: '/assets/banners/navidad.png',
+      image: '/assets/banners/navidad.webp',
       color: 'bg-accent'
     },
     {
@@ -47,7 +47,7 @@ const MeetAndPlay = () => {
         {/* Background */}
         <div className="absolute inset-0">
           <img 
-            src="/assets/parents/sea.png" 
+            src="/assets/parents/sea.webp" 
             alt="Sea Background" 
             className="w-full h-full object-cover"
           />
@@ -77,7 +77,7 @@ const MeetAndPlay = () => {
               className="relative mb-8"
             >
               <img 
-                src="/assets/games/bubu_full.png" 
+                src="/assets/games/bubu_full.webp" 
                 alt="Bubu Tambor" 
                 className="h-[280px] md:h-[450px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
               />
@@ -113,7 +113,7 @@ const MeetAndPlay = () => {
       <section className="relative h-screen flex items-end justify-center overflow-hidden -mt-24 z-30">
         <div className="absolute inset-0">
           <img 
-            src="/assets/parents/parents_img.png" 
+            src="/assets/parents/parents_img.webp" 
             alt="Bumsy Parents" 
             className="w-full h-full object-cover"
           />
@@ -162,7 +162,7 @@ const MeetAndPlay = () => {
               className="relative mb-16"
             >
               <img 
-                src="/assets/parents/sergi_learning.png" 
+                src="/assets/parents/sergi_learning.webp" 
                 alt="Sergi Learning" 
                 className="h-[400px] md:h-[600px] object-contain drop-shadow-[0_40px_80px_rgba(0,0,0,0.15)]"
               />
@@ -215,8 +215,8 @@ const MeetAndPlay = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { title: 'Juegos Online', icon: '🎮', image: '/assets/banners/bumsy-plus.png', desc: 'Desafíos interactivos que estimulan el pensamiento lógico.' },
-              { title: 'Canciones en Vivo', icon: '🎤', image: '/assets/banners/news_idara.png', desc: 'Videos musicales diseñados para el desarrollo motriz.' },
+              { title: 'Juegos Online', icon: '🎮', image: '/assets/banners/bumsy-plus.webp', desc: 'Desafíos interactivos que estimulan el pensamiento lógico.' },
+              { title: 'Canciones en Vivo', icon: '🎤', image: '/assets/banners/news_idara.webp', desc: 'Videos musicales diseñados para el desarrollo motriz.' },
               { title: 'Zona Creativa', icon: '🎨', image: '/assets/banners/pintar.png', desc: 'Actividades descargables para fomentar la creatividad.' }
             ].map((item, i) => (
               <motion.div 

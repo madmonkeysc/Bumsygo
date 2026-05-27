@@ -51,7 +51,7 @@ const SnakeGame = () => {
   useSEO({
     title: 'Bumsy Snake — Serpiente de Bumsy Town',
     description: 'Juega al clásico juego de la serpiente con los personajes de Bumsy Town. ¡Colecciona frutas y supera tu récord!',
-    image: '/assets/games/poster_snake.png',
+    image: '/assets/games/poster_snake.webp',
   });
 
   const [screen, setScreen] = useState('cover'); // cover | playing | gameover
@@ -64,6 +64,40 @@ const SnakeGame = () => {
 
   gameRef.current = game;
   tickRef.current = tick;
+
+  // ── Swipe gestures (mobile) ──────────────────────────────────────────────────
+  const touchStartRef = useRef({ x: 0, y: 0 });
+
+  const handleTouchStart = (e) => {
+    if (screen !== 'playing') return;
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchEnd = (e) => {
+    if (screen !== 'playing') return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartRef.current.x;
+    const dy = touch.clientY - touchStartRef.current.y;
+    const threshold = 35; // minimum swipe distance
+
+    if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+      let swipeDir = null;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        swipeDir = dx > 0 ? 'RIGHT' : 'LEFT';
+      } else {
+        swipeDir = dy > 0 ? 'DOWN' : 'UP';
+      }
+
+      if (swipeDir) {
+        setGame(g => {
+          const currentDirName = Object.keys(DIR).find(k => DIR[k] === g.dir);
+          if (swipeDir === OPPOSITE[currentDirName]) return g;
+          return { ...g, pendingDir: DIR[swipeDir] };
+        });
+      }
+    }
+  };
 
   // ── Keyboard input ──────────────────────────────────────────────────────────
   const handleKey = useCallback((e) => {
@@ -385,44 +419,49 @@ const SnakeGame = () => {
 
       {/* Game board */}
       <div
-        className="relative z-10 rounded-2xl overflow-hidden border-2 border-slate-700/60 shadow-[0_0_60px_rgba(139,92,246,0.15)]"
-        style={{ width: COLS * CELL, height: ROWS * CELL, background: '#0f172a' }}
+        className="relative z-10 rounded-2xl overflow-hidden border-2 border-slate-700/60 shadow-[0_0_60px_rgba(139,92,246,0.15)] w-full max-w-[560px] aspect-square touch-none"
+        style={{ background: '#0f172a' }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Inner grid lines */}
         <div className="absolute inset-0 opacity-[0.06]" style={{
           backgroundImage: `linear-gradient(#94a3b8 1px, transparent 1px), linear-gradient(90deg, #94a3b8 1px, transparent 1px)`,
-          backgroundSize: `${CELL}px ${CELL}px`
+          backgroundSize: `${100 / COLS}% ${100 / ROWS}%`
         }} />
 
         {/* Snake */}
         {game.snake.map((cell, i) => {
           const isHead = i === 0;
-          const size = isHead ? CELL - 2 : CELL - 4;
-          const offset = isHead ? 1 : 2;
           return (
             <div
               key={`${cell.x}-${cell.y}-${i}`}
-              className="absolute transition-all duration-75"
+              className="absolute p-[1.5px] xs:p-[2px] transition-all duration-75"
               style={{
-                left: cell.x * CELL + offset,
-                top: cell.y * CELL + offset,
-                width: size,
-                height: size,
-                borderRadius: isHead ? 10 : 8,
-                background: isHead
-                  ? 'linear-gradient(135deg, #a78bfa, #7c3aed)'
-                  : `hsl(${260 - i * 2}, 70%, ${65 - i * 0.8}%)`,
-                boxShadow: isHead ? '0 0 14px rgba(167,139,250,0.7)' : undefined,
+                left: `${(cell.x / COLS) * 100}%`,
+                top: `${(cell.y / ROWS) * 100}%`,
+                width: `${100 / COLS}%`,
+                height: `${100 / ROWS}%`,
                 zIndex: game.snake.length - i,
               }}
             >
-              {isHead && (
-                <div className="absolute inset-0 flex items-center justify-center text-xs select-none pointer-events-none">
-                  {/* Eyes */}
-                  <div className="absolute top-[30%] left-[20%] w-[18%] h-[18%] bg-white rounded-full" />
-                  <div className="absolute top-[30%] right-[20%] w-[18%] h-[18%] bg-white rounded-full" />
-                </div>
-              )}
+              <div
+                className={`w-full h-full ${isHead ? 'rounded-[35%]' : 'rounded-[25%]'} relative`}
+                style={{
+                  background: isHead
+                    ? 'linear-gradient(135deg, #a78bfa, #7c3aed)'
+                    : `hsl(${260 - i * 2}, 70%, ${65 - i * 0.8}%)`,
+                  boxShadow: isHead ? '0 0 14px rgba(167,139,250,0.7)' : undefined,
+                }}
+              >
+                {isHead && (
+                  <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
+                    {/* Eyes */}
+                    <div className="absolute top-[30%] left-[20%] w-[18%] h-[18%] bg-white rounded-full" />
+                    <div className="absolute top-[30%] right-[20%] w-[18%] h-[18%] bg-white rounded-full" />
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
@@ -432,13 +471,12 @@ const SnakeGame = () => {
           key={`${game.food.x},${game.food.y}`}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="absolute flex items-center justify-center"
+          className="absolute flex items-center justify-center text-[6vw] xs:text-[5vw] sm:text-2xl md:text-3xl"
           style={{
-            left: game.food.x * CELL,
-            top: game.food.y * CELL,
-            width: CELL,
-            height: CELL,
-            fontSize: CELL * 0.72,
+            left: `${(game.food.x / COLS) * 100}%`,
+            top: `${(game.food.y / ROWS) * 100}%`,
+            width: `${100 / COLS}%`,
+            height: `${100 / ROWS}%`,
             lineHeight: 1,
           }}
         >
@@ -446,33 +484,11 @@ const SnakeGame = () => {
         </motion.div>
       </div>
 
-      {/* Mobile D-Pad */}
-      <div className="relative z-10 mt-6 grid grid-cols-3 gap-2 md:hidden">
-        {[
-          [null,    'UP',    null   ],
-          ['LEFT',  null,    'RIGHT'],
-          [null,    'DOWN',  null   ],
-        ].map((row, ri) =>
-          row.map((dir, ci) => (
-            <button
-              key={`${ri}-${ci}`}
-              onPointerDown={() => dir && dpad(dir)}
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black transition-all active:scale-90 ${
-                dir
-                  ? 'bg-slate-700/80 hover:bg-violet-600/60 text-slate-200 border border-slate-600 active:bg-violet-600'
-                  : 'pointer-events-none'
-              }`}
-            >
-              {dir === 'UP' && '↑'}
-              {dir === 'DOWN' && '↓'}
-              {dir === 'LEFT' && '←'}
-              {dir === 'RIGHT' && '→'}
-            </button>
-          ))
-        )}
-      </div>
+      <p className="relative z-10 text-slate-400 text-sm mt-6 font-bold md:hidden animate-pulse text-center max-w-xs">
+        👆 ¡Desliza el dedo en el tablero hacia cualquier dirección para mover la serpiente!
+      </p>
 
-      <p className="relative z-10 text-slate-600 text-xs mt-4 hidden md:block">
+      <p className="relative z-10 text-slate-500 text-xs mt-6 hidden md:block">
         Usa las teclas ↑ ↓ ← → o W A S D para moverte
       </p>
     </div>

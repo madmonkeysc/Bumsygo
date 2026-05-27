@@ -12,14 +12,14 @@ const Home = () => {
   useSEO({
     title: 'Música, Juegos y Diversión para Niños',
     description: '¡Bienvenidos al mundo de Bumsy! Descubre canciones infantiles, cuentos animados, juegos educativos y toda la magia de Bumsy Town.',
-    image: '/assets/hero/bg_bumsy_go.png'
+    image: '/assets/hero/bg_bumsy_go.webp'
   });
 
   const heroSlides = [
     { 
       id: 1, 
-      bgImg: '/assets/hero/bg_bumsy_go.png', 
-      fgImg: '/assets/hero/fg_bumsy_go.png',
+      bgImg: '/assets/hero/bg_bumsy_go.webp', 
+      fgImg: '/assets/hero/fg_bumsy_go.webp',
       title: 'ESCRIBAMOS UNA GRAN HISTORIA JUNTOS', 
       subtitle: 'Contenidos, educación y shows en vivo alegría cada día.',
       btnText: 'YO QUIERO',
@@ -27,8 +27,8 @@ const Home = () => {
     },
     { 
       id: 2, 
-      bgImg: '/assets/hero/bg_games.png', 
-      fgImg: '/assets/hero/fg_games.png',
+      bgImg: '/assets/hero/bg_games.webp', 
+      fgImg: '/assets/hero/fg_games.webp',
       title: '¡HORA DE JUGAR Y APRENDER!', 
       subtitle: 'Descubre los nuevos juegos interactivos de Bumsy Town.',
       btnText: 'JUGAR AHORA',
@@ -36,8 +36,8 @@ const Home = () => {
     },
     { 
       id: 3, 
-      bgImg: '/assets/hero/bg_friends.png', 
-      fgImg: '/assets/hero/fg_friends.png',
+      bgImg: '/assets/hero/bg_friends.webp', 
+      fgImg: '/assets/hero/fg_friends.webp',
       title: 'CONOCE A NUESTROS MEJORES AMIGOS', 
       subtitle: 'Cada personaje tiene una historia mágica para compartir contigo.',
       btnText: 'VER CATÁLOGO',
@@ -45,8 +45,8 @@ const Home = () => {
     },
     { 
       id: 4, 
-      bgImg: '/assets/hero/bg_learning.png', 
-      fgImg: '/assets/hero/fg_learning.png',
+      bgImg: '/assets/hero/bg_learning.webp', 
+      fgImg: '/assets/hero/fg_learning.webp',
       title: 'APRENDE Y JUEGA CON BUMSY', 
       subtitle: 'Descubre actividades educativas diseñadas para divertir.',
       btnText: 'NUEVOS EPISODIOS',
@@ -54,8 +54,8 @@ const Home = () => {
     },
     { 
       id: 5, 
-      bgImg: '/assets/hero/bg_next.png', 
-      fgImg: '/assets/hero/fg_next.png',
+      bgImg: '/assets/hero/bg_next.webp', 
+      fgImg: '/assets/hero/fg_next.webp',
       title: '¡LO PRÓXIMO EN BUMSY TOWN!', 
       subtitle: 'No te pierdas los lanzamientos más esperados de la temporada.',
       btnText: 'VER NOVEDADES',
@@ -111,17 +111,17 @@ const Home = () => {
     { 
       title: 'Colaboración global: Bumsy x Idara Play', 
       date: 'Abril 2026', 
-      image: '/assets/banners/news_idara.png' 
+      image: '/assets/banners/news_idara.webp' 
     },
     { 
       title: '¡Bumsy Town ya disponible en países de habla hispana!', 
       date: 'Marzo 2026', 
-      image: '/assets/banners/news_world.png' 
+      image: '/assets/banners/news_world.webp' 
     },
     { 
       title: 'Temporada 1 de "Cuentos Mágicos"', 
       date: 'Marzo 2026', 
-      image: '/assets/banners/news_cuentos.png' 
+      image: '/assets/banners/news_cuentos.webp' 
     },
   ];
 
@@ -294,7 +294,7 @@ const Home = () => {
         {/* Background Image Bumsy BS */}
         <div className="absolute inset-0 bg-slate-900">
           <img 
-            src="/assets/branding/bumsybs_fondo.png" 
+            src="/assets/branding/bumsybs_fondo.webp" 
             alt="Bumsy BS Background" 
             className="w-full h-full object-cover object-center select-none" 
           />
@@ -310,7 +310,7 @@ const Home = () => {
             className="mb-12 hover:scale-105 transition-transform"
           >
             <img 
-              src="/assets/branding/bs2_logo.png" 
+              src="/assets/branding/bs2_logo.webp" 
               alt="Logo BS2" 
               className="h-72 md:h-[450px] object-contain select-none drop-shadow-[0_15px_30px_rgba(252,242,0,0.5)]" 
             />
@@ -373,7 +373,7 @@ const Home = () => {
             {/* Left Prev Char Hint */}
             <div className="hidden lg:flex w-24 h-[400px] absolute -left-40 opacity-30 pointer-events-none items-center justify-end overflow-hidden rounded-r-[40px] bg-gradient-to-r from-transparent to-primary/5">
                <img 
-                 src={characters[(activeCharIndex - 1 + characters.length) % characters.length].image} 
+                 src={characters[(activeCharIndex - 1 + characters.length) % characters.length].card} 
                  className="h-40 translate-x-12 filter blur-[2px] object-contain" 
                  alt="previous"
                />
@@ -504,7 +504,7 @@ const Home = () => {
         {/* Foreground Image */}
         <div className="w-full flex justify-center relative z-20 px-6">
            <img 
-             src="/assets/banners/bumsy_28.png" 
+             src="/assets/banners/bumsy_28.webp" 
              className="w-full max-w-[1200px] hover:scale-[1.02] transition-transform duration-500 drop-shadow-[0_30px_60px_rgba(0,0,0,0.15)] relative z-30" 
              alt="Nuestro Nuevo Contenido" 
            />
@@ -522,7 +522,7 @@ const Home = () => {
         >
           {/* Yellow Background Image (Assets from User) */}
           <img 
-            src="/assets/banners/fondo_youtube.png" 
+            src="/assets/banners/fondo_youtube.webp" 
             alt="YouTube Background" 
             className="w-full h-auto block" 
           />
@@ -552,7 +552,7 @@ const Home = () => {
                 className="w-full md:w-1/2"
               >
                 <img 
-                  src="/assets/banners/youtube_banner.png" 
+                  src="/assets/banners/youtube_banner.webp" 
                   alt="YouTube Bumsy" 
                   className="w-full h-auto drop-shadow-[0_20px_40px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-500" 
                 />
@@ -613,7 +613,7 @@ const Home = () => {
           className="relative w-full"
         >
           <img 
-            src="/assets/banners/bumsy_skool.png" 
+            src="/assets/banners/bumsy_skool.webp" 
             alt="Bumsy School" 
             className="w-full h-auto block" 
           />
@@ -695,7 +695,7 @@ const Home = () => {
           className="absolute inset-0"
         >
           <img 
-            src="/assets/banners/pipa_colors.png" 
+            src="/assets/banners/pipa_colors.webp" 
             alt="Pipa Colors" 
             className="w-full h-full object-cover transition-transform duration-[2000ms] hover:scale-105"
           />
@@ -743,7 +743,7 @@ const Home = () => {
          <div className="w-full relative h-[500px] md:h-auto min-h-[500px] flex flex-col justify-between">
             
             {/* Imagen de fondo / Flamy */}
-            <img src="/assets/banners/bumsy_29.png" alt="Hacer Negocios con Bumsy" className="w-full h-full object-cover absolute inset-0 md:relative md:object-contain md:h-auto md:max-h-none" />
+            <img src="/assets/banners/bumsy_29.webp" alt="Hacer Negocios con Bumsy" className="w-full h-full object-cover absolute inset-0 md:relative md:object-contain md:h-auto md:max-h-none" />
             
             {/* Textos montados arriba para no tapar al Flamingo */}
             <div className="absolute top-10 md:top-16 left-0 right-0 z-20 flex flex-col items-center text-center px-6 pointer-events-none">

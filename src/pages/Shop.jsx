@@ -9,28 +9,28 @@ const Shop = () => {
   useSEO({
     title: 'Tienda Oficial',
     description: 'Llévate a casa la magia de Bumsy Town. Peluches, ropa, libros y accesorios oficiales de Bumsy y sus amigos.',
-    image: '/assets/banners/mercha.png'
+    image: '/assets/banners/mercha.webp'
   });
   
   const categories = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos'];
   
   const products = [
-    { id: 1, name: 'Peluche Bumsy Fox (XXL)', price: 29.99, category: 'Peluches', image: '/assets/banners/mercha.png', color: 'bg-orange-50', rating: 5 },
-    { id: 2, name: 'Camiseta Arcoíris Uni', price: 19.99, category: 'Ropa', image: '/assets/banners/mercha.png', color: 'bg-pink-50', rating: 4 },
-    { id: 3, name: 'Cuento: Aventuras en el Bosque', price: 14.99, category: 'Libros', image: '/assets/banners/books.png', color: 'bg-green-50', rating: 5 },
-    { id: 4, name: 'Mochila Tarta Turtle', price: 34.99, category: 'Accesorios', image: '/assets/banners/mercha.png', color: 'bg-emerald-50', rating: 5 },
+    { id: 1, name: 'Peluche Bumsy Fox (XXL)', price: 29.99, category: 'Peluches', image: '/assets/banners/mercha.webp', color: 'bg-orange-50', rating: 5 },
+    { id: 2, name: 'Camiseta Arcoíris Uni', price: 19.99, category: 'Ropa', image: '/assets/banners/mercha.webp', color: 'bg-pink-50', rating: 4 },
+    { id: 3, name: 'Cuento: Aventuras en el Bosque', price: 14.99, category: 'Libros', image: '/assets/banners/books.webp', color: 'bg-green-50', rating: 5 },
+    { id: 4, name: 'Mochila Tarta Turtle', price: 34.99, category: 'Accesorios', image: '/assets/banners/mercha.webp', color: 'bg-emerald-50', rating: 5 },
     { id: 5, name: 'Pack de Pegatinas Mágicas', price: 5.99, category: 'Accesorios', image: '/assets/banners/pintar.png', color: 'bg-yellow-50', rating: 4 },
-    { id: 6, name: 'Gorra Pipo Penguin', price: 12.99, category: 'Ropa', image: '/assets/banners/mercha.png', color: 'bg-blue-50', rating: 5 },
-    { id: 7, name: 'Peluche Tarta Extra Suave', price: 24.99, category: 'Peluches', image: '/assets/banners/mercha.png', color: 'bg-green-50', rating: 4 },
+    { id: 6, name: 'Gorra Pipo Penguin', price: 12.99, category: 'Ropa', image: '/assets/banners/mercha.webp', color: 'bg-blue-50', rating: 5 },
+    { id: 7, name: 'Peluche Tarta Extra Suave', price: 24.99, category: 'Peluches', image: '/assets/banners/mercha.webp', color: 'bg-green-50', rating: 4 },
     { id: 8, name: 'Libro para Colorear Bumsy', price: 9.99, category: 'Libros', image: '/assets/banners/pintar.png', color: 'bg-purple-50', rating: 5 },
     
     // Regalos para Colorear (Especiales / Gratuitos)
-    { id: 9, name: 'Coloreable Bubu Mágico', price: 0, category: 'Regalos', image: '/assets/ecommerce/bubu_portada.png', isFree: true, downloadUrl: '/assets/ecommerce/bubu_portada.png', rating: 5 },
-    { id: 10, name: 'Bumsy Word Search (Sopa de Letras)', price: 0, category: 'Regalos', image: '/assets/ecommerce/bumsy_word_01.png', isFree: true, downloadUrl: '/assets/ecommerce/bumsy_word_01.png', rating: 5 },
-    { id: 11, name: 'Coloreable Especial Flamy Colors', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_colors.png', isFree: true, downloadUrl: '/assets/ecommerce/flamy_colors.png', rating: 5 },
-    { id: 12, name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.png', isFree: true, downloadUrl: '/assets/ecommerce/flamy_portada.png', rating: 5 },
-    { id: 13, name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.png', isFree: true, downloadUrl: '/assets/ecommerce/lola_portada.png', rating: 5 },
-    { id: 14, name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.png', isFree: true, downloadUrl: '/assets/ecommerce/pipa_portada_2.png', rating: 5 }
+    { id: 9, name: 'Coloreable Bubu Mágico', price: 0, category: 'Regalos', image: '/assets/ecommerce/bubu_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/bubu_portada.png', rating: 5 },
+    { id: 10, name: 'Bumsy Word Search (Sopa de Letras)', price: 0, category: 'Regalos', image: '/assets/ecommerce/bumsy_word_01.webp', isFree: true, downloadUrl: '/assets/ecommerce/bumsy_word_01.png', rating: 5 },
+    { id: 11, name: 'Coloreable Especial Flamy Colors', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_colors.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_colors.png', rating: 5 },
+    { id: 12, name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_portada.png', rating: 5 },
+    { id: 13, name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/lola_portada.png', rating: 5 },
+    { id: 14, name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', isFree: true, downloadUrl: '/assets/ecommerce/pipa_portada_2.png', rating: 5 }
   ];
 
   const filteredProducts = activeCategory === 'Todos' 
@@ -44,7 +44,7 @@ const Shop = () => {
         {/* Background Image Fondo NEXT */}
         <div className="absolute inset-0 bg-slate-900">
           <img 
-            src="/assets/branding/shop_bg_next.png" 
+            src="/assets/branding/shop_bg_next.webp" 
             alt="Fondo NEXT Background" 
             className="w-full h-full object-cover object-center select-none" 
           />
@@ -78,7 +78,7 @@ const Shop = () => {
               className="relative w-full max-w-lg"
             >
                <div className="absolute inset-0 bg-white/20 rounded-full blur-3xl animate-pulse"></div>
-               <img loading="lazy" src="/assets/branding/shop_fg_next.png" alt="Next Products" className="relative z-10 w-full h-auto drop-shadow-[0_30px_60px_rgba(0,0,0,0.25)] select-none hover:scale-105 transition-transform duration-500" />
+               <img loading="lazy" src="/assets/branding/shop_fg_next.webp" alt="Next Products" className="relative z-10 w-full h-auto drop-shadow-[0_30px_60px_rgba(0,0,0,0.25)] select-none hover:scale-105 transition-transform duration-500" />
             </motion.div>
           </div>
         </div>

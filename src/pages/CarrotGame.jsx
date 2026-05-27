@@ -6,8 +6,8 @@ import useSEO from '../hooks/useSEO';
 
 const GAME_DURATION = 30; // seconds
 const SPAWN_INTERVAL = 800; // ms
-const BACKGROUND_IMG = '/assets/hero/bg_bumsy_go.png';
-const LOGO_CARROTS = '/assets/games/logo_carrots.png';
+const BACKGROUND_IMG = '/assets/hero/bg_bumsy_go.webp';
+const LOGO_CARROTS = '/assets/games/logo_carrots.webp';
 const CHARACTER_SERGI = '/assets/characters/cards/sergi.webp';
 const CARROT_IMG = 'https://cdn-icons-png.flaticon.com/512/2909/2909808.png'; // Using a placeholder for now, or I'll generate one if possible. Actually, I'll use an Emoji for simplicity and reliability.
 

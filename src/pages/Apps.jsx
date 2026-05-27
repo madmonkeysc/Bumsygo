@@ -7,7 +7,7 @@ const Apps = () => {
   useSEO({
     title: 'Apps y Juegos Interactivos',
     description: 'Lleva la diversión de Bumsy Go a tus dispositivos móviles. Juegos educativos, seguros y divertidos para niños de todas las edades.',
-    image: '/assets/banners/bumsy-plus.png'
+    image: '/assets/banners/bumsy-plus.webp'
   });
 
   const apps = [
@@ -19,7 +19,7 @@ const Apps = () => {
       reviews: '2.5k',
       tags: ['Aventura', 'Creatividad'],
       color: 'bg-primary',
-      image: '/assets/banners/bumsy-plus.png'
+      image: '/assets/banners/bumsy-plus.webp'
     },
     {
       id: 2,
@@ -39,7 +39,7 @@ const Apps = () => {
       reviews: '1.8k',
       tags: ['Educación', 'Matemáticas'],
       color: 'bg-secondary',
-      image: '/assets/banners/escuela.png'
+      image: '/assets/banners/escuela.webp'
     }
   ];
 
