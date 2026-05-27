@@ -65,37 +65,44 @@ const SnakeGame = () => {
   gameRef.current = game;
   tickRef.current = tick;
 
-  // ── Swipe gestures (mobile) ──────────────────────────────────────────────────
-  const touchStartRef = useRef({ x: 0, y: 0 });
-
-  const handleTouchStart = (e) => {
+  // ── Board Tapping controls (mobile & click) ─────────────────────────────────
+  const handleBoardClick = (e) => {
     if (screen !== 'playing') return;
-    const touch = e.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
-  };
 
-  const handleTouchEnd = (e) => {
-    if (screen !== 'playing') return;
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - touchStartRef.current.x;
-    const dy = touch.clientY - touchStartRef.current.y;
-    const threshold = 35; // minimum swipe distance
+    let clientX = e.clientX;
+    let clientY = e.clientY;
 
-    if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
-      let swipeDir = null;
-      if (Math.abs(dx) > Math.abs(dy)) {
-        swipeDir = dx > 0 ? 'RIGHT' : 'LEFT';
-      } else {
-        swipeDir = dy > 0 ? 'DOWN' : 'UP';
-      }
+    if (e.changedTouches && e.changedTouches[0]) {
+      clientX = e.changedTouches[0].clientX;
+      clientY = e.changedTouches[0].clientY;
+    } else if (e.touches && e.touches[0]) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    }
 
-      if (swipeDir) {
-        setGame(g => {
-          const currentDirName = Object.keys(DIR).find(k => DIR[k] === g.dir);
-          if (swipeDir === OPPOSITE[currentDirName]) return g;
-          return { ...g, pendingDir: DIR[swipeDir] };
-        });
-      }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = clientX - rect.left;
+    const clickY = clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const dx = clickX - centerX;
+    const dy = clickY - centerY;
+
+    let tapDir = null;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      tapDir = dx > 0 ? 'RIGHT' : 'LEFT';
+    } else {
+      tapDir = dy > 0 ? 'DOWN' : 'UP';
+    }
+
+    if (tapDir) {
+      setGame(g => {
+        const currentDirName = Object.keys(DIR).find(k => DIR[k] === g.dir);
+        if (tapDir === OPPOSITE[currentDirName]) return g;
+        return { ...g, pendingDir: DIR[tapDir] };
+      });
     }
   };
 
@@ -388,7 +395,7 @@ const SnakeGame = () => {
   // PLAYING SCREEN
   // ════════════════════════════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden select-none px-2 py-4"
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden select-none px-2 py-4 touch-none"
       style={{ fontFamily: "'Poppins', sans-serif" }}
     >
       {/* Background grid */}
@@ -419,10 +426,9 @@ const SnakeGame = () => {
 
       {/* Game board */}
       <div
-        className="relative z-10 rounded-2xl overflow-hidden border-2 border-slate-700/60 shadow-[0_0_60px_rgba(139,92,246,0.15)] w-full max-w-[560px] aspect-square touch-none"
+        className="relative z-10 rounded-2xl overflow-hidden border-2 border-slate-700/60 shadow-[0_0_60px_rgba(139,92,246,0.15)] w-full max-w-[560px] aspect-square touch-none cursor-pointer"
         style={{ background: '#0f172a' }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        onPointerDown={handleBoardClick}
       >
         {/* Inner grid lines */}
         <div className="absolute inset-0 opacity-[0.06]" style={{
@@ -484,8 +490,8 @@ const SnakeGame = () => {
         </motion.div>
       </div>
 
-      <p className="relative z-10 text-slate-400 text-sm mt-6 font-bold md:hidden animate-pulse text-center max-w-xs">
-        👆 ¡Desliza el dedo en el tablero hacia cualquier dirección para mover la serpiente!
+      <p className="relative z-10 text-slate-400 text-sm mt-6 font-bold md:hidden animate-pulse text-center max-w-xs select-none">
+        👆 ¡Toca en los extremos del tablero (arriba, abajo, izquierda, derecha) para dirigir la serpiente!
       </p>
 
       <p className="relative z-10 text-slate-500 text-xs mt-6 hidden md:block">
