@@ -31,10 +31,10 @@ const COLORS = [
 ];
 
 const DRAWINGS = [
-  { id: 'bumsy', name: 'Bumsy Oso', src: '/assets/games/colors/bumsy_lineart.png' },
-  { id: 'pipa', name: 'Pipa Pintora', src: '/assets/games/colors/pipa_lineart.png' },
-  { id: 'lumi', name: 'Lumi Búho', src: '/assets/games/colors/lumi_lineart.png' },
-  { id: 'stella', name: 'Estrella Mágica', src: '/assets/games/colors/stella_lineart.png' },
+  { id: 'bumsy', name: 'Bumsy Oso', src: '/assets/games/colors/bumsy_lineart.webp' },
+  { id: 'pipa', name: 'Pipa Pintora', src: '/assets/games/colors/pipa_lineart.webp' },
+  { id: 'lumi', name: 'Lumi Búho', src: '/assets/games/colors/lumi_lineart.webp' },
+  { id: 'stella', name: 'Estrella Mágica', src: '/assets/games/colors/stella_lineart.webp' },
 ];
 
 const ColoringGame = () => {
@@ -48,6 +48,7 @@ const ColoringGame = () => {
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [selectedDrawing, setSelectedDrawing] = useState(DRAWINGS[0]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDrawingDrawerOpen, setIsDrawingDrawerOpen] = useState(false);
   
   // Undo History Stack
   const [history, setHistory] = useState([]);
@@ -242,27 +243,27 @@ const ColoringGame = () => {
   };
 
   return (
-    <div className="pt-24 pb-0 bg-primary/5 min-h-screen flex flex-col md:flex-row overflow-hidden">
+    <div className="pt-20 md:pt-24 pb-0 bg-slate-950 min-h-screen h-screen flex flex-col md:flex-row overflow-hidden select-none text-slate-100">
       
-      {/* Sidebar - Galleries */}
-      <div className="w-full md:w-80 bg-white shadow-2xl z-20 flex flex-col h-auto md:h-[calc(100vh-6rem)] border-r border-gray-100 overflow-y-auto hide-scrollbar">
-        <div className="p-8 border-b border-gray-100 bg-accent/5 sticky top-0 z-10 backdrop-blur-md">
-          <img src="/assets/games/logo_pipa.webp" alt="Pintando con Pipa" className="h-16 object-contain mb-2" />
-          <p className="font-bold text-gray-500 mt-2 text-sm">Elige un dibujo mágico</p>
+      {/* Sidebar - Galleries (Desktop only) */}
+      <div className="hidden md:flex flex-col w-72 bg-slate-900 border-r border-slate-800 h-full overflow-y-auto hide-scrollbar">
+        <div className="p-6 border-b border-slate-800 bg-slate-950/40 sticky top-0 z-10 backdrop-blur-md">
+          <img src="/assets/games/logo_pipa.webp" alt="Pintando con Pipa" className="h-14 object-contain mb-2 mx-auto" />
+          <p className="font-bold text-slate-400 mt-2 text-center text-xs tracking-wider uppercase">Elige un dibujo mágico</p>
         </div>
         
-        <div className="p-6 grid grid-cols-2 md:grid-cols-1 gap-4">
+        <div className="p-4 flex flex-col gap-4">
           {DRAWINGS.map(drawing => (
             <motion.button
               key={drawing.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => setSelectedDrawing(drawing)}
-              className={`relative rounded-3xl overflow-hidden aspect-video md:aspect-square border-4 transition-all ${selectedDrawing.id === drawing.id ? 'border-accent shadow-[0_10px_20px_rgba(255,105,180,0.3)]' : 'border-transparent shadow-sm'}`}
+              className={`relative rounded-2xl overflow-hidden aspect-video border-4 transition-all ${selectedDrawing.id === drawing.id ? 'border-pink-500 shadow-[0_0_20px_rgba(236,72,153,0.3)]' : 'border-slate-800 shadow-sm'}`}
             >
               <img src={drawing.src} alt={drawing.name} className="w-full h-full object-cover bg-white" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                 <span className="text-white font-black text-sm uppercase tracking-wider">{drawing.name}</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent flex items-end p-3">
+                 <span className="text-white font-black text-xs uppercase tracking-wider">{drawing.name}</span>
               </div>
             </motion.button>
           ))}
@@ -270,68 +271,76 @@ const ColoringGame = () => {
       </div>
 
       {/* Main Canvas Area */}
-      <div className="flex-1 flex flex-col relative h-[calc(100vh-6rem)]">
+      <div className="flex-1 flex flex-col h-full relative overflow-hidden">
         
         {/* Canvas Toolbar */}
-        <div className="h-20 bg-white/80 backdrop-blur-xl border-b border-gray-200 flex items-center justify-between px-6 md:px-12 z-10 shadow-sm overflow-x-auto hide-scrollbar">
-           <div className="flex items-center gap-4 min-w-max mr-4">
-             <div className="w-10 h-10 rounded-full shadow-inner border-2 border-gray-200" style={{ backgroundColor: selectedColor }}></div>
-             <span className="font-black text-primary uppercase tracking-widest text-sm hidden md:inline">Color Actual</span>
+        <div className="h-16 md:h-20 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 md:px-8 z-10 shadow-md">
+           <div className="flex items-center gap-3">
+             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.1)] border-2 border-white/80" style={{ backgroundColor: selectedColor }}></div>
+             <span className="font-black text-slate-300 uppercase tracking-widest text-xs hidden sm:inline">Color Actual</span>
            </div>
 
-           <div className="flex items-center gap-2 md:gap-4 min-w-max">
+           <div className="flex items-center gap-2 md:gap-3">
+              {/* Mobile Drawings Button */}
+              <button
+                onClick={() => setIsDrawingDrawerOpen(true)}
+                className="md:hidden bg-pink-600 hover:bg-pink-500 text-white p-2.5 rounded-full font-black text-xs flex items-center gap-1.5 transition-all shadow-lg uppercase tracking-wider"
+              >
+                <ImageIcon size={16} /> <span>Dibujos</span>
+              </button>
+
               <button 
                 onClick={handleUndo}
                 disabled={history.length === 0}
-                className={`p-3 md:px-6 md:py-3 rounded-full font-black text-sm flex items-center gap-2 uppercase transition-all ${history.length === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-orange-100 hover:bg-orange-200 text-orange-600 shadow-sm hover:shadow-md'}`}
+                className={`p-2.5 md:px-5 md:py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 uppercase transition-all ${history.length === 0 ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-orange-600/20 hover:bg-orange-600/35 text-orange-400 border border-orange-500/30'}`}
                 title="Deshacer"
               >
-                <Undo2 size={18} /> <span className="hidden md:inline">Deshacer</span>
+                <Undo2 size={16} /> <span className="hidden sm:inline">Deshacer</span>
               </button>
               
               <button 
                 onClick={() => loadImage(selectedDrawing.src)}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-600 p-3 md:px-6 md:py-3 rounded-full font-black text-sm flex items-center gap-2 transition-colors uppercase"
+                className="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 md:px-5 md:py-2.5 border border-slate-700 rounded-full font-black text-xs flex items-center gap-1.5 transition-colors uppercase"
               >
-                <Trash2 size={18} /> <span className="hidden md:inline">Limpiar</span>
+                <Trash2 size={16} /> <span className="hidden sm:inline">Limpiar</span>
               </button>
               
               <button 
                 onClick={handleDownload}
-                className="bg-primary hover:bg-secondary hover:text-primary text-white p-3 md:px-6 md:py-3 rounded-full font-black text-sm flex items-center gap-2 shadow-lg hover:shadow-xl transition-all uppercase"
+                className="bg-pink-600 hover:bg-pink-500 text-white p-2.5 md:px-5 md:py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 shadow-[0_0_20px_rgba(236,72,153,0.3)] transition-all uppercase tracking-wider"
               >
-                <Download size={18} /> <span className="hidden md:inline">Guardar</span>
+                <Download size={16} /> <span className="hidden sm:inline">Guardar</span>
               </button>
            </div>
         </div>
 
         {/* Canvas Container */}
-        <div className="flex-1 overflow-auto bg-gray-100 flex items-center justify-center p-4 relative cursor-crosshair">
+        <div className="flex-1 bg-slate-950 flex items-center justify-center p-2 sm:p-4 relative overflow-hidden">
            <canvas 
              ref={canvasRef}
              width={800}
              height={800}
-             onClick={floodFill}
-             className="max-w-full h-auto max-h-full object-contain bg-white shadow-2xl rounded-2xl touch-none"
+             onPointerDown={floodFill}
+             className="max-w-full max-h-full aspect-square object-contain bg-white shadow-[0_0_60px_rgba(255,255,255,0.06)] rounded-2xl touch-none"
              style={{ cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="${selectedColor.replace('#', '%23')}" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><path d="m5 2 5 5"/></svg>') 0 24, crosshair` }}
            />
            {isProcessing && (
-             <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-20">
-               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-accent"></div>
+             <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-20">
+               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
              </div>
            )}
         </div>
 
         {/* Bottom Palette */}
-        <div className="h-28 md:h-32 bg-white shadow-[0_-10px_30px_rgba(0,0,0,0.05)] border-t border-gray-100 flex items-center justify-start overflow-x-auto px-6 py-4 hide-scrollbar z-10">
-          <div className="flex items-center gap-3 md:gap-4 mx-auto min-w-max">
+        <div className="h-20 md:h-24 bg-slate-900 border-t border-slate-800 flex items-center justify-start overflow-x-auto px-4 py-2 hide-scrollbar z-10">
+          <div className="flex items-center gap-2 sm:gap-3 mx-auto min-w-max">
             {COLORS.map((color) => (
               <motion.button
                 key={color}
-                whileHover={{ scale: 1.1, y: -5 }}
+                whileHover={{ scale: 1.15, y: -4 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setSelectedColor(color)}
-                className={`w-14 h-14 md:w-16 md:h-16 rounded-full shadow-md border-4 transition-all ${selectedColor === color ? 'border-primary scale-110 shadow-lg' : 'border-white'}`}
+                className={`w-10 h-10 md:w-12 md:h-12 rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.3)] border-4 transition-all ${selectedColor === color ? 'border-pink-500 scale-110 shadow-[0_0_15px_rgba(236,72,153,0.5)]' : 'border-slate-800 hover:border-slate-400'}`}
                 style={{ backgroundColor: color }}
               />
             ))}
@@ -339,6 +348,41 @@ const ColoringGame = () => {
         </div>
 
       </div>
+
+      {/* Mobile Drawings Drawer */}
+      {isDrawingDrawerOpen && (
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-end justify-center md:hidden" onClick={() => setIsDrawingDrawerOpen(false)}>
+          <motion.div 
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-slate-900 border-t border-slate-800 rounded-t-3xl w-full max-h-[75vh] overflow-y-auto p-5 shadow-2xl flex flex-col"
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+              <span className="font-black text-slate-200 text-sm uppercase tracking-widest">Elige un dibujo mágico</span>
+              <button onClick={() => setIsDrawingDrawerOpen(false)} className="text-slate-400 hover:text-slate-200 font-bold text-base bg-slate-800 rounded-full w-8 h-8 flex items-center justify-center">✕</button>
+            </div>
+            <div className="grid grid-cols-2 gap-3 pb-6">
+              {DRAWINGS.map(drawing => (
+                <button
+                  key={drawing.id}
+                  onClick={() => {
+                    setSelectedDrawing(drawing);
+                    setIsDrawingDrawerOpen(false);
+                  }}
+                  className={`relative rounded-xl overflow-hidden aspect-video border-4 transition-all ${selectedDrawing.id === drawing.id ? 'border-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'border-slate-800'}`}
+                >
+                  <img src={drawing.src} alt={drawing.name} className="w-full h-full object-cover bg-white" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent flex items-end p-2">
+                     <span className="text-white font-black text-[10px] uppercase tracking-wider">{drawing.name}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       <style>{`
         .hide-scrollbar::-webkit-scrollbar { display: none; }
