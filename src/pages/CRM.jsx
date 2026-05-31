@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, ShoppingBag, MessageSquare, Plus, Trash2, Edit2, LogOut, CheckCircle, 
   Clock, ArrowRight, UserCheck, Shield, Sparkles, Phone, Mail, Key, 
-  FileText, Search, Package, AlertCircle
+  FileText, Search, Package, AlertCircle, Calendar, MapPin, CreditCard, TrendingUp, Tag
 } from 'lucide-react';
 import useSEO from '../hooks/useSEO';
 
 // --- Preset Categories for Products ---
 const CATEGORIES = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos'];
 
-// --- Preset Image Options to Select From (since upload is frontend-only) ---
+// --- Preset Image Options to Select From ---
 const IMAGE_PRESETS = [
   { name: 'Mercancía General', url: '/assets/banners/mercha.webp' },
   { name: 'Libros y Cuadernos', url: '/assets/banners/books.webp' },
@@ -35,11 +35,13 @@ const CRM = () => {
   const [clients, setClients] = useState([]);
   const [customProducts, setCustomProducts] = useState([]);
   const [inquiries, setInquiries] = useState([]);
+  const [sales, setSales] = useState([]);
+  const [stockOverrides, setStockOverrides] = useState({});
   const [sellerPassword, setSellerPassword] = useState('bumsyking');
   
   // UI Tabs
-  const [buyerTab, setBuyerTab] = useState('catalog'); // catalog, my_inquiries, my_profile
-  const [sellerTab, setSellerTab] = useState('summary'); // summary, clients, products, inquiries, settings
+  const [buyerTab, setBuyerTab] = useState('catalog'); // catalog, my_profile, my_purchases, my_inquiries
+  const [sellerTab, setSellerTab] = useState('summary'); // summary, sales, clients, products, inquiries, settings
 
   // Form states - Auth
   const [loginEmail, setLoginEmail] = useState('');
@@ -57,10 +59,24 @@ const CRM = () => {
   const [prodCategory, setProdCategory] = useState('Peluches');
   const [prodDescription, setProdDescription] = useState('');
   const [prodImageUrl, setProdImageUrl] = useState(IMAGE_PRESETS[0].url);
+  const [prodStock, setProdStock] = useState('25');
   const [editingProduct, setEditingProduct] = useState(null);
+
+  // Form states - Buyer Profile Update
+  const [profileName, setProfileName] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [profileAddress, setProfileAddress] = useState('');
+  const [profileBirthday, setProfileBirthday] = useState('');
+
+  // Checkout Modal states
+  const [activeCheckoutProduct, setActiveCheckoutProduct] = useState(null);
+  const [checkoutAddress, setCheckoutAddress] = useState('');
+  const [checkoutBirthday, setCheckoutBirthday] = useState('');
+  const [checkoutPhone, setCheckoutPhone] = useState('');
 
   // Filter/Search States
   const [clientSearch, setClientSearch] = useState('');
+  const [salesSearch, setSalesSearch] = useState('');
   const [catalogSearch, setCatalogSearch] = useState('');
   const [activeCatalogCategory, setActiveCatalogCategory] = useState('Todos');
 
@@ -69,7 +85,7 @@ const CRM = () => {
 
   // --- Database Initialization ---
   useEffect(() => {
-    // Clients
+    // Clients (with shipping address and birthdays)
     const savedClients = localStorage.getItem('bumsy_crm_clients');
     if (savedClients) {
       setClients(JSON.parse(savedClients));
@@ -83,7 +99,9 @@ const CRM = () => {
           password: 'buyer123', 
           interest: 'Peluches', 
           registeredAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          notes: 'Cliente premium sumamente interesado en el Peluche Bumsy Fox XXL.'
+          notes: 'Cliente premium sumamente interesado en el Peluche Bumsy Fox XXL.',
+          address: 'Av. Reforma 123, Colonia Centro, Ciudad de México',
+          birthday: '1995-04-12'
         },
         { 
           id: 2, 
@@ -93,14 +111,16 @@ const CRM = () => {
           password: 'buyer123', 
           interest: 'Libros', 
           registeredAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          notes: 'Prefiere libros de colorear interactivos para sus hijos.'
+          notes: 'Prefiere libros de colorear interactivos para sus hijos.',
+          address: 'Calle 50 #456, Monterrey, Nuevo León',
+          birthday: '1998-08-24'
         }
       ];
       localStorage.setItem('bumsy_crm_clients', JSON.stringify(defaultClients));
       setClients(defaultClients);
     }
 
-    // Custom Products
+    // Custom Products (with initial stock)
     const savedProducts = localStorage.getItem('bumsy_crm_products');
     if (savedProducts) {
       setCustomProducts(JSON.parse(savedProducts));
@@ -114,11 +134,27 @@ const CRM = () => {
           description: 'Taza de cerámica premium que cambia de color al verter líquidos calientes.', 
           image: '/assets/banners/mercha.webp',
           status: 'Activo',
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          stock: 45
         }
       ];
       localStorage.setItem('bumsy_crm_products', JSON.stringify(defaultProducts));
       setCustomProducts(defaultProducts);
+    }
+
+    // Stock overrides to manage static products' inventory
+    const savedOverrides = localStorage.getItem('bumsy_crm_stock_overrides');
+    if (savedOverrides) {
+      setStockOverrides(JSON.parse(savedOverrides));
+    } else {
+      const defaultOverrides = {
+        'static_1': 15,
+        'static_2': 8,
+        'static_3': 20,
+        'static_4': 12,
+      };
+      localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(defaultOverrides));
+      setStockOverrides(defaultOverrides);
     }
 
     // Inquiries
@@ -141,12 +177,52 @@ const CRM = () => {
       setInquiries(defaultInquiries);
     }
 
+    // Sales (Simulated purchase history)
+    const savedSales = localStorage.getItem('bumsy_crm_sales');
+    if (savedSales) {
+      setSales(JSON.parse(savedSales));
+    } else {
+      const defaultSales = [
+        {
+          id: 'sale_1',
+          buyerEmail: 'juan@perez.com',
+          buyerName: 'Juan Pérez',
+          productName: 'Peluche Bumsy Fox (XXL)',
+          price: 29.99,
+          address: 'Av. Reforma 123, Colonia Centro, Ciudad de México',
+          birthday: '1995-04-12',
+          date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+        }
+      ];
+      localStorage.setItem('bumsy_crm_sales', JSON.stringify(defaultSales));
+      setSales(defaultSales);
+    }
+
     // Seller Settings
     const savedPass = localStorage.getItem('bumsy_crm_seller_password');
     if (savedPass) {
       setSellerPassword(savedPass);
     }
   }, []);
+
+  // Sync profile form when tab changes
+  useEffect(() => {
+    if (currentUser) {
+      setProfileName(currentUser.name || '');
+      setProfilePhone(currentUser.phone || '');
+      setProfileAddress(currentUser.address || '');
+      setProfileBirthday(currentUser.birthday || '');
+    }
+  }, [buyerTab, currentUser]);
+
+  // Sync checkout modal fields when checkout product changes
+  useEffect(() => {
+    if (activeCheckoutProduct && currentUser) {
+      setCheckoutAddress(currentUser.address || '');
+      setCheckoutBirthday(currentUser.birthday || '');
+      setCheckoutPhone(currentUser.phone || '');
+    }
+  }, [activeCheckoutProduct, currentUser]);
 
   // Show a disappearing auto-dismiss banner
   const triggerNotification = (text, type = 'success') => {
@@ -176,7 +252,9 @@ const CRM = () => {
       password: regPassword,
       interest: regInterest,
       registeredAt: new Date().toISOString(),
-      notes: ''
+      notes: '',
+      address: '',
+      birthday: ''
     };
 
     const updatedClients = [...clients, newClient];
@@ -247,6 +325,91 @@ const CRM = () => {
     triggerNotification('¡Consulta enviada! El vendedor responderá muy pronto.');
   };
 
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    if (!currentUser) return;
+
+    const updatedUser = {
+      ...currentUser,
+      name: profileName,
+      phone: profilePhone,
+      address: profileAddress,
+      birthday: profileBirthday
+    };
+
+    const updatedClients = clients.map(c => c.id === currentUser.id ? updatedUser : c);
+    setClients(updatedClients);
+    localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
+    setCurrentUser(updatedUser);
+
+    triggerNotification('¡Perfil actualizado con éxito! Tus datos se auto-completarán en tu próxima compra.');
+  };
+
+  const handleConfirmPurchase = (e) => {
+    e.preventDefault();
+    if (!currentUser || !activeCheckoutProduct) return;
+
+    const stockVal = getProductStock(activeCheckoutProduct);
+    if (stockVal <= 0) {
+      triggerNotification('Lo sentimos, este producto está agotado.', 'error');
+      return;
+    }
+
+    // Deduct stock in override state & localStorage
+    const newStock = stockVal - 1;
+    const updatedOverrides = {
+      ...stockOverrides,
+      [activeCheckoutProduct.id]: newStock
+    };
+    setStockOverrides(updatedOverrides);
+    localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(updatedOverrides));
+
+    // Also deduct stock in customProducts if it's dynamic
+    if (activeCheckoutProduct.id.toString().startsWith('custom_')) {
+      const updatedCustoms = customProducts.map(p => {
+        if (p.id === activeCheckoutProduct.id) {
+          return { ...p, stock: newStock };
+        }
+        return p;
+      });
+      setCustomProducts(updatedCustoms);
+      localStorage.setItem('bumsy_crm_products', JSON.stringify(updatedCustoms));
+    }
+
+    // Create new global sales record
+    const newSale = {
+      id: `sale_${Date.now()}`,
+      buyerEmail: currentUser.email,
+      buyerName: currentUser.name,
+      productName: activeCheckoutProduct.name,
+      price: activeCheckoutProduct.price,
+      address: checkoutAddress,
+      birthday: checkoutBirthday,
+      date: new Date().toISOString()
+    };
+
+    const updatedSales = [newSale, ...sales];
+    setSales(updatedSales);
+    localStorage.setItem('bumsy_crm_sales', JSON.stringify(updatedSales));
+
+    // Save profile details to user session
+    const updatedUser = {
+      ...currentUser,
+      phone: checkoutPhone,
+      address: checkoutAddress,
+      birthday: checkoutBirthday
+    };
+    setCurrentUser(updatedUser);
+
+    const updatedClients = clients.map(c => c.id === currentUser.id ? updatedUser : c);
+    setClients(updatedClients);
+    localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
+
+    triggerNotification(`¡Compra de "${activeCheckoutProduct.name}" simulada con éxito!`);
+    setActiveCheckoutProduct(null);
+    setBuyerTab('my_purchases'); // direct to purchases history
+  };
+
   // --- Seller Dashboard Handlers ---
   const handleSaveNotes = (clientId, notes) => {
     const updatedClients = clients.map(c => {
@@ -267,6 +430,8 @@ const CRM = () => {
       return;
     }
 
+    const stockParsed = parseInt(prodStock) || 0;
+
     if (editingProduct) {
       // Edit mode
       const updated = customProducts.map(p => {
@@ -277,31 +442,53 @@ const CRM = () => {
             price: parseFloat(prodPrice),
             category: prodCategory,
             description: prodDescription,
-            image: prodImageUrl
+            image: prodImageUrl,
+            stock: stockParsed
           };
         }
         return p;
       });
       setCustomProducts(updated);
       localStorage.setItem('bumsy_crm_products', JSON.stringify(updated));
-      triggerNotification('Producto actualizado correctamente en el catálogo.');
+
+      // Update override
+      const updatedOverrides = {
+        ...stockOverrides,
+        [editingProduct.id]: stockParsed
+      };
+      setStockOverrides(updatedOverrides);
+      localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(updatedOverrides));
+
+      triggerNotification('Producto y stock actualizados correctamente en el catálogo.');
       setEditingProduct(null);
     } else {
       // Create mode
+      const newId = `custom_${Date.now()}`;
       const newProduct = {
-        id: `custom_${Date.now()}`,
+        id: newId,
         name: prodName,
         price: parseFloat(prodPrice),
         category: prodCategory,
         description: prodDescription,
         image: prodImageUrl,
         status: 'Activo',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        stock: stockParsed
       };
+
       const updated = [...customProducts, newProduct];
       setCustomProducts(updated);
       localStorage.setItem('bumsy_crm_products', JSON.stringify(updated));
-      triggerNotification('¡Nuevo producto subido con éxito al catálogo!');
+
+      // Register override
+      const updatedOverrides = {
+        ...stockOverrides,
+        [newId]: stockParsed
+      };
+      setStockOverrides(updatedOverrides);
+      localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(updatedOverrides));
+
+      triggerNotification('¡Nuevo producto subido con éxito con stock inicial!');
     }
 
     // Reset Form
@@ -310,6 +497,7 @@ const CRM = () => {
     setProdCategory('Peluches');
     setProdDescription('');
     setProdImageUrl(IMAGE_PRESETS[0].url);
+    setProdStock('25');
   };
 
   const handleEditProductClick = (product) => {
@@ -319,6 +507,7 @@ const CRM = () => {
     setProdCategory(product.category);
     setProdDescription(product.description || '');
     setProdImageUrl(product.image);
+    setProdStock(product.stock !== undefined ? product.stock.toString() : '25');
     setSellerTab('products'); // Switch tab to see form
   };
 
@@ -369,6 +558,14 @@ const CRM = () => {
     ...customProducts
   ];
 
+  // Helper to extract stock level for any product dynamically
+  const getProductStock = (p) => {
+    if (p.id in stockOverrides) {
+      return stockOverrides[p.id];
+    }
+    return p.stock !== undefined ? p.stock : 25;
+  };
+
   // Filtering products for buyer viewer
   const filteredCatalog = allProductsList.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(catalogSearch.toLowerCase()) || 
@@ -376,6 +573,10 @@ const CRM = () => {
     const matchesCategory = activeCatalogCategory === 'Todos' || p.category === activeCatalogCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Stats calculation for Admin
+  const totalSalesRevenue = sales.reduce((sum, item) => sum + item.price, 0).toFixed(2);
+  const totalUnitsSold = sales.length;
 
   return (
     <div className="pt-24 min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none relative overflow-hidden">
@@ -474,7 +675,7 @@ const CRM = () => {
         {portal === 'buyer_login' && (
           <div className="max-w-md w-full mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-md">
             <h2 className="text-2xl font-black uppercase mb-2 text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>Ingreso Comprador</h2>
-            <p className="text-slate-400 text-xs font-semibold text-center mb-6">Explora y realiza consultas en la tienda</p>
+            <p className="text-slate-400 text-xs font-semibold text-center mb-6">Explora y realiza compras en la tienda</p>
             
             <form onSubmit={handleBuyerLogin} className="flex flex-col gap-4">
               <div>
@@ -521,7 +722,7 @@ const CRM = () => {
         {portal === 'buyer_register' && (
           <div className="max-w-md w-full mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-md">
             <h2 className="text-2xl font-black uppercase mb-2 text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>Registro de Comprador</h2>
-            <p className="text-slate-400 text-xs font-semibold text-center mb-6">Crea tu cuenta para guardar tus consultas</p>
+            <p className="text-slate-400 text-xs font-semibold text-center mb-6">Crea tu cuenta para guardar tus datos y compras</p>
             
             <form onSubmit={handleBuyerRegister} className="flex flex-col gap-4">
               <div>
@@ -666,24 +867,36 @@ const CRM = () => {
                   <h3 className="font-black text-lg uppercase tracking-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>
                     ¡Hola, {currentUser.name}!
                   </h3>
-                  <span className="text-xs text-slate-400 font-semibold flex items-center gap-1.5 mt-0.5">
+                  <span className="text-xs text-slate-400 font-semibold flex items-center gap-1.5 mt-0.5 text-left">
                     <UserCheck size={12} className="text-pink-400" /> Comprador Registrado · {currentUser.email}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center flex-wrap gap-2.5">
                 <button 
                   onClick={() => setBuyerTab('catalog')} 
                   className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'catalog' ? 'bg-pink-600 text-white shadow-lg' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800'}`}
                 >
-                  Ver Catálogo
+                  Catálogo
+                </button>
+                <button 
+                  onClick={() => setBuyerTab('my_profile')} 
+                  className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'my_profile' ? 'bg-pink-600 text-white shadow-lg' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800'}`}
+                >
+                  Mi Perfil
+                </button>
+                <button 
+                  onClick={() => setBuyerTab('my_purchases')} 
+                  className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'my_purchases' ? 'bg-pink-600 text-white shadow-lg' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800'}`}
+                >
+                  Mis Compras ({sales.filter(s => s.buyerEmail === currentUser.email).length})
                 </button>
                 <button 
                   onClick={() => setBuyerTab('my_inquiries')} 
                   className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'my_inquiries' ? 'bg-pink-600 text-white shadow-lg' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800'}`}
                 >
-                  Mis Consultas ({inquiries.filter(i => i.buyerEmail === currentUser.email).length})
+                  Consultas ({inquiries.filter(i => i.buyerEmail === currentUser.email).length})
                 </button>
                 <button onClick={handleLogout} className="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-full transition-colors" title="Cerrar Sesión">
                   <LogOut size={16} />
@@ -702,7 +915,7 @@ const CRM = () => {
                       <button
                         key={cat}
                         onClick={() => setActiveCatalogCategory(cat)}
-                        className={`px-4 py-2 rounded-full text-xs font-bold uppercase transition-all ${activeCatalogCategory === cat ? 'bg-slate-100 text-slate-950 font-black' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'}`}
+                        className={`px-4 py-2 rounded-full text-xs font-bold uppercase transition-all whitespace-nowrap ${activeCatalogCategory === cat ? 'bg-slate-100 text-slate-950 font-black' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'}`}
                       >
                         {cat}
                       </button>
@@ -729,30 +942,190 @@ const CRM = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredCatalog.map(p => (
-                      <div key={p.id} className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col group hover:border-pink-500/30 transition-all duration-300">
-                        <div className="aspect-video w-full rounded-2xl overflow-hidden bg-slate-950 mb-4 border border-slate-850 relative">
-                          <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                          <span className="absolute top-3 right-3 bg-pink-600/90 text-white font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider">
-                            {p.category}
-                          </span>
+                    {filteredCatalog.map(p => {
+                      const stockLevel = getProductStock(p);
+                      const isOutOfStock = stockLevel <= 0;
+
+                      return (
+                        <div key={p.id} className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col group hover:border-pink-500/30 transition-all duration-300 relative overflow-hidden">
+                          <div className="aspect-video w-full rounded-2xl overflow-hidden bg-slate-950 mb-4 border border-slate-850 relative">
+                            <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            
+                            {/* Stock status badge */}
+                            <span className={`absolute top-3 left-3 font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider ${
+                              isOutOfStock 
+                                ? 'bg-red-500/90 text-white shadow-md' 
+                                : stockLevel <= 5 
+                                  ? 'bg-amber-500/90 text-slate-950 shadow-md' 
+                                  : 'bg-slate-900/80 text-slate-300'
+                            }`}>
+                              {isOutOfStock ? 'Agotado' : `Stock: ${stockLevel} u.`}
+                            </span>
+
+                            <span className="absolute top-3 right-3 bg-pink-600/90 text-white font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider">
+                              {p.category}
+                            </span>
+                          </div>
+                          <h4 className="font-black text-lg text-slate-200 mb-1 leading-tight group-hover:text-pink-400 transition-colors uppercase text-left" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                            {p.name}
+                          </h4>
+                          <p className="text-slate-400 text-xs font-semibold mb-4 flex-1 line-clamp-2 text-left">
+                            {p.description || 'Sin descripción adicional disponible.'}
+                          </p>
+                          <div className="flex items-center justify-between border-t border-slate-850 pt-4 mt-auto">
+                            <span className="text-pink-500 font-black text-2xl" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              ${p.price} <span className="text-xs text-slate-500 font-bold font-sans">USD</span>
+                            </span>
+                            
+                            <div className="flex items-center gap-1.5">
+                              <button 
+                                onClick={() => handleInquirySubmit(p)}
+                                className="bg-slate-800 hover:bg-slate-755 border border-slate-700 text-slate-300 font-black text-[10px] uppercase tracking-wider px-3 py-2 rounded-full transition-all flex items-center gap-1"
+                                title="Enviar consulta de preventa"
+                              >
+                                <MessageSquare size={12} />
+                              </button>
+                              <button 
+                                onClick={() => {
+                                  if (isOutOfStock) {
+                                    triggerNotification('Producto agotado.', 'error');
+                                    return;
+                                  }
+                                  setActiveCheckoutProduct(p);
+                                }}
+                                disabled={isOutOfStock}
+                                className={`font-black text-[10px] uppercase tracking-wider px-4 py-2 rounded-full transition-all flex items-center gap-1 shadow-lg ${
+                                  isOutOfStock 
+                                    ? 'bg-slate-800 text-slate-600 border border-slate-850 cursor-not-allowed' 
+                                    : 'bg-pink-600 hover:bg-pink-500 text-white'
+                                }`}
+                              >
+                                <ShoppingBag size={12} /> Comprar
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                        <h4 className="font-black text-lg text-slate-200 mb-1 leading-tight group-hover:text-pink-400 transition-colors uppercase" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                          {p.name}
-                        </h4>
-                        <p className="text-slate-400 text-xs font-semibold mb-4 flex-1 line-clamp-2">
-                          {p.description || 'Sin descripción adicional disponible.'}
-                        </p>
-                        <div className="flex items-center justify-between border-t border-slate-850 pt-4 mt-auto">
-                          <span className="text-pink-500 font-black text-2xl" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                            ${p.price} <span className="text-xs text-slate-500 font-bold font-sans">USD</span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB: MY PROFILE (birthday, shipping address, details) */}
+            {buyerTab === 'my_profile' && (
+              <div className="max-w-2xl w-full mx-auto bg-slate-900/30 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-md">
+                <div className="flex items-center gap-2.5 mb-6 border-b border-slate-800 pb-4">
+                  <UserCheck className="text-pink-400" size={24} />
+                  <h3 className="text-xl font-black uppercase text-left" style={{ fontFamily: "'Poppins', sans-serif" }}>Configuración de mi Perfil</h3>
+                </div>
+
+                <form onSubmit={handleSaveProfile} className="flex flex-col gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nombre Completo</label>
+                      <input 
+                        type="text" 
+                        value={profileName}
+                        onChange={(e) => setProfileName(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-semibold"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Teléfono Móvil</label>
+                      <input 
+                        type="tel" 
+                        value={profilePhone}
+                        onChange={(e) => setProfilePhone(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-mono"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Correo Electrónico (No editable)</label>
+                      <input 
+                        type="email" 
+                        value={currentUser.email}
+                        disabled
+                        className="w-full bg-slate-950/50 border border-slate-850 rounded-xl px-4 py-3 text-xs text-slate-500 cursor-not-allowed font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Fecha de Cumpleaños</label>
+                      <div className="relative">
+                        <Calendar size={14} className="absolute left-4 top-3.5 text-slate-500" />
+                        <input 
+                          type="date" 
+                          value={profileBirthday}
+                          onChange={(e) => setProfileBirthday(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl pl-11 pr-4 py-3 text-xs focus:outline-none text-slate-300 font-mono"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Dirección de Envío Completa</label>
+                    <div className="relative">
+                      <MapPin size={14} className="absolute left-4 top-3.5 text-slate-500" />
+                      <input 
+                        type="text" 
+                        value={profileAddress}
+                        onChange={(e) => setProfileAddress(e.target.value)}
+                        placeholder="Calle, Número, Colonia, Ciudad, Estado, Código Postal"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl pl-11 pr-4 py-3 text-xs focus:outline-none text-slate-200 font-semibold"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Informational Offer Tracking Notice */}
+                  <div className="bg-pink-500/5 border border-pink-500/10 rounded-2xl p-4 flex gap-3 text-left">
+                    <Sparkles className="text-pink-400 shrink-0" size={18} />
+                    <p className="text-[11px] text-pink-300 leading-relaxed font-semibold">
+                      ¡Al guardar tus datos, estos se autocompletarán de forma segura en todas tus compras futuras para agilizar el proceso! Además, te enviaremos regalos y ofertas sorpresas en tu mes de cumpleaños.
+                    </p>
+                  </div>
+
+                  <button type="submit" className="bg-pink-600 hover:bg-pink-500 text-white font-black text-xs py-4 rounded-xl shadow-lg uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
+                    <UserCheck size={14} /> Guardar Perfil Seguro
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* TAB: MY PURCHASES (simulated history) */}
+            {buyerTab === 'my_purchases' && (
+              <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-6 backdrop-blur-md text-left">
+                <h3 className="text-xl font-black uppercase mb-6 flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <ShoppingBag size={20} className="text-pink-400" /> Mi Historial de Compras
+                </h3>
+                
+                {sales.filter(s => s.buyerEmail === currentUser.email).length === 0 ? (
+                  <div className="py-12 text-center text-slate-500 font-semibold flex flex-col items-center justify-center">
+                    <ShoppingBag size={40} className="mb-3 text-slate-750" />
+                    Aún no tienes compras simuladas registradas.
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {sales.filter(s => s.buyerEmail === currentUser.email).map(order => (
+                      <div key={order.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[9px] font-mono text-pink-400 font-black uppercase">Pedido: #{order.id.toUpperCase()}</span>
+                          <h4 className="font-black text-base text-slate-200 uppercase" style={{ fontFamily: "'Poppins', sans-serif" }}>{order.productName}</h4>
+                          <span className="text-xs text-slate-400 font-semibold flex items-center gap-1"><MapPin size={12} className="text-slate-550" /> Enviado a: {order.address}</span>
+                          <span className="text-[10px] text-slate-500 font-mono mt-1">{new Date(order.date).toLocaleString()}</span>
+                        </div>
+                        <div className="flex flex-col md:items-end gap-2 shrink-0">
+                          <span className="font-mono text-pink-500 font-black text-xl">${order.price.toFixed(2)} USD</span>
+                          <span className="text-[9px] font-black uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full flex items-center gap-1">
+                            <CheckCircle size={10} /> Procesado & Enviado
                           </span>
-                          <button 
-                            onClick={() => handleInquirySubmit(p)}
-                            className="bg-slate-800 hover:bg-pink-600 hover:text-white border border-slate-700 hover:border-pink-500 text-pink-400 font-black text-[10px] uppercase tracking-wider px-4 py-2 rounded-full transition-all flex items-center gap-1.5"
-                          >
-                            <MessageSquare size={12} /> Consultar
-                          </button>
                         </div>
                       </div>
                     ))}
@@ -763,7 +1136,7 @@ const CRM = () => {
 
             {/* TAB: MY INQUIRIES */}
             {buyerTab === 'my_inquiries' && (
-              <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-6 backdrop-blur-md">
+              <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-6 backdrop-blur-md text-left">
                 <h3 className="text-xl font-black uppercase mb-6 flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   <FileText size={20} className="text-pink-400" /> Historial de Consultas
                 </h3>
@@ -819,7 +1192,7 @@ const CRM = () => {
             {/* Sidebar Navigation */}
             <div className="w-full lg:w-64 bg-slate-900/40 border border-slate-800 rounded-3xl p-6 h-fit backdrop-blur-md flex flex-col gap-6">
               
-              <div className="flex items-center gap-3 border-b border-slate-800 pb-5">
+              <div className="flex items-center gap-3 border-b border-slate-800 pb-5 text-left">
                 <span className="p-2 rounded-xl bg-indigo-500/20 border border-indigo-500/35 text-indigo-400">
                   <Shield size={20} />
                 </span>
@@ -832,8 +1205,9 @@ const CRM = () => {
               <div className="flex flex-col gap-1.5">
                 {[
                   { id: 'summary', name: 'Resumen', icon: Sparkles },
+                  { id: 'sales', name: 'Ventas / Pedidos', icon: CreditCard },
                   { id: 'clients', name: 'Clientes CRM', icon: Users },
-                  { id: 'products', name: 'Subir Productos', icon: Plus },
+                  { id: 'products', name: 'Subir/Stock', icon: Plus },
                   { id: 'inquiries', name: 'Bandeja Leads', icon: MessageSquare },
                   { id: 'settings', name: 'Seguridad', icon: Key }
                 ].map(tab => {
@@ -870,68 +1244,186 @@ const CRM = () => {
                 <div className="flex flex-col gap-6">
                   
                   {/* Grid Stat Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 flex items-center justify-between backdrop-blur-md">
-                      <div>
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Clientes Totales</span>
-                        <span className="text-3xl font-black text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>{clients.length}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex items-center justify-between backdrop-blur-md">
+                      <div className="text-left">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Clientes CRM</span>
+                        <span className="text-2xl font-black text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>{clients.length}</span>
                       </div>
-                      <span className="p-3 bg-pink-500/10 text-pink-400 rounded-2xl"><Users size={24} /></span>
+                      <span className="p-2.5 bg-pink-500/10 text-pink-400 rounded-2xl"><Users size={20} /></span>
                     </div>
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 flex items-center justify-between backdrop-blur-md">
-                      <div>
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Productos Propios</span>
-                        <span className="text-3xl font-black text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>{customProducts.length}</span>
+
+                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex items-center justify-between backdrop-blur-md">
+                      <div className="text-left">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Total Ventas</span>
+                        <span className="text-2xl font-black text-slate-100 font-mono" style={{ fontFamily: "'Poppins', sans-serif" }}>${totalSalesRevenue}</span>
                       </div>
-                      <span className="p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl"><Plus size={24} /></span>
+                      <span className="p-2.5 bg-green-500/10 text-green-400 rounded-2xl"><TrendingUp size={20} /></span>
                     </div>
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 flex items-center justify-between backdrop-blur-md">
-                      <div>
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Leads / Consultas</span>
-                        <span className="text-3xl font-black text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                          {inquiries.filter(i => i.status === 'Pendiente').length}{' '}
-                          <span className="text-xs text-orange-400 font-black font-sans uppercase">Nuevas</span>
+
+                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex items-center justify-between backdrop-blur-md">
+                      <div className="text-left">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Artículos Vendidos</span>
+                        <span className="text-2xl font-black text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>{totalUnitsSold} u.</span>
+                      </div>
+                      <span className="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-2xl"><ShoppingBag size={20} /></span>
+                    </div>
+
+                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex items-center justify-between backdrop-blur-md">
+                      <div className="text-left">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Leads Pendientes</span>
+                        <span className="text-2xl font-black text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          {inquiries.filter(i => i.status === 'Pendiente').length}
                         </span>
                       </div>
-                      <span className="p-3 bg-orange-500/10 text-orange-400 rounded-2xl"><MessageSquare size={24} /></span>
+                      <span className="p-2.5 bg-orange-500/10 text-orange-400 rounded-2xl"><MessageSquare size={20} /></span>
                     </div>
                   </div>
 
-                  {/* Quick Leads Feed */}
-                  <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="font-black text-lg uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                        <Sparkles size={18} className="text-indigo-400" /> Actividad Reciente del CRM
-                      </h3>
-                      <button onClick={() => setSellerTab('inquiries')} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs uppercase tracking-wider">
-                        Ver todas
-                      </button>
-                    </div>
-
-                    {inquiries.length === 0 ? (
-                      <div className="py-12 text-center text-slate-600 font-semibold">
-                        Sin consultas ni leads de clientes registrados todavía.
+                  {/* Activity Feeds */}
+                  <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                    
+                    {/* Recent Sales log */}
+                    <div className="xl:col-span-7 bg-slate-900/30 border border-slate-800 rounded-3xl p-6">
+                      <div className="flex items-center justify-between mb-5">
+                        <h3 className="font-black text-base uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          <CreditCard size={18} className="text-green-400" /> Ventas Recientes
+                        </h3>
+                        <button onClick={() => setSellerTab('sales')} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs uppercase tracking-wider">
+                          Ver todas
+                        </button>
                       </div>
-                    ) : (
-                      <div className="flex flex-col gap-3">
-                        {inquiries.slice(0, 3).map(inq => (
-                          <div key={inq.id} className="bg-slate-950/60 border border-slate-850 rounded-2xl p-4 flex items-center justify-between gap-4">
-                            <div className="text-left">
-                              <span className="text-[10px] font-mono text-indigo-400 font-black uppercase">{inq.buyerName} · {inq.buyerEmail}</span>
-                              <h4 className="font-black text-sm text-slate-200 uppercase mt-0.5 leading-none">{inq.productName}</h4>
-                              <p className="text-slate-400 text-xs italic mt-1.5">"{inq.message}"</p>
+
+                      {sales.length === 0 ? (
+                        <div className="py-8 text-center text-slate-600 font-semibold text-xs">
+                          Sin transacciones registradas todavía.
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          {sales.slice(0, 3).map(sale => (
+                            <div key={sale.id} className="bg-slate-950/60 border border-slate-850 rounded-xl p-3 flex items-center justify-between gap-3 text-left">
+                              <div>
+                                <span className="text-[9px] font-mono text-slate-500 block uppercase">Pedido: #{sale.id.slice(5, 12)}</span>
+                                <h4 className="font-black text-xs text-slate-200 uppercase mt-0.5 leading-none">{sale.productName}</h4>
+                                <span className="text-[10px] text-slate-450 block mt-1 font-semibold">{sale.buyerName} ({sale.buyerEmail})</span>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <span className="font-mono text-green-400 font-bold text-sm block">${sale.price.toFixed(2)}</span>
+                                <span className="text-[8px] text-slate-500 block">{new Date(sale.date).toLocaleDateString()}</span>
+                              </div>
                             </div>
-                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
-                              inq.status === 'Pendiente' ? 'bg-orange-500/15 text-orange-400' : 'bg-green-500/15 text-green-400'
-                            }`}>
-                              {inq.status}
-                            </span>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Quick Inquiries Feed */}
+                    <div className="xl:col-span-5 bg-slate-900/30 border border-slate-800 rounded-3xl p-6">
+                      <div className="flex items-center justify-between mb-5">
+                        <h3 className="font-black text-base uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          <MessageSquare size={18} className="text-orange-400" /> Leads / Mensajes
+                        </h3>
+                        <button onClick={() => setSellerTab('inquiries')} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs uppercase tracking-wider">
+                          Ver todos
+                        </button>
                       </div>
-                    )}
+
+                      {inquiries.length === 0 ? (
+                        <div className="py-8 text-center text-slate-600 font-semibold text-xs">
+                          Sin consultas de clientes registradas.
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          {inquiries.slice(0, 2).map(inq => (
+                            <div key={inq.id} className="bg-slate-950/60 border border-slate-850 rounded-xl p-3 flex flex-col text-left gap-1.5">
+                              <div className="flex justify-between items-center">
+                                <span className="text-[9px] font-black text-indigo-400 uppercase">{inq.buyerName}</span>
+                                <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${inq.status === 'Pendiente' ? 'bg-orange-500/15 text-orange-400' : 'bg-green-500/15 text-green-400'}`}>
+                                  {inq.status}
+                                </span>
+                              </div>
+                              <h4 className="font-black text-xs text-slate-200 uppercase leading-none">{inq.productName}</h4>
+                              <p className="text-slate-400 text-[10px] italic">"{inq.message}"</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                   </div>
 
+                </div>
+              )}
+
+              {/* TAB: SALES MANAGEMENT (global transactions dashboard) */}
+              {sellerTab === 'sales' && (
+                <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-6 flex flex-col gap-6 backdrop-blur-md">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
+                    <h3 className="font-black text-xl uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      <CreditCard size={20} className="text-indigo-400" /> Registro de Ventas & Pedidos
+                    </h3>
+                    
+                    <div className="relative flex items-center bg-slate-955 border border-slate-855 rounded-full px-4 py-2 w-full sm:w-64">
+                      <Search size={14} className="text-slate-500 mr-2" />
+                      <input 
+                        type="text" 
+                        placeholder="Buscar por comprador o producto..."
+                        value={salesSearch}
+                        onChange={(e) => setSalesSearch(e.target.value)}
+                        className="bg-transparent text-xs w-full focus:outline-none text-slate-200 placeholder-slate-600 font-semibold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto w-full border border-slate-850 rounded-2xl">
+                    <table className="w-full text-left border-collapse min-w-[750px]">
+                      <thead>
+                        <tr className="bg-slate-950/70 border-b border-slate-850 text-slate-400 font-black text-[10px] uppercase tracking-wider">
+                          <th className="p-4">Pedido / ID</th>
+                          <th className="p-4">Comprador</th>
+                          <th className="p-4">Cumpleaños</th>
+                          <th className="p-4">Producto</th>
+                          <th className="p-4">Dirección de Envío</th>
+                          <th className="p-4">Monto</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sales.filter(s => 
+                          s.buyerName.toLowerCase().includes(salesSearch.toLowerCase()) || 
+                          s.productName.toLowerCase().includes(salesSearch.toLowerCase())
+                        ).map(sale => (
+                          <tr key={sale.id} className="border-b border-slate-850 hover:bg-slate-900/30 transition-colors">
+                            <td className="p-4 font-mono text-[10px] text-slate-500 font-bold">
+                              #{sale.id.toUpperCase()}
+                              <span className="block text-[8px] text-slate-600">{new Date(sale.date).toLocaleDateString()}</span>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex flex-col text-left">
+                                <span className="font-black text-slate-200 text-xs uppercase">{sale.buyerName}</span>
+                                <span className="text-[10px] text-slate-550 font-mono">{sale.buyerEmail}</span>
+                              </div>
+                            </td>
+                            <td className="p-4 text-[10px] font-mono font-bold text-pink-400">
+                              {sale.birthday ? (
+                                <span className="flex items-center gap-1">
+                                  <Calendar size={11} /> {sale.birthday}
+                                </span>
+                              ) : '--'}
+                            </td>
+                            <td className="p-4 font-black text-xs text-slate-300 uppercase">
+                              {sale.productName}
+                            </td>
+                            <td className="p-4 text-xs text-slate-450 font-semibold max-w-[200px] truncate" title={sale.address}>
+                              {sale.address}
+                            </td>
+                            <td className="p-4 font-mono font-black text-sm text-green-400">
+                              ${sale.price.toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
 
@@ -940,7 +1432,7 @@ const CRM = () => {
                 <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-6 flex flex-col gap-6 backdrop-blur-md">
                   <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
                     <h3 className="font-black text-xl uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                      <Users size={20} className="text-indigo-400" /> Registro de Clientes (CRM)
+                      <Users size={20} className="text-indigo-400" /> Directorio de Clientes (CRM)
                     </h3>
                     
                     <div className="relative flex items-center bg-slate-955 border border-slate-855 rounded-full px-4 py-2 w-full sm:w-64">
@@ -956,11 +1448,12 @@ const CRM = () => {
                   </div>
 
                   <div className="overflow-x-auto w-full border border-slate-850 rounded-2xl">
-                    <table className="w-full text-left border-collapse min-w-[600px]">
+                    <table className="w-full text-left border-collapse min-w-[850px]">
                       <thead>
                         <tr className="bg-slate-950/70 border-b border-slate-850 text-slate-400 font-black text-[10px] uppercase tracking-wider">
                           <th className="p-4">Cliente / Contacto</th>
-                          <th className="p-4">Interés</th>
+                          <th className="p-4">Cumpleaños</th>
+                          <th className="p-4">Dirección Guardada</th>
                           <th className="p-4">Fecha Registro</th>
                           <th className="p-4">Notas Internas CRM</th>
                         </tr>
@@ -975,10 +1468,23 @@ const CRM = () => {
                                 <span className="text-[10px] text-slate-500 font-mono font-bold flex items-center gap-1"><Phone size={10} /> {client.phone}</span>
                               </div>
                             </td>
-                            <td className="p-4">
-                              <span className="text-[9px] font-black uppercase tracking-wider bg-slate-950 border border-slate-850 text-pink-400 px-2.5 py-1 rounded-full">
-                                {client.interest}
-                              </span>
+                            <td className="p-4 text-[11px] font-mono font-bold text-pink-400 whitespace-nowrap">
+                              {client.birthday ? (
+                                <span className="flex items-center gap-1">
+                                  <Calendar size={12} /> {client.birthday}
+                                </span>
+                              ) : (
+                                <span className="text-slate-600">No provisto</span>
+                              )}
+                            </td>
+                            <td className="p-4 text-xs text-slate-450 font-semibold max-w-[200px] truncate" title={client.address || 'Sin dirección registrada'}>
+                              {client.address ? (
+                                <span className="flex items-center gap-1">
+                                  <MapPin size={12} className="text-slate-600 shrink-0" /> {client.address}
+                                </span>
+                              ) : (
+                                <span className="text-slate-600">Sin dirección</span>
+                              )}
                             </td>
                             <td className="p-4 text-[10px] text-slate-500 font-mono font-bold">
                               {new Date(client.registeredAt).toLocaleDateString()}
@@ -987,7 +1493,7 @@ const CRM = () => {
                               <div className="flex items-center gap-2">
                                 <textarea 
                                   defaultValue={client.notes}
-                                  placeholder="Escribe notas aquí... (ej. quiere gorras,VIP)"
+                                  placeholder="Notas comerciales... (ej. VIP, le gustan peluches)"
                                   onBlur={(e) => handleSaveNotes(client.id, e.target.value)}
                                   className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-indigo-500 rounded-lg p-2 text-xs focus:outline-none transition-colors text-slate-300 resize-none h-12 leading-tight"
                                 />
@@ -1013,7 +1519,7 @@ const CRM = () => {
 
                     <form onSubmit={handleProductSubmit} className="flex flex-col gap-4">
                       <div>
-                        <label className="text-xs font-black text-slate-400 uppercase block mb-1">Nombre del Producto</label>
+                        <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nombre del Producto</label>
                         <input 
                           type="text" 
                           placeholder="Peluche Bumsy Gold, Taza, etc."
@@ -1024,25 +1530,36 @@ const CRM = () => {
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-xs font-black text-slate-400 uppercase block mb-1">Precio (USD)</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="col-span-1">
+                          <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Precio ($)</label>
                           <input 
                             type="number" 
                             step="0.01"
                             placeholder="19.99"
                             value={prodPrice}
                             onChange={(e) => setProdPrice(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-855 focus:border-indigo-500 rounded-xl px-4 py-3 text-xs focus:outline-none transition-colors text-slate-200 font-mono font-bold"
+                            className="w-full bg-slate-950 border border-slate-855 focus:border-indigo-500 rounded-xl px-3 py-3 text-xs focus:outline-none transition-colors text-slate-200 font-mono font-bold"
                             required
                           />
                         </div>
-                        <div>
-                          <label className="text-xs font-black text-slate-400 uppercase block mb-1">Categoría</label>
+                        <div className="col-span-1">
+                          <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Stock Físico</label>
+                          <input 
+                            type="number" 
+                            placeholder="25"
+                            value={prodStock}
+                            onChange={(e) => setProdStock(e.target.value)}
+                            className="w-full bg-slate-950 border border-slate-855 focus:border-indigo-500 rounded-xl px-3 py-3 text-xs focus:outline-none transition-colors text-slate-200 font-mono font-bold"
+                            required
+                          />
+                        </div>
+                        <div className="col-span-1">
+                          <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Categoría</label>
                           <select 
                             value={prodCategory}
                             onChange={(e) => setProdCategory(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-855 focus:border-indigo-500 rounded-xl px-4 py-3 text-xs focus:outline-none transition-colors text-slate-300 font-semibold"
+                            className="w-full bg-slate-950 border border-slate-855 focus:border-indigo-500 rounded-xl px-3 py-3 text-xs focus:outline-none transition-colors text-slate-300 font-semibold"
                           >
                             {CATEGORIES.slice(1).map(cat => (
                               <option key={cat} value={cat}>{cat}</option>
@@ -1052,17 +1569,17 @@ const CRM = () => {
                       </div>
 
                       <div>
-                        <label className="text-xs font-black text-slate-400 uppercase block mb-1">Descripción Corta</label>
+                        <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Descripción Corta</label>
                         <textarea 
                           placeholder="Escribe los detalles mágicos de este producto oficial..."
                           value={prodDescription}
                           onChange={(e) => setProdDescription(e.target.value)}
-                          className="w-full bg-slate-955 border border-slate-855 focus:border-indigo-500 rounded-xl px-4 py-3 text-xs focus:outline-none transition-colors text-slate-300 resize-none h-20 leading-snug font-semibold"
+                          className="w-full bg-slate-955 border border-slate-855 focus:border-indigo-500 rounded-xl px-4 py-3 text-xs focus:outline-none transition-colors text-slate-300 resize-none h-20 leading-snug font-semibold text-left"
                         />
                       </div>
 
                       <div>
-                        <label className="text-xs font-black text-slate-400 uppercase block mb-2">Preset Gráfico Oficial (Pre-diseños)</label>
+                        <label className="text-xs font-black text-slate-400 uppercase block mb-2 text-left">Preset Gráfico Oficial (Pre-diseños)</label>
                         <div className="grid grid-cols-3 gap-2">
                           {IMAGE_PRESETS.map((p, idx) => (
                             <button
@@ -1094,6 +1611,7 @@ const CRM = () => {
                               setProdCategory('Peluches');
                               setProdDescription('');
                               setProdImageUrl(IMAGE_PRESETS[0].url);
+                              setProdStock('25');
                             }}
                             className="bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-slate-200 px-4 rounded-xl text-xs font-black uppercase transition-colors"
                           >
@@ -1122,39 +1640,52 @@ const CRM = () => {
                       </div>
                     ) : (
                       <div className="flex flex-col gap-4 max-h-[500px] overflow-y-auto pr-2 hide-scrollbar">
-                        {customProducts.map(p => (
-                          <div key={p.id} className="bg-slate-950/60 border border-slate-855 rounded-2xl p-4 flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
-                              <div className="w-16 h-10 rounded-lg overflow-hidden bg-slate-950 border border-slate-850 shrink-0">
-                                <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
-                              </div>
-                              <div className="text-left">
-                                <span className="text-[8px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase font-black tracking-wider">
-                                  {p.category}
-                                </span>
-                                <h4 className="font-black text-sm text-slate-200 uppercase mt-1">{p.name}</h4>
-                                <span className="font-mono text-indigo-400 font-bold text-xs">${p.price} USD</span>
-                              </div>
-                            </div>
+                        {customProducts.map(p => {
+                          const stockLevel = getProductStock(p);
 
-                            <div className="flex items-center gap-2">
-                              <button 
-                                onClick={() => handleEditProductClick(p)}
-                                className="bg-slate-900 border border-slate-800 text-indigo-400 hover:text-indigo-300 p-2.5 rounded-xl transition-colors"
-                                title="Editar"
-                              >
-                                <Edit2 size={12} />
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteProduct(p.id)}
-                                className="bg-slate-900 border border-slate-800 text-red-400 hover:text-red-300 p-2.5 rounded-xl transition-colors"
-                                title="Eliminar"
-                              >
-                                <Trash2 size={12} />
-                              </button>
+                          return (
+                            <div key={p.id} className="bg-slate-955/60 border border-slate-855 rounded-2xl p-4 flex items-center justify-between gap-4 text-left">
+                              <div className="flex items-center gap-4">
+                                <div className="w-16 h-10 rounded-lg overflow-hidden bg-slate-950 border border-slate-850 shrink-0">
+                                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[8px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase font-black tracking-wider">
+                                      {p.category}
+                                    </span>
+                                    <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${
+                                      stockLevel <= 0 
+                                        ? 'bg-red-500/10 text-red-400 border border-red-500/20' 
+                                        : 'bg-green-500/10 text-green-400 border border-green-500/20'
+                                    }`}>
+                                      Stock: {stockLevel}
+                                    </span>
+                                  </div>
+                                  <h4 className="font-black text-sm text-slate-200 uppercase mt-1 leading-tight">{p.name}</h4>
+                                  <span className="font-mono text-indigo-400 font-bold text-xs">${p.price} USD</span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button 
+                                  onClick={() => handleEditProductClick(p)}
+                                  className="bg-slate-900 border border-slate-800 text-indigo-400 hover:text-indigo-300 p-2.5 rounded-xl transition-colors"
+                                  title="Editar"
+                                >
+                                  <Edit2 size={12} />
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteProduct(p.id)}
+                                  className="bg-slate-900 border border-slate-800 text-red-400 hover:text-red-300 p-2.5 rounded-xl transition-colors"
+                                  title="Eliminar"
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -1223,16 +1754,16 @@ const CRM = () => {
 
                   <form onSubmit={handlePasswordChange} className="flex flex-col gap-4">
                     <div>
-                      <label className="text-xs font-black text-slate-400 uppercase block mb-1">Nombre de Usuario Administrador</label>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nombre de Usuario Administrador</label>
                       <input 
                         type="text" 
                         value="admin"
                         disabled
-                        className="w-full bg-slate-950/50 text-slate-550 border border-slate-855 rounded-xl px-4 py-3 text-xs cursor-not-allowed"
+                        className="w-full bg-slate-950/50 text-slate-555 border border-slate-855 rounded-xl px-4 py-3 text-xs cursor-not-allowed"
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-black text-slate-400 uppercase block mb-1">Nuevo PIN / Contraseña de Vendedor</label>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nuevo PIN / Contraseña de Vendedor</label>
                       <input 
                         type="password" 
                         name="newPass"
@@ -1254,6 +1785,131 @@ const CRM = () => {
         )}
 
       </div>
+
+      {/* ── SIMULATED QUICK CHECKOUT MODAL ─────────────────────────────────────── */}
+      <AnimatePresence>
+        {activeCheckoutProduct && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            >
+              {/* Modal Header */}
+              <div className="bg-slate-950/60 px-6 py-5 border-b border-slate-850 flex items-center justify-between text-left">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="text-pink-500" size={20} />
+                  <h3 className="font-black text-base uppercase tracking-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    Formulario de Compra Rápida
+                  </h3>
+                </div>
+                <button 
+                  onClick={() => setActiveCheckoutProduct(null)}
+                  className="text-slate-400 hover:text-white text-xs font-black uppercase tracking-wider bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-full"
+                >
+                  Cerrar
+                </button>
+              </div>
+
+              {/* Modal Body / Scrollable */}
+              <div className="p-6 overflow-y-auto flex flex-col gap-5">
+                
+                {/* Product details mini-card */}
+                <div className="bg-slate-950/40 border border-slate-850 rounded-2xl p-4 flex items-center gap-4 text-left">
+                  <div className="w-16 h-12 rounded-lg overflow-hidden bg-slate-950 border border-slate-850 shrink-0">
+                    <img src={activeCheckoutProduct.image} alt={activeCheckoutProduct.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm text-slate-200 uppercase leading-tight">{activeCheckoutProduct.name}</h4>
+                    <span className="font-mono text-pink-500 font-bold text-sm block mt-0.5">${activeCheckoutProduct.price} USD</span>
+                  </div>
+                </div>
+
+                {/* Pre-fill autofill notice banner */}
+                <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-3 flex gap-2.5 text-left">
+                  <Sparkles size={16} className="text-indigo-400 shrink-0 mt-0.5" />
+                  <p className="text-[10px] text-indigo-300 leading-tight font-semibold">
+                    ¡Autocompletado Activo! Hemos pre-cargado tus datos personales y dirección de envío desde tu perfil de usuario registrado.
+                  </p>
+                </div>
+
+                <form onSubmit={handleConfirmPurchase} className="flex flex-col gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nombre Completo</label>
+                      <input 
+                        type="text" 
+                        value={currentUser.name} 
+                        disabled
+                        className="w-full bg-slate-950/50 border border-slate-850 rounded-xl px-4 py-3 text-xs text-slate-500 cursor-not-allowed font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Teléfono de Contacto</label>
+                      <input 
+                        type="tel" 
+                        value={checkoutPhone} 
+                        onChange={(e) => setCheckoutPhone(e.target.value)}
+                        placeholder="+52 55 1234 5678"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-mono"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Email del Comprador</label>
+                      <input 
+                        type="email" 
+                        value={currentUser.email} 
+                        disabled
+                        className="w-full bg-slate-950/50 border border-slate-850 rounded-xl px-4 py-3 text-xs text-slate-500 cursor-not-allowed font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Fecha de Cumpleaños</label>
+                      <input 
+                        type="date" 
+                        value={checkoutBirthday} 
+                        onChange={(e) => setCheckoutBirthday(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-300 font-mono"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Dirección de Envío Completa</label>
+                    <input 
+                      type="text" 
+                      value={checkoutAddress} 
+                      onChange={(e) => setCheckoutAddress(e.target.value)}
+                      placeholder="Calle, Número, Colonia, Ciudad, Estado, Código Postal"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-semibold"
+                      required
+                    />
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-sm py-4 rounded-xl shadow-lg mt-3 uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <CreditCard size={14} /> Confirmar Compra (${activeCheckoutProduct.price} USD)
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 };

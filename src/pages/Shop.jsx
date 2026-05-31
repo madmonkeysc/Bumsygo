@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Heart, Search, Filter, Star, Truck, ShieldCheck, RefreshCcw, ShoppingBag, Gift } from 'lucide-react';
+import { ShoppingCart, Heart, Search, Filter, Star, Truck, ShieldCheck, RefreshCcw, ShoppingBag, Gift, Sparkles } from 'lucide-react';
 import useSEO from '../hooks/useSEO';
 
 const Shop = () => {
@@ -30,7 +30,12 @@ const Shop = () => {
     image: '/assets/banners/mercha.webp'
   });
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [stockOverrides, setStockOverrides] = useState({});
+  const [notification, setNotification] = useState(null);
+
   useEffect(() => {
+    // Custom CRM products loading
     const savedProducts = localStorage.getItem('bumsy_crm_products');
     if (savedProducts) {
       try {
@@ -52,16 +57,66 @@ const Shop = () => {
         console.error('Error parsing CRM products:', e);
       }
     }
+
+    // Dynamic stock overrides loading
+    const savedOverrides = localStorage.getItem('bumsy_crm_stock_overrides');
+    if (savedOverrides) {
+      try {
+        setStockOverrides(JSON.parse(savedOverrides));
+      } catch (e) {
+        console.error('Error parsing stock overrides:', e);
+      }
+    }
   }, []);
+
+  const getProductStock = (product) => {
+    if (product.isFree) return 999;
+    const strId = product.id.toString();
+    const key = strId.startsWith('custom_') ? strId : `static_${product.id}`;
+    if (key in stockOverrides) {
+      return stockOverrides[key];
+    }
+    const defaults = {
+      'static_1': 15,
+      'static_2': 8,
+      'static_3': 20,
+      'static_4': 12,
+    };
+    return defaults[key] !== undefined ? defaults[key] : 25;
+  };
+
+  const triggerNotification = (text) => {
+    setNotification(text);
+    setTimeout(() => setNotification(null), 4000);
+  };
   
   const categories = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos'];
 
-  const filteredProducts = activeCategory === 'Todos' 
-    ? allProducts 
-    : allProducts.filter(p => p.category === activeCategory);
+  const filteredProducts = allProducts.filter(p => {
+    const matchesCategory = activeCategory === 'Todos' || p.category === activeCategory;
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+
 
   return (
-    <div className="pb-24 pt-0 bg-white">
+    <div className="pb-24 pt-0 bg-white relative">
+      {/* Floating Notification */}
+      <AnimatePresence>
+        {notification && (
+          <motion.div 
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-28 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-950/10 backdrop-blur-xl bg-slate-950/90 text-white max-w-md w-[90%]"
+          >
+            <Sparkles size={20} className="text-[#FCF200] shrink-0 animate-pulse" />
+            <span className="font-bold text-sm leading-tight">{notification}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Featured Promo */}
       <section className="relative pt-36 pb-28 md:pt-48 md:pb-36 overflow-hidden">
         {/* Background Image Fondo NEXT */}
@@ -121,7 +176,7 @@ const Shop = () => {
             <div className="w-12 h-[3px] bg-slate-100 mx-auto rounded-full"></div>
           </div>
 
-          {/* Elegant Floating Category Dock (Scrollable without visible scrollbars) */}
+          {/* Elegant Floating Category Dock */}
           <div className="w-full flex justify-center">
             <div className="flex gap-4 overflow-x-auto pb-2 scroll-smooth no-scrollbar w-full max-w-4xl justify-start md:justify-center">
               {categories.map(cat => (
@@ -148,6 +203,8 @@ const Shop = () => {
               <input 
                 type="text" 
                 placeholder="Buscar productos oficiales..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-transparent py-2.5 focus:outline-none text-slate-800 font-semibold text-lg placeholder-slate-400"
                 style={{ fontFamily: "'Poppins', sans-serif" }}
               />
@@ -161,106 +218,149 @@ const Shop = () => {
         {/* Premium Product Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-14">
           <AnimatePresence mode='popLayout'>
-            {filteredProducts.map((product) => (
-              <motion.div 
-                key={product.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                whileHover={{ y: -8 }}
-                className="bg-white border border-slate-100 rounded-[40px] p-6 md:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.03)] hover:shadow-[0_30px_70px_rgba(15,23,42,0.08)] hover:border-slate-200 transition-all duration-500 flex flex-col group relative overflow-hidden"
-              >
-                {/* Heart Button on Top Right (Boutique Style) */}
-                <button className="absolute top-8 right-8 md:top-10 md:right-10 bg-white/90 hover:bg-white text-slate-400 hover:text-rose-500 p-4 rounded-full shadow-md hover:shadow-lg border border-slate-100 backdrop-blur-sm z-20 transition-all active:scale-90">
-                  <Heart size={20} />
-                </button>
+            {filteredProducts.map((product) => {
+              const stockVal = getProductStock(product);
+              const isOutOfStock = stockVal <= 0;
 
-                {/* Product Image Area (Vertical Aspect Ratio 3:4) */}
-                <div className="aspect-[3/4] w-full rounded-[30px] bg-slate-50 flex items-center justify-center mb-8 relative overflow-hidden group-hover:bg-slate-100/70 transition-colors duration-500">
-                  <img 
-                    loading="lazy" 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 select-none" 
-                  />
-                  {/* Elegant Fading Overlay */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-slate-900/10 backdrop-blur-[1px] transition-all duration-300 flex items-center justify-center">
-                     {product.isFree ? (
-                       <a 
-                         href={product.downloadUrl} 
-                         download
-                         className="bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-sm tracking-wider px-8 py-4 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
-                         style={{ fontFamily: "'Poppins', sans-serif" }}
-                       >
-                         <Gift size={16} /> ¡DESCARGAR REGALO!
-                       </a>
-                     ) : (
-                       <button 
-                         className="bg-slate-950 hover:bg-slate-800 text-white font-bold text-sm tracking-wider px-8 py-4 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
-                         style={{ fontFamily: "'Poppins', sans-serif" }}
-                       >
-                         <ShoppingCart size={16} /> AÑADIR AL CARRITO
-                       </button>
-                     )}
-                  </div>
-                </div>
+              return (
+                <motion.div 
+                  key={product.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  whileHover={{ y: -8 }}
+                  className="bg-white border border-slate-100 rounded-[40px] p-6 md:p-8 shadow-[0_12px_35px_rgba(15,23,42,0.03)] hover:shadow-[0_30px_70px_rgba(15,23,42,0.08)] hover:border-slate-200 transition-all duration-500 flex flex-col group relative overflow-hidden"
+                >
+                  {/* Heart Button on Top Right (Boutique Style) */}
+                  <button className="absolute top-8 right-8 md:top-10 md:right-10 bg-white/90 hover:bg-white text-slate-400 hover:text-rose-500 p-4 rounded-full shadow-md hover:shadow-lg border border-slate-100 backdrop-blur-sm z-20 transition-all active:scale-90">
+                    <Heart size={20} />
+                  </button>
 
-                {/* Details Area */}
-                <div className="flex-1 flex flex-col">
-                  <div className="flex items-center justify-between mb-3">
-                    <span 
-                      className="text-xs font-bold text-slate-400 uppercase tracking-widest"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
-                    >
-                      {product.category}
-                    </span>
-                    <div className="flex items-center gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={14} fill={i < product.rating ? '#F59E0B' : 'none'} color={i < product.rating ? '#F59E0B' : '#E2E8F0'} />
-                      ))}
+                  {/* Product Image Area (Vertical Aspect Ratio 3:4) */}
+                  <div className="aspect-[3/4] w-full rounded-[30px] bg-slate-50 flex items-center justify-center mb-8 relative overflow-hidden group-hover:bg-slate-100/70 transition-colors duration-500">
+                    <img 
+                      loading="lazy" 
+                      src={product.image} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 select-none" 
+                    />
+
+                    {/* Stock level badge overlay */}
+                    {!product.isFree && (
+                      <span className={`absolute top-4 left-4 font-black text-[10px] uppercase px-3.5 py-1.5 rounded-full tracking-wider z-20 shadow-md ${
+                        isOutOfStock 
+                          ? 'bg-red-500 text-white' 
+                          : stockVal <= 5 
+                            ? 'bg-amber-500 text-slate-950 shadow-sm' 
+                            : 'bg-slate-950 text-white'
+                      }`}>
+                        {isOutOfStock ? 'Agotado' : `Stock: ${stockVal} u.`}
+                      </span>
+                    )}
+
+                    {/* Elegant Fading Overlay */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-slate-900/10 backdrop-blur-[1px] transition-all duration-300 flex items-center justify-center">
+                       {product.isFree ? (
+                         <a 
+                           href={product.downloadUrl} 
+                           download
+                           className="bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-sm tracking-wider px-8 py-4 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                           style={{ fontFamily: "'Poppins', sans-serif" }}
+                         >
+                           <Gift size={16} /> ¡DESCARGAR REGALO!
+                         </a>
+                       ) : (
+                         <button 
+                           onClick={() => {
+                             if (isOutOfStock) {
+                               triggerNotification('Lo sentimos, este producto está temporalmente agotado.');
+                             } else {
+                               triggerNotification('¡Añadido! Inicia sesión en /crm para completar la compra instantánea.');
+                             }
+                           }}
+                           className={`font-bold text-sm tracking-wider px-8 py-4 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2 ${
+                             isOutOfStock 
+                               ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
+                               : 'bg-slate-950 hover:bg-slate-800 text-white'
+                           }`}
+                           style={{ fontFamily: "'Poppins', sans-serif" }}
+                         >
+                           <ShoppingCart size={16} /> {isOutOfStock ? 'AGOTADO' : 'AÑADIR AL CARRITO'}
+                         </button>
+                       )}
                     </div>
                   </div>
-                  <h3 
-                    className="text-2xl font-bold text-slate-800 group-hover:text-accent transition-colors leading-tight mb-5 tracking-tight"
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
-                  >
-                    {product.name}
-                  </h3>
-                  <div className="flex items-center justify-between mt-auto pt-5 border-t border-slate-100">
-                    {product.isFree ? (
-                      <>
-                        <span 
-                          className="text-2xl font-black text-rose-500 tracking-tight flex items-center gap-2"
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                        >
-                          <Gift size={22} className="animate-bounce text-amber-500" /> GRATIS
-                        </span>
-                        <a 
-                          href={product.downloadUrl} 
-                          download
-                          className="bg-amber-400 text-slate-950 hover:bg-slate-950 hover:text-white p-4 rounded-full transition-all border border-amber-300 hover:border-slate-950 shadow-md active:scale-90"
-                        >
-                          <Gift size={20} />
-                        </a>
-                      </>
-                    ) : (
-                      <>
-                        <span 
-                          className="text-3xl font-extrabold text-slate-950 tracking-tight"
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                        >
-                          ${product.price}
-                        </span>
-                        <button className="bg-slate-50 text-slate-700 hover:bg-slate-950 hover:text-white p-4 rounded-full transition-all border border-slate-100 hover:border-slate-950 shadow-sm active:scale-90">
-                          <ShoppingBag size={20} />
-                        </button>
-                      </>
-                    )}
+
+                  {/* Details Area */}
+                  <div className="flex-1 flex flex-col">
+                    <div className="flex items-center justify-between mb-3 text-left">
+                      <span 
+                        className="text-xs font-bold text-slate-400 uppercase tracking-widest"
+                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        {product.category}
+                      </span>
+                      <div className="flex items-center gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={14} fill={i < product.rating ? '#F59E0B' : 'none'} color={i < product.rating ? '#F59E0B' : '#E2E8F0'} />
+                        ))}
+                      </div>
+                    </div>
+                    <h3 
+                      className="text-2xl font-bold text-slate-800 group-hover:text-accent transition-colors leading-tight mb-5 tracking-tight text-left"
+                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
+                      {product.name}
+                    </h3>
+                    <div className="flex items-center justify-between mt-auto pt-5 border-t border-slate-100">
+                      {product.isFree ? (
+                        <>
+                          <span 
+                            className="text-2xl font-black text-rose-500 tracking-tight flex items-center gap-2"
+                            style={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            <Gift size={22} className="animate-bounce text-amber-500" /> GRATIS
+                          </span>
+                          <a 
+                            href={product.downloadUrl} 
+                            download
+                            className="bg-amber-400 text-slate-950 hover:bg-slate-950 hover:text-white p-4 rounded-full transition-all border border-amber-300 hover:border-slate-950 shadow-md active:scale-90"
+                          >
+                            <Gift size={20} />
+                          </a>
+                        </>
+                      ) : (
+                        <>
+                          <span 
+                            className="text-3xl font-extrabold text-slate-950 tracking-tight"
+                            style={{ fontFamily: "'Poppins', sans-serif" }}
+                          >
+                            ${product.price}
+                          </span>
+                          <button 
+                            onClick={() => {
+                              if (isOutOfStock) {
+                                triggerNotification('Lo sentimos, este producto está temporalmente agotado.');
+                              } else {
+                                triggerNotification('¡Añadido al carrito! Haz tu pedido rápido ingresando a /crm.');
+                              }
+                            }}
+                            className={`p-4 rounded-full transition-all border shadow-sm active:scale-90 ${
+                              isOutOfStock 
+                                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' 
+                                : 'bg-slate-50 text-slate-700 hover:bg-slate-950 hover:text-white border-slate-100 hover:border-slate-950'
+                            }`}
+                          >
+                            <ShoppingBag size={20} />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
       </section>
