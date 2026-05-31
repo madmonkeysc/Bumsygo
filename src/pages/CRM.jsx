@@ -262,7 +262,7 @@ const CRM = () => {
     localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
     
     setCurrentUser(newClient);
-    triggerNotification('¡Registro exitoso! Bienvenido a tu Portal de Comprador.');
+    triggerNotification('¡Registro exitoso! Bienvenido al Club de Amigos Bumsy.');
     setPortal('buyer_dashboard');
     
     // Clear form
@@ -611,62 +611,58 @@ const CRM = () => {
         {/* HEADER BRANDING */}
         <div className="text-center mb-10">
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center justify-center gap-2 mb-2">
-            <span className="p-2.5 rounded-2xl bg-gradient-to-tr from-pink-500 to-indigo-600 shadow-[0_0_20px_rgba(236,72,153,0.3)]">
-              <Users size={24} className="text-white" />
+            <span className="p-2.5 rounded-2xl bg-gradient-to-tr from-pink-500 to-amber-400 shadow-[0_0_20px_rgba(236,72,153,0.3)]">
+              <Sparkles size={24} className="text-white" />
             </span>
-            <span className="text-sm font-black text-pink-500 tracking-[0.3em] uppercase">Portal Administrativo</span>
+            <span className="text-sm font-black text-pink-500 tracking-[0.3em] uppercase">¡HOLA, AMIGO DE BUMSY TOWN!</span>
           </motion.div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 uppercase" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            CRM & Catálogo <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">Bumsy Go</span>
+            El Club Mágico <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">Bumsy Go</span>
           </h1>
           <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto font-medium">
-            Registra clientes, gestiona consultas en tiempo real y actualiza tu stock desde un único portal interno inteligente.
+            El lugar de la diversión y las sorpresas. Únete gratis para recibir regalos especiales, descargar coloreables de Pipa y guardar tus personajes favoritos.
           </p>
         </div>
 
         {/* ── GATEWAY PAGE ──────────────────────────────────────────────────────── */}
         {portal === 'gateway' && (
-          <div className="flex-1 flex items-center justify-center py-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
+          <div className="flex-1 flex flex-col items-center justify-center py-6">
+            {/* Card 1: Club de Amigos (Featured Card with high visual weight) */}
+            <motion.div 
+              whileHover={{ y: -6, scale: 1.01 }}
+              onClick={() => setPortal('buyer_login')}
+              className="bg-slate-900/40 border-2 border-pink-500/30 hover:border-pink-500 rounded-3xl p-10 cursor-pointer flex flex-col items-center text-center backdrop-blur-lg shadow-2xl group transition-all duration-300 relative overflow-hidden max-w-2xl w-full"
+            >
+              {/* Highlight Background Glow */}
+              <div className="absolute inset-0 bg-pink-500/5 opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               
-              {/* Card 1: Buyers Portal */}
-              <motion.div 
-                whileHover={{ y: -8, scale: 1.02 }}
-                onClick={() => setPortal('buyer_login')}
-                className="bg-slate-900/40 border border-slate-800 hover:border-pink-500/50 rounded-3xl p-8 cursor-pointer flex flex-col items-center text-center backdrop-blur-lg shadow-xl group transition-all duration-300 relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                <div className="w-16 h-16 rounded-2xl bg-pink-500/10 flex items-center justify-center text-pink-400 mb-6 group-hover:scale-110 transition-transform">
-                  <ShoppingBag size={32} />
-                </div>
-                <h3 className="text-2xl font-black uppercase mb-3 text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>Soy Comprador</h3>
-                <p className="text-slate-400 text-sm font-semibold mb-8 leading-relaxed">
-                  Ingresa o regístrate para ver productos mágicos cargados por el vendedor, consultar precios y guardar tu historial.
-                </p>
-                <span className="mt-auto bg-pink-600 group-hover:bg-pink-500 text-white font-black text-xs px-8 py-3 rounded-full flex items-center gap-2 uppercase tracking-wider shadow-lg transition-colors">
-                  Ingresar al Portal <ArrowRight size={14} />
-                </span>
-              </motion.div>
+              <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-pink-500/20 blur-xl group-hover:bg-pink-500/30 transition-colors"></div>
+              
+              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-500 to-amber-400 flex items-center justify-center text-white mb-6 group-hover:scale-110 shadow-[0_10px_25px_rgba(236,72,153,0.3)] transition-transform">
+                <Sparkles size={38} className="animate-pulse" />
+              </div>
+              
+              <h3 className="text-3xl font-black mb-3 text-white uppercase tracking-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                ¡Entrar al Club de Amigos!
+              </h3>
+              
+              <p className="text-slate-350 text-base font-semibold mb-8 leading-relaxed max-w-lg">
+                Colecciona tus personajes favoritos, descarga las plantillas gratis para colorear con Pipa, obtén regalos de cumpleaños y guarda tus datos para envíos rápidos de tus peluches mágicos.
+              </p>
+              
+              <span className="bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 text-white font-black text-sm px-10 py-4.5 rounded-full flex items-center gap-3 uppercase tracking-wider shadow-lg shadow-pink-500/25 transition-all transform group-hover:scale-105 active:scale-95">
+                ¡Ingresar Ahora! ✨ <ArrowRight size={16} />
+              </span>
+            </motion.div>
 
-              {/* Card 2: Seller Portal */}
-              <motion.div 
-                whileHover={{ y: -8, scale: 1.02 }}
+            {/* Subtle, Low-Profile Staff Gateway Access */}
+            <div className="mt-14 opacity-50 hover:opacity-100 transition-opacity">
+              <button 
                 onClick={() => setPortal('seller_login')}
-                className="bg-slate-900/40 border border-slate-800 hover:border-indigo-500/50 rounded-3xl p-8 cursor-pointer flex flex-col items-center text-center backdrop-blur-lg shadow-xl group transition-all duration-300 relative overflow-hidden"
+                className="inline-flex items-center gap-2 text-xs font-semibold text-slate-450 hover:text-indigo-400 border border-slate-800 rounded-full px-6 py-3 bg-slate-950/40 hover:bg-slate-950 transition-all hover:border-slate-700"
               >
-                <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-6 group-hover:scale-110 transition-transform">
-                  <Shield size={32} />
-                </div>
-                <h3 className="text-2xl font-black uppercase mb-3 text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>Soy Vendedor</h3>
-                <p className="text-slate-400 text-sm font-semibold mb-8 leading-relaxed">
-                  Acceso privado para administrar clientes registrados (CRM), subir productos al catálogo y dar seguimiento a consultas de venta.
-                </p>
-                <span className="mt-auto bg-slate-800 group-hover:bg-indigo-900 text-slate-200 border border-slate-700 font-black text-xs px-8 py-3 rounded-full flex items-center gap-2 uppercase tracking-wider transition-all">
-                  Acceso Restringido <Key size={14} />
-                </span>
-              </motion.div>
-
+                <Key size={12} /> Acceso para Personal de Bumsy Go
+              </button>
             </div>
           </div>
         )}
@@ -674,8 +670,8 @@ const CRM = () => {
         {/* ── BUYER LOGIN ──────────────────────────────────────────────────────── */}
         {portal === 'buyer_login' && (
           <div className="max-w-md w-full mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-md">
-            <h2 className="text-2xl font-black uppercase mb-2 text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>Ingreso Comprador</h2>
-            <p className="text-slate-400 text-xs font-semibold text-center mb-6">Explora y realiza compras en la tienda</p>
+            <h2 className="text-2xl font-black uppercase mb-2 text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>¡Hola de nuevo, Amigo!</h2>
+            <p className="text-slate-400 text-xs font-semibold text-center mb-6">Inicia sesión en tu espacio mágico del Club</p>
             
             <form onSubmit={handleBuyerLogin} className="flex flex-col gap-4">
               <div>
@@ -709,7 +705,7 @@ const CRM = () => {
             <div className="text-center mt-6 flex flex-col gap-2">
               <span className="text-xs text-slate-400 font-semibold">
                 ¿No tienes cuenta?{' '}
-                <button onClick={() => setPortal('buyer_register')} className="text-pink-500 hover:underline font-bold">Regístrate gratis aquí</button>
+                <button onClick={() => setPortal('buyer_register')} className="text-pink-500 hover:underline font-bold">Únete gratis aquí</button>
               </span>
               <button onClick={() => setPortal('gateway')} className="text-xs text-slate-500 hover:text-slate-300 font-bold uppercase tracking-wider mt-4">
                 Volver
@@ -721,8 +717,8 @@ const CRM = () => {
         {/* ── BUYER REGISTER ───────────────────────────────────────────────────── */}
         {portal === 'buyer_register' && (
           <div className="max-w-md w-full mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-md">
-            <h2 className="text-2xl font-black uppercase mb-2 text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>Registro de Comprador</h2>
-            <p className="text-slate-400 text-xs font-semibold text-center mb-6">Crea tu cuenta para guardar tus datos y compras</p>
+            <h2 className="text-2xl font-black uppercase mb-2 text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>¡Únete al Club de Amigos!</h2>
+            <p className="text-slate-400 text-xs font-semibold text-center mb-6">Regístrate gratis para empezar a recibir sorpresas mágicas</p>
             
             <form onSubmit={handleBuyerRegister} className="flex flex-col gap-4">
               <div>
