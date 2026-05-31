@@ -1183,7 +1183,7 @@ const CRM = () => {
 
         {/* ── SELLER DASHBOARD ─────────────────────────────────────────────────── */}
         {portal === 'seller_dashboard' && isSellerAuthenticated && (
-          <div className="flex flex-col lg:flex-row gap-8 flex-1">
+          <div className="flex flex-col lg:flex-row gap-8 flex-1 text-left" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
             
             {/* Sidebar Navigation */}
             <div className="w-full lg:w-64 bg-slate-900/40 border border-slate-800 rounded-3xl p-6 h-fit backdrop-blur-md flex flex-col gap-6">
@@ -1198,7 +1198,6 @@ const CRM = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
                 {[
                   { id: 'summary', name: 'Resumen', icon: Sparkles },
                   { id: 'sales', name: 'Ventas / Pedidos', icon: CreditCard },
@@ -1212,9 +1211,9 @@ const CRM = () => {
                     <button
                       key={tab.id}
                       onClick={() => setSellerTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
                         sellerTab === tab.id 
-                          ? 'bg-indigo-600 text-white shadow-lg' 
+                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
                           : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
                       }`}
                     >
@@ -1222,11 +1221,10 @@ const CRM = () => {
                     </button>
                   );
                 })}
-              </div>
 
               <button 
                 onClick={handleLogout}
-                className="w-full mt-4 flex items-center gap-3 px-4 py-3 border border-red-500/30 bg-red-950/20 hover:bg-red-950/40 text-red-400 rounded-xl text-xs font-black uppercase tracking-wider transition-all"
+                className="w-full mt-4 flex items-center gap-3 px-4 py-3 border border-red-500/30 bg-red-950/20 hover:bg-red-950/40 text-red-400 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
               >
                 <LogOut size={16} /> Salir del CRM
               </button>
@@ -1241,38 +1239,38 @@ const CRM = () => {
                   
                   {/* Grid Stat Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex items-center justify-between backdrop-blur-md">
+                    <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 flex items-center justify-between backdrop-blur-md">
                       <div className="text-left">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Clientes CRM</span>
-                        <span className="text-2xl font-black text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>{clients.length}</span>
+                        <span className="text-[10px] font-bold text-slate-550 uppercase tracking-wider block mb-1">Clientes CRM</span>
+                        <span className="text-2xl font-bold text-slate-100">{clients.length}</span>
                       </div>
-                      <span className="p-2.5 bg-pink-500/10 text-pink-400 rounded-2xl"><Users size={20} /></span>
+                      <span className="p-2.5 bg-pink-500/10 text-pink-400 rounded-xl"><Users size={20} /></span>
                     </div>
 
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex items-center justify-between backdrop-blur-md">
+                    <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 flex items-center justify-between backdrop-blur-md">
                       <div className="text-left">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Total Ventas</span>
-                        <span className="text-2xl font-black text-slate-100 font-mono" style={{ fontFamily: "'Poppins', sans-serif" }}>${totalSalesRevenue}</span>
+                        <span className="text-[10px] font-bold text-slate-555 uppercase tracking-wider block mb-1">Total Ventas</span>
+                        <span className="text-2xl font-bold text-slate-100 font-mono">${totalSalesRevenue}</span>
                       </div>
-                      <span className="p-2.5 bg-green-500/10 text-green-400 rounded-2xl"><TrendingUp size={20} /></span>
+                      <span className="p-2.5 bg-green-500/10 text-green-400 rounded-xl"><TrendingUp size={20} /></span>
                     </div>
 
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex items-center justify-between backdrop-blur-md">
+                    <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 flex items-center justify-between backdrop-blur-md">
                       <div className="text-left">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Artículos Vendidos</span>
-                        <span className="text-2xl font-black text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>{totalUnitsSold} u.</span>
+                        <span className="text-[10px] font-bold text-slate-555 uppercase tracking-wider block mb-1">Artículos Vendidos</span>
+                        <span className="text-2xl font-bold text-slate-100">{totalUnitsSold} u.</span>
                       </div>
-                      <span className="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-2xl"><ShoppingBag size={20} /></span>
+                      <span className="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-xl"><ShoppingBag size={20} /></span>
                     </div>
 
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex items-center justify-between backdrop-blur-md">
+                    <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 flex items-center justify-between backdrop-blur-md">
                       <div className="text-left">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Leads Pendientes</span>
-                        <span className="text-2xl font-black text-slate-100" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                        <span className="text-[10px] font-bold text-slate-555 uppercase tracking-wider block mb-1">Leads Pendientes</span>
+                        <span className="text-2xl font-bold text-slate-100">
                           {inquiries.filter(i => i.status === 'Pendiente').length}
                         </span>
                       </div>
-                      <span className="p-2.5 bg-orange-500/10 text-orange-400 rounded-2xl"><MessageSquare size={20} /></span>
+                      <span className="p-2.5 bg-orange-500/10 text-orange-400 rounded-xl"><MessageSquare size={20} /></span>
                     </div>
                   </div>
 
@@ -1280,9 +1278,9 @@ const CRM = () => {
                   <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
                     
                     {/* Recent Sales log */}
-                    <div className="xl:col-span-7 bg-slate-900/30 border border-slate-800 rounded-3xl p-6">
+                    <div className="xl:col-span-7 bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
                       <div className="flex items-center justify-between mb-5">
-                        <h3 className="font-black text-base uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                        <h3 className="font-bold text-base uppercase tracking-wider flex items-center gap-2 text-slate-200">
                           <CreditCard size={18} className="text-green-400" /> Ventas Recientes
                         </h3>
                         <button onClick={() => setSellerTab('sales')} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs uppercase tracking-wider">
@@ -1297,10 +1295,10 @@ const CRM = () => {
                       ) : (
                         <div className="flex flex-col gap-3">
                           {sales.slice(0, 3).map(sale => (
-                            <div key={sale.id} className="bg-slate-950/60 border border-slate-850 rounded-xl p-3 flex items-center justify-between gap-3 text-left">
+                            <div key={sale.id} className="bg-slate-950/60 border border-slate-850 rounded-lg p-3 flex items-center justify-between gap-3 text-left">
                               <div>
                                 <span className="text-[9px] font-mono text-slate-500 block uppercase">Pedido: #{sale.id.slice(5, 12)}</span>
-                                <h4 className="font-black text-xs text-slate-200 uppercase mt-0.5 leading-none">{sale.productName}</h4>
+                                <h4 className="font-semibold text-xs text-slate-200 uppercase mt-0.5 leading-none">{sale.productName}</h4>
                                 <span className="text-[10px] text-slate-450 block mt-1 font-semibold">{sale.buyerName} ({sale.buyerEmail})</span>
                               </div>
                               <div className="text-right shrink-0">
@@ -1314,9 +1312,9 @@ const CRM = () => {
                     </div>
 
                     {/* Quick Inquiries Feed */}
-                    <div className="xl:col-span-5 bg-slate-900/30 border border-slate-800 rounded-3xl p-6">
+                    <div className="xl:col-span-5 bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
                       <div className="flex items-center justify-between mb-5">
-                        <h3 className="font-black text-base uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                        <h3 className="font-bold text-base uppercase tracking-wider flex items-center gap-2 text-slate-200">
                           <MessageSquare size={18} className="text-orange-400" /> Leads / Mensajes
                         </h3>
                         <button onClick={() => setSellerTab('inquiries')} className="text-indigo-400 hover:text-indigo-300 font-bold text-xs uppercase tracking-wider">
@@ -1331,14 +1329,14 @@ const CRM = () => {
                       ) : (
                         <div className="flex flex-col gap-3">
                           {inquiries.slice(0, 2).map(inq => (
-                            <div key={inq.id} className="bg-slate-950/60 border border-slate-850 rounded-xl p-3 flex flex-col text-left gap-1.5">
+                            <div key={inq.id} className="bg-slate-950/60 border border-slate-850 rounded-lg p-3 flex flex-col text-left gap-1.5">
                               <div className="flex justify-between items-center">
-                                <span className="text-[9px] font-black text-indigo-400 uppercase">{inq.buyerName}</span>
-                                <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${inq.status === 'Pendiente' ? 'bg-orange-500/15 text-orange-400' : 'bg-green-500/15 text-green-400'}`}>
+                                <span className="text-[9px] font-bold text-indigo-400 uppercase">{inq.buyerName}</span>
+                                <span className={`text-[8px] font-bold uppercase px-2 py-0.5 rounded-full ${inq.status === 'Pendiente' ? 'bg-orange-500/15 text-orange-400' : 'bg-green-500/15 text-green-400'}`}>
                                   {inq.status}
                                 </span>
                               </div>
-                              <h4 className="font-black text-xs text-slate-200 uppercase leading-none">{inq.productName}</h4>
+                              <h4 className="font-semibold text-xs text-slate-200 uppercase leading-none">{inq.productName}</h4>
                               <p className="text-slate-400 text-[10px] italic">"{inq.message}"</p>
                             </div>
                           ))}
@@ -1353,9 +1351,9 @@ const CRM = () => {
 
               {/* TAB: SALES MANAGEMENT (global transactions dashboard) */}
               {sellerTab === 'sales' && (
-                <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-6 flex flex-col gap-6 backdrop-blur-md">
+                <div className="bg-slate-900/30 border border-slate-800 rounded-2xl p-6 flex flex-col gap-6 backdrop-blur-md">
                   <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
-                    <h3 className="font-black text-xl uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    <h3 className="font-bold text-xl uppercase tracking-wider flex items-center gap-2 text-slate-200">
                       <CreditCard size={20} className="text-indigo-400" /> Registro de Ventas & Pedidos
                     </h3>
                     
@@ -1371,10 +1369,10 @@ const CRM = () => {
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto w-full border border-slate-850 rounded-2xl">
+                  <div className="overflow-x-auto w-full border border-slate-850 rounded-xl">
                     <table className="w-full text-left border-collapse min-w-[750px]">
                       <thead>
-                        <tr className="bg-slate-950/70 border-b border-slate-850 text-slate-400 font-black text-[10px] uppercase tracking-wider">
+                        <tr className="bg-slate-950/70 border-b border-slate-850 text-slate-400 font-bold text-[10px] uppercase tracking-wider">
                           <th className="p-4">Pedido / ID</th>
                           <th className="p-4">Comprador</th>
                           <th className="p-4">Cumpleaños</th>
@@ -1395,7 +1393,7 @@ const CRM = () => {
                             </td>
                             <td className="p-4">
                               <div className="flex flex-col text-left">
-                                <span className="font-black text-slate-200 text-xs uppercase">{sale.buyerName}</span>
+                                <span className="font-semibold text-slate-200 text-xs uppercase">{sale.buyerName}</span>
                                 <span className="text-[10px] text-slate-550 font-mono">{sale.buyerEmail}</span>
                               </div>
                             </td>
@@ -1406,13 +1404,13 @@ const CRM = () => {
                                 </span>
                               ) : '--'}
                             </td>
-                            <td className="p-4 font-black text-xs text-slate-300 uppercase">
+                            <td className="p-4 font-semibold text-xs text-slate-300 uppercase">
                               {sale.productName}
                             </td>
                             <td className="p-4 text-xs text-slate-450 font-semibold max-w-[200px] truncate" title={sale.address}>
                               {sale.address}
                             </td>
-                            <td className="p-4 font-mono font-black text-sm text-green-400">
+                            <td className="p-4 font-mono font-bold text-sm text-green-400">
                               ${sale.price.toFixed(2)}
                             </td>
                           </tr>
@@ -1425,9 +1423,9 @@ const CRM = () => {
 
               {/* TAB: CLIENTS CRM TABLE */}
               {sellerTab === 'clients' && (
-                <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-6 flex flex-col gap-6 backdrop-blur-md">
+                <div className="bg-slate-900/30 border border-slate-800 rounded-2xl p-6 flex flex-col gap-6 backdrop-blur-md">
                   <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
-                    <h3 className="font-black text-xl uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    <h3 className="font-bold text-xl uppercase tracking-wider flex items-center gap-2 text-slate-200">
                       <Users size={20} className="text-indigo-400" /> Directorio de Clientes (CRM)
                     </h3>
                     
@@ -1443,10 +1441,10 @@ const CRM = () => {
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto w-full border border-slate-850 rounded-2xl">
+                  <div className="overflow-x-auto w-full border border-slate-850 rounded-xl">
                     <table className="w-full text-left border-collapse min-w-[850px]">
                       <thead>
-                        <tr className="bg-slate-950/70 border-b border-slate-850 text-slate-400 font-black text-[10px] uppercase tracking-wider">
+                        <tr className="bg-slate-950/70 border-b border-slate-850 text-slate-400 font-bold text-[10px] uppercase tracking-wider">
                           <th className="p-4">Cliente / Contacto</th>
                           <th className="p-4">Cumpleaños</th>
                           <th className="p-4">Dirección Guardada</th>
@@ -1459,7 +1457,7 @@ const CRM = () => {
                           <tr key={client.id} className="border-b border-slate-850 hover:bg-slate-900/30 transition-colors">
                             <td className="p-4">
                               <div className="flex flex-col gap-0.5 text-left">
-                                <span className="font-black text-slate-200 uppercase text-xs">{client.name}</span>
+                                <span className="font-semibold text-slate-200 uppercase text-xs">{client.name}</span>
                                 <span className="text-[10px] text-slate-500 font-mono font-bold flex items-center gap-1"><Mail size={10} /> {client.email}</span>
                                 <span className="text-[10px] text-slate-500 font-mono font-bold flex items-center gap-1"><Phone size={10} /> {client.phone}</span>
                               </div>
@@ -1489,7 +1487,7 @@ const CRM = () => {
                               <div className="flex items-center gap-2">
                                 <textarea 
                                   defaultValue={client.notes}
-                                  placeholder="Notas comerciales... (ej. VIP, le gustan peluches)"
+                                  placeholder="Notas comerciales..."
                                   onBlur={(e) => handleSaveNotes(client.id, e.target.value)}
                                   className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-indigo-500 rounded-lg p-2 text-xs focus:outline-none transition-colors text-slate-300 resize-none h-12 leading-tight"
                                 />
@@ -1621,7 +1619,7 @@ const CRM = () => {
                   {/* Custom Products List */}
                   <div className="xl:col-span-7 bg-slate-900/30 border border-slate-800 rounded-3xl p-6 backdrop-blur-md flex flex-col gap-6">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-black text-lg uppercase tracking-tight flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      <h3 className="font-bold text-lg uppercase tracking-wider flex items-center gap-2 text-slate-200">
                         <ShoppingBag size={20} className="text-indigo-400" /> Catálogo de Productos CRM
                       </h3>
                       <span className="text-[10px] bg-slate-950 px-3 py-1 border border-slate-850 text-indigo-400 font-black rounded-full uppercase">
