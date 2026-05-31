@@ -66,11 +66,11 @@ const Header = () => {
           <Link to="/shop" className="bg-[#FCF200] hover:bg-[#EDE400] text-black px-6 py-2.5 rounded-full font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md active:scale-95">
             <ShoppingBag size={18} /> Tienda
           </Link>
-          <button className={`font-bold hover:text-accent flex items-center gap-1 transition-colors ${
+          <Link to="/crm" className={`font-bold hover:text-accent flex items-center gap-1 transition-colors ${
             (isScrolled || !isTransparentHeader) ? 'text-primary' : 'text-white'
           }`}>
             <LogIn size={18} /> Acceso
-          </button>
+          </Link>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -102,9 +102,9 @@ const Header = () => {
           <Link to="/shop" onClick={() => setIsOpen(false)} className="flex items-center gap-4 font-black text-2xl text-primary p-4 rounded-3xl hover:bg-primary/5">
             <ShoppingBag size={24} className="text-primary/40" /> Tienda
           </Link>
-          <button className="flex items-center gap-4 font-black text-2xl text-primary p-4 rounded-3xl hover:bg-primary/5 text-left">
+          <Link to="/crm" onClick={() => setIsOpen(false)} className="flex items-center gap-4 font-black text-2xl text-primary p-4 rounded-3xl hover:bg-primary/5 text-left">
             <LogIn size={24} className="text-primary/40" /> Acceso
-          </button>
+          </Link>
         </div>
       )}
     </header>

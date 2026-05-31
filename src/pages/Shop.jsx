@@ -1,20 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Heart, Search, Filter, Star, Truck, ShieldCheck, RefreshCcw, ShoppingBag, Gift } from 'lucide-react';
 import useSEO from '../hooks/useSEO';
 
 const Shop = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
-  
-  useSEO({
-    title: 'Tienda Oficial',
-    description: 'Llévate a casa la magia de Bumsy Town. Peluches, ropa, libros y accesorios oficiales de Bumsy y sus amigos.',
-    image: '/assets/banners/mercha.webp'
-  });
-  
-  const categories = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos'];
-  
-  const products = [
+  const [allProducts, setAllProducts] = useState([
     { id: 1, name: 'Peluche Bumsy Fox (XXL)', price: 29.99, category: 'Peluches', image: '/assets/banners/mercha.webp', color: 'bg-orange-50', rating: 5 },
     { id: 2, name: 'Camiseta Arcoíris Uni', price: 19.99, category: 'Ropa', image: '/assets/banners/mercha.webp', color: 'bg-pink-50', rating: 4 },
     { id: 3, name: 'Cuento: Aventuras en el Bosque', price: 14.99, category: 'Libros', image: '/assets/banners/books.webp', color: 'bg-green-50', rating: 5 },
@@ -31,11 +22,43 @@ const Shop = () => {
     { id: 12, name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_portada.png', rating: 5 },
     { id: 13, name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/lola_portada.png', rating: 5 },
     { id: 14, name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', isFree: true, downloadUrl: '/assets/ecommerce/pipa_portada_2.png', rating: 5 }
-  ];
+  ]);
+
+  useSEO({
+    title: 'Tienda Oficial',
+    description: 'Llévate a casa la magia de Bumsy Town. Peluches, ropa, libros y accesorios oficiales de Bumsy y sus amigos.',
+    image: '/assets/banners/mercha.webp'
+  });
+
+  useEffect(() => {
+    const savedProducts = localStorage.getItem('bumsy_crm_products');
+    if (savedProducts) {
+      try {
+        const parsed = JSON.parse(savedProducts);
+        const formattedCustom = parsed.map(p => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          category: p.category,
+          image: p.image,
+          color: 'bg-slate-50',
+          rating: 5
+        }));
+        setAllProducts(prev => {
+          const staticOnes = prev.filter(item => typeof item.id === 'number');
+          return [...staticOnes, ...formattedCustom];
+        });
+      } catch (e) {
+        console.error('Error parsing CRM products:', e);
+      }
+    }
+  }, []);
+  
+  const categories = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos'];
 
   const filteredProducts = activeCategory === 'Todos' 
-    ? products 
-    : products.filter(p => p.category === activeCategory);
+    ? allProducts 
+    : allProducts.filter(p => p.category === activeCategory);
 
   return (
     <div className="pb-24 pt-0 bg-white">
