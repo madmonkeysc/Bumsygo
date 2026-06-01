@@ -35,27 +35,47 @@ const Shop = () => {
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
-    // Custom CRM products loading
+    // Centralized CRM products database loading
     const savedProducts = localStorage.getItem('bumsy_crm_products');
     if (savedProducts) {
       try {
         const parsed = JSON.parse(savedProducts);
-        const formattedCustom = parsed.map(p => ({
+        const formatted = parsed.map(p => ({
           id: p.id,
           name: p.name,
-          price: p.price,
+          price: Number(p.price),
           category: p.category,
           image: p.image,
-          color: 'bg-slate-50',
-          rating: 5
+          color: p.color || 'bg-slate-50',
+          rating: p.rating || 5,
+          isFree: p.isFree || Number(p.price) === 0,
+          downloadUrl: p.downloadUrl
         }));
-        setAllProducts(prev => {
-          const staticOnes = prev.filter(item => typeof item.id === 'number');
-          return [...staticOnes, ...formattedCustom];
-        });
+        setAllProducts(formatted);
       } catch (e) {
         console.error('Error parsing CRM products:', e);
       }
+    } else {
+      // Seed initial catalog if empty so both modules share the same database
+      const defaultProducts = [
+        { id: 1, name: 'Peluche Bumsy Fox (XXL)', price: 29.99, category: 'Peluches', image: '/assets/banners/mercha.webp', description: 'Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.', stock: 15, rating: 5, color: 'bg-orange-50' },
+        { id: 2, name: 'Camiseta Arcoíris Uni', price: 19.99, category: 'Ropa', image: '/assets/banners/mercha.webp', description: 'Camiseta oficial con diseño de arcoíris de Bumsy Town. Algodón 100% orgánico.', stock: 8, rating: 4, color: 'bg-pink-50' },
+        { id: 3, name: 'Cuento: Aventuras en el Bosque', price: 14.99, category: 'Libros', image: '/assets/banners/books.webp', description: 'El cuento oficial ilustrado que narra las divertidas aventuras de Bumsy y sus amigos.', stock: 20, rating: 5, color: 'bg-green-50' },
+        { id: 4, name: 'Mochila Tarta Turtle', price: 34.99, category: 'Accesorios', image: '/assets/banners/mercha.webp', description: 'Mochila escolar resistente y colorida de Tarta Turtle con compartimentos especiales.', stock: 12, rating: 5, color: 'bg-emerald-50' },
+        { id: 5, name: 'Pack de Pegatinas Mágicas', price: 5.99, category: 'Accesorios', image: '/assets/banners/pintar.png', description: 'Paquete de 50 pegatinas de vinilo resistentes al agua con todos los personajes.', stock: 50, rating: 4, color: 'bg-yellow-50' },
+        { id: 6, name: 'Gorra Pipo Penguin', price: 12.99, category: 'Ropa', image: '/assets/banners/mercha.webp', description: 'Gorra ajustable oficial con bordado premium de Pipo Penguin.', stock: 30, rating: 5, color: 'bg-blue-50' },
+        { id: 7, name: 'Peluche Tarta Extra Suave', price: 24.99, category: 'Peluches', image: '/assets/banners/mercha.webp', description: 'Peluche coleccionable de Tarta Turtle, suave, tierno y con colores brillantes.', stock: 10, rating: 4, color: 'bg-green-50' },
+        { id: 8, name: 'Libro para Colorear Bumsy', price: 9.99, category: 'Libros', image: '/assets/banners/pintar.png', description: 'Libro físico con más de 60 páginas de plantillas e ilustraciones para colorear.', stock: 40, rating: 5, color: 'bg-purple-50' },
+        { id: 9, name: 'Coloreable Bubu Mágico', price: 0, category: 'Regalos', image: '/assets/ecommerce/bubu_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/bubu_portada.png', description: 'Plantilla digital gratuita de Bubu Mágico para descargar y pintar.', stock: 999, rating: 5, color: 'bg-slate-50' },
+        { id: 10, name: 'Bumsy Word Search (Sopa de Letras)', price: 0, category: 'Regalos', image: '/assets/ecommerce/bumsy_word_01.webp', isFree: true, downloadUrl: '/assets/ecommerce/bumsy_word_01.png', description: 'Divertido juego de sopa de letras imprimible con vocabulario de Bumsy Town.', stock: 999, rating: 5, color: 'bg-slate-50' },
+        { id: 11, name: 'Coloreable Especial Flamy Colors', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_colors.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_colors.png', description: 'Dibujo especial descargable de Flamy para colorear con tus mejores tonos.', stock: 999, rating: 5, color: 'bg-slate-50' },
+        { id: 12, name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_portada.png', description: 'Precioso libro digital de colorear de Flamy y sus inseparables amigos.', stock: 999, rating: 5, color: 'bg-slate-50' },
+        { id: 13, name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/lola_portada.png', description: 'Divertida plantilla digital de Lola Unicornio para pintar y decorar.', stock: 999, rating: 5, color: 'bg-slate-50' },
+        { id: 14, name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', isFree: true, downloadUrl: '/assets/ecommerce/pipa_portada_2.png', description: 'Nueva plantilla interactiva oficial de Pipa para colorear gratis.', stock: 999, rating: 5, color: 'bg-slate-50' },
+        { id: 'custom_1', name: 'Taza Mágica Bumsy (CRM)', price: 14.99, category: 'Accesorios', image: '/assets/banners/mercha.webp', description: 'Taza de cerámica premium que cambia de color al verter líquidos calientes.', stock: 45, rating: 5, color: 'bg-slate-50' }
+      ];
+      localStorage.setItem('bumsy_crm_products', JSON.stringify(defaultProducts));
+      setAllProducts(defaultProducts);
     }
 
     // Dynamic stock overrides loading
