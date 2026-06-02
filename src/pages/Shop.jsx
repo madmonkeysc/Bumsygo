@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Heart, Search, Filter, Star, Truck, ShieldCheck, RefreshCcw, ShoppingBag, Gift, Sparkles } from 'lucide-react';
+import { ShoppingCart, Heart, Search, Filter, Star, Truck, ShieldCheck, RefreshCcw, ShoppingBag, Gift, Sparkles, Trash2, CreditCard } from 'lucide-react';
 import useSEO from '../hooks/useSEO';
 
 const Shop = () => {
@@ -33,6 +33,67 @@ const Shop = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [stockOverrides, setStockOverrides] = useState({});
   const [notification, setNotification] = useState(null);
+  const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Sync cart with localStorage so items are persisted beautifully
+  useEffect(() => {
+    const savedCart = localStorage.getItem('bumsy_shop_cart');
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
+
+  const saveCartToStorage = (updatedCart) => {
+    setCart(updatedCart);
+    localStorage.setItem('bumsy_shop_cart', JSON.stringify(updatedCart));
+  };
+
+  const addToCart = (product) => {
+    const updated = [...cart];
+    const existing = updated.find((item) => item.id === product.id);
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      updated.push({ ...product, quantity: 1 });
+    }
+    saveCartToStorage(updated);
+    setIsCartOpen(true);
+    triggerNotification(`¡"${product.name}" añadido al carrito!`);
+  };
+
+  const removeFromCart = (id) => {
+    const updated = cart.filter((item) => item.id !== id);
+    saveCartToStorage(updated);
+    triggerNotification('Producto removido del carrito.');
+  };
+
+  const updateCartQuantity = (id, quantity) => {
+    if (quantity <= 0) {
+      removeFromCart(id);
+      return;
+    }
+    const updated = cart.map((item) => (item.id === id ? { ...item, quantity } : item));
+    saveCartToStorage(updated);
+  };
+
+  const handleProceedToCheckout = () => {
+    if (cart.length > 0) {
+      // Direct checkout for first item in cart
+      localStorage.setItem('bumsy_checkout_redirect', JSON.stringify(cart[0]));
+    }
+    triggerNotification('¡Excelente! Redirigiéndote al portal seguro para completar tu compra...');
+    setIsCartOpen(false);
+    setTimeout(() => {
+      window.location.href = '/crm';
+    }, 1200);
+  };
+
+  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
     // Centralized CRM products database loading
@@ -48,8 +109,8 @@ const Shop = () => {
           image: p.image,
           color: p.color || 'bg-slate-50',
           rating: p.rating || 5,
-          isFree: p.isFree || Number(p.price) === 0,
-          downloadUrl: p.downloadUrl
+          isFree: p.isFree || Number(p.price) === 0 || p.category === 'Regalos',
+          downloadUrl: p.pdfFile || p.downloadUrl
         }));
         setAllProducts(formatted);
       } catch (e) {
@@ -284,21 +345,21 @@ const Shop = () => {
                        {product.isFree ? (
                          <a 
                            href={product.downloadUrl} 
-                           download
+                           download={product.downloadUrl?.startsWith('data:application/pdf') ? `${product.name}.pdf` : `${product.name}.png`}
                            className="bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-sm tracking-wider px-8 py-4 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
                            style={{ fontFamily: "'Poppins', sans-serif" }}
                          >
                            <Gift size={16} /> ¡DESCARGAR REGALO!
                          </a>
                        ) : (
-                         <button 
-                           onClick={() => {
-                             if (isOutOfStock) {
-                               triggerNotification('Lo sentimos, este producto está temporalmente agotado.');
-                             } else {
-                               triggerNotification('¡Añadido! Inicia sesión en /crm para completar la compra instantánea.');
-                             }
-                           }}
+                          <button 
+                            onClick={() => {
+                              if (isOutOfStock) {
+                                triggerNotification('Lo sentimos, este producto está temporalmente agotado.');
+                              } else {
+                                addToCart(product);
+                              }
+                            }}
                            className={`font-bold text-sm tracking-wider px-8 py-4 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2 ${
                              isOutOfStock 
                                ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
@@ -344,7 +405,7 @@ const Shop = () => {
                           </span>
                           <a 
                             href={product.downloadUrl} 
-                            download
+                            download={product.downloadUrl?.startsWith('data:application/pdf') ? `${product.name}.pdf` : `${product.name}.png`}
                             className="bg-amber-400 text-slate-950 hover:bg-slate-950 hover:text-white p-4 rounded-full transition-all border border-amber-300 hover:border-slate-950 shadow-md active:scale-90"
                           >
                             <Gift size={20} />
@@ -363,7 +424,7 @@ const Shop = () => {
                               if (isOutOfStock) {
                                 triggerNotification('Lo sentimos, este producto está temporalmente agotado.');
                               } else {
-                                triggerNotification('¡Añadido al carrito! Haz tu pedido rápido ingresando a /crm.');
+                                addToCart(product);
                               }
                             }}
                             className={`p-4 rounded-full transition-all border shadow-sm active:scale-90 ${
@@ -468,6 +529,130 @@ const Shop = () => {
           </div>
         </div>
       </section>
+
+      {/* Floating Cart Icon Bubble */}
+      {cart.length > 0 && (
+        <motion.button
+          onClick={() => setIsCartOpen(true)}
+          initial={{ scale: 0, y: 50 }}
+          animate={{ scale: 1, y: 0 }}
+          exit={{ scale: 0, y: 50 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="fixed bottom-8 right-8 z-40 bg-pink-600 hover:bg-pink-500 text-white p-5 rounded-full shadow-2xl flex items-center justify-center border border-pink-400/20"
+        >
+          <ShoppingCart size={28} />
+          <span className="absolute -top-1 -right-1 bg-yellow-400 text-slate-950 font-black text-xs w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-bounce">
+            {cart.reduce((sum, item) => sum + item.quantity, 0)}
+          </span>
+        </motion.button>
+      )}
+
+      {/* Cart Drawer */}
+      <AnimatePresence>
+        {isCartOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCartOpen(false)}
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            />
+
+            {/* Slide-over Container */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-slate-950/95 border-l border-slate-850 backdrop-blur-xl text-white shadow-2xl flex flex-col"
+            >
+              {/* Drawer Header */}
+              <div className="p-6 border-b border-slate-850 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <ShoppingCart size={22} className="text-pink-500" />
+                  <h3 className="font-black text-lg uppercase tracking-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    Tu Carrito
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setIsCartOpen(false)}
+                  className="text-slate-400 hover:text-white text-xs font-black uppercase bg-slate-900 hover:bg-slate-850 border border-slate-800 px-4 py-2 rounded-full transition-all"
+                >
+                  Cerrar
+                </button>
+              </div>
+
+              {/* Drawer Body (Cart Items List) */}
+              <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+                {cart.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-slate-500 gap-3">
+                    <ShoppingBag size={48} className="text-slate-700" />
+                    <p className="text-sm font-semibold uppercase tracking-wider">Tu carrito está vacío</p>
+                  </div>
+                ) : (
+                  cart.map((item) => (
+                    <div key={item.id} className="bg-slate-900/60 border border-slate-850 rounded-2xl p-4 flex gap-4 relative overflow-hidden">
+                      <div className="w-16 h-16 rounded-xl bg-slate-950 border border-slate-850 overflow-hidden shrink-0">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0 flex flex-col justify-between">
+                        <div>
+                          <h4 className="font-black text-xs uppercase text-slate-200 tracking-tight leading-tight truncate">{item.name}</h4>
+                          <span className="font-mono text-pink-500 font-bold text-xs block mt-1">${item.price} USD</span>
+                        </div>
+                        
+                        {/* Quantity adjusters */}
+                        <div className="flex items-center gap-2.5 mt-3">
+                          <button
+                            onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
+                            className="w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-black text-xs flex items-center justify-center border border-slate-700 transition-colors"
+                          >
+                            -
+                          </button>
+                          <span className="font-mono text-xs font-black text-slate-300">{item.quantity}</span>
+                          <button
+                            onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
+                            className="w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-black text-xs flex items-center justify-center border border-slate-700 transition-colors"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removeFromCart(item.id)}
+                        className="absolute top-4 right-4 text-slate-500 hover:text-red-400 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Drawer Footer */}
+              {cart.length > 0 && (
+                <div className="p-6 border-t border-slate-850 bg-slate-950 flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-400 font-black uppercase tracking-wider">Subtotal:</span>
+                    <span className="font-mono text-xl font-black text-pink-500">${cartTotal.toFixed(2)} USD</span>
+                  </div>
+
+                  <button
+                    onClick={handleProceedToCheckout}
+                    className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-sm py-4 rounded-2xl shadow-[0_12px_30px_rgba(219,39,119,0.3)] uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                  >
+                    <CreditCard size={16} /> Proceder al Pago / Registrarse
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 };

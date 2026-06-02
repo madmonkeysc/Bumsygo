@@ -29,3 +29,11 @@ Bumsy Go/
 
 # Cache
 .cache/
+
+# Local scripts with private keys
+deploy_via_api.cjs
+push.cjs
+push.js
+run_deploy.sh
+clean.cjs
+/mercadopago_preference.php

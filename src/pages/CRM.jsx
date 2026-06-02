@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Users, ShoppingBag, MessageSquare, Plus, Trash2, Edit2, LogOut, CheckCircle, 
-  Clock, ArrowRight, UserCheck, Shield, Sparkles, Phone, Mail, Key, 
-  FileText, Search, Package, AlertCircle, Calendar, MapPin, CreditCard, TrendingUp, Tag
+import {
+  Users, ShoppingBag, MessageSquare, Plus, Trash2, Edit2, LogOut, CheckCircle,
+  Clock, ArrowRight, UserCheck, Shield, Sparkles, Phone, Mail, Key,
+  FileText, Search, Package, AlertCircle, Calendar, MapPin, CreditCard, TrendingUp, Tag,
+  Upload, Download, Gift
 } from 'lucide-react';
 import useSEO from '../hooks/useSEO';
 
@@ -26,11 +27,11 @@ const CRM = () => {
 
   // --- Core State ---
   const [portal, setPortal] = useState('gateway'); // gateway, buyer_login, buyer_register, buyer_dashboard, seller_login, seller_dashboard
-  
+
   // Auth state
   const [currentUser, setCurrentUser] = useState(null); // active buyer
   const [isSellerAuthenticated, setIsSellerAuthenticated] = useState(false);
-  
+
   // Database states loaded from localStorage
   const [clients, setClients] = useState([]);
   const [customProducts, setCustomProducts] = useState([]);
@@ -38,7 +39,7 @@ const CRM = () => {
   const [sales, setSales] = useState([]);
   const [stockOverrides, setStockOverrides] = useState({});
   const [sellerPassword, setSellerPassword] = useState('bumsyking');
-  
+
   // UI Tabs
   const [buyerTab, setBuyerTab] = useState('catalog'); // catalog, my_profile, my_purchases, my_inquiries
   const [sellerTab, setSellerTab] = useState('summary'); // summary, sales, clients, products, inquiries, settings
@@ -60,6 +61,8 @@ const CRM = () => {
   const [prodDescription, setProdDescription] = useState('');
   const [prodImageUrl, setProdImageUrl] = useState(IMAGE_PRESETS[0].url);
   const [prodStock, setProdStock] = useState('25');
+  const [prodPdfUrl, setProdPdfUrl] = useState('');
+  const [prodPdfName, setProdPdfName] = useState('');
   const [editingProduct, setEditingProduct] = useState(null);
 
   // Form states - Buyer Profile Update
@@ -82,6 +85,7 @@ const CRM = () => {
 
   // Popup / Alert Notification States
   const [notification, setNotification] = useState(null);
+  const [paymentSuccessData, setPaymentSuccessData] = useState(null);
 
   // --- Database Initialization ---
   useEffect(() => {
@@ -91,25 +95,25 @@ const CRM = () => {
       setClients(JSON.parse(savedClients));
     } else {
       const defaultClients = [
-        { 
-          id: 1, 
-          name: 'Juan Pérez', 
-          email: 'juan@perez.com', 
-          phone: '+52 55 1234 5678', 
-          password: 'buyer123', 
-          interest: 'Peluches', 
+        {
+          id: 1,
+          name: 'Juan Pérez',
+          email: 'juan@perez.com',
+          phone: '+52 55 1234 5678',
+          password: 'buyer123',
+          interest: 'Peluches',
           registeredAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
           notes: 'Cliente premium sumamente interesado en el Peluche Bumsy Fox XXL.',
           address: 'Av. Reforma 123, Colonia Centro, Ciudad de México',
           birthday: '1995-04-12'
         },
-        { 
-          id: 2, 
-          name: 'María Gómez', 
-          email: 'maria@gomez.com', 
-          phone: '+52 55 8765 4321', 
-          password: 'buyer123', 
-          interest: 'Libros', 
+        {
+          id: 2,
+          name: 'María Gómez',
+          email: 'maria@gomez.com',
+          phone: '+52 55 8765 4321',
+          password: 'buyer123',
+          interest: 'Libros',
           registeredAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
           notes: 'Prefiere libros de colorear interactivos para sus hijos.',
           address: 'Calle 50 #456, Monterrey, Nuevo León',
@@ -120,30 +124,52 @@ const CRM = () => {
       setClients(defaultClients);
     }
 
-    // Custom Products (with initial stock)
+    // Centralized Products Database (with self-healing automatic merge)
     const savedProducts = localStorage.getItem('bumsy_crm_products');
+    const defaultProducts = [
+      { id: 1, name: "Peluche Bumsy Fox (XXL)", price: 29.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.", status: "Activo", createdAt: new Date().toISOString(), stock: 15, rating: 5, color: "bg-orange-50" },
+      { id: 2, name: "Camiseta Arcoíris Uni", price: 19.99, category: "Ropa", image: "/assets/banners/mercha.webp", description: "Camiseta oficial con diseño de arcoíris de Bumsy Town. Algodón 100% orgánico.", status: "Activo", createdAt: new Date().toISOString(), stock: 8, rating: 4, color: "bg-pink-50" },
+      { id: 3, name: "Cuento: Aventuras en el Bosque", price: 14.99, category: "Libros", image: "/assets/banners/books.webp", description: "El cuento oficial ilustrado que narra las divertidas aventuras de Bumsy y sus amigos.", status: "Activo", createdAt: new Date().toISOString(), stock: 20, rating: 5, color: "bg-green-50" },
+      { id: 4, name: "Mochila Tarta Turtle", price: 34.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Mochila escolar resistente y colorida de Tarta Turtle con compartimentos especiales.", status: "Activo", createdAt: new Date().toISOString(), stock: 12, rating: 5, color: "bg-emerald-50" },
+      { id: 5, name: "Pack de Pegatinas Mágicas", price: 5.99, category: "Accesorios", image: "/assets/banners/pintar.png", description: "Paquete de 50 pegatinas de vinilo resistentes al agua con todos los personajes.", status: "Activo", createdAt: new Date().toISOString(), stock: 50, rating: 4, color: "bg-yellow-50" },
+      { id: 6, name: "Gorra Pipo Penguin", price: 12.99, category: "Ropa", image: "/assets/banners/mercha.webp", description: "Gorra ajustable oficial con bordado premium de Pipo Penguin.", status: "Activo", createdAt: new Date().toISOString(), stock: 30, rating: 5, color: "bg-blue-50" },
+      { id: 7, name: "Peluche Tarta Extra Suave", price: 24.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche coleccionable de Tarta Turtle, suave, tierno y con colores brillantes.", status: "Activo", createdAt: new Date().toISOString(), stock: 10, rating: 4, color: "bg-green-50" },
+      { id: 8, name: "Libro para Colorear Bumsy", price: 9.99, category: "Libros", image: "/assets/banners/pintar.png", description: "Libro físico con más de 60 páginas de plantillas e ilustraciones para colorear.", status: "Activo", createdAt: new Date().toISOString(), stock: 40, rating: 5, color: "bg-purple-50" },
+      { id: 9, name: "Coloreable Bubu Mágico", price: 0, category: "Regalos", image: "/assets/ecommerce/bubu_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/bubu_portada.png", description: "Plantilla digital gratuita de Bubu Mágico para descargar y pintar.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
+      { id: 10, name: "Bumsy Word Search (Sopa de Letras)", price: 0, category: "Regalos", image: "/assets/ecommerce/bumsy_word_01.webp", isFree: true, downloadUrl: "/assets/ecommerce/bumsy_word_01.png", description: "Divertido juego de sopa de letras imprimible con vocabulario de Bumsy Town.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
+      { id: 11, name: "Coloreable Especial Flamy Colors", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_colors.webp", isFree: true, downloadUrl: "/assets/ecommerce/flamy_colors.png", description: "Dibujo especial descargable de Flamy para colorear con tus mejores tonos.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
+      { id: 12, name: "Libro Portada Flamy y Amigos", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/flamy_portada.png", description: "Precioso libro digital de colorear de Flamy y sus inseparables amigos.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
+      { id: 13, name: "Coloreable Lola Unicornio", price: 0, category: "Regalos", image: "/assets/ecommerce/lola_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/lola_portada.png", description: "Divertida plantilla digital de Lola Unicornio para pintar y decorar.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
+      { id: 14, name: "Coloreable Pipa Portada 2", price: 0, category: "Regalos", image: "/assets/ecommerce/pipa_portada_2.webp", isFree: true, downloadUrl: "/assets/ecommerce/pipa_portada_2.png", description: "Nueva plantilla interactiva oficial de Pipa para colorear gratis.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
+      { id: 'custom_1', name: "Taza Mágica Bumsy (CRM)", price: 14.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Taza de cerámica premium que cambia de color al verter líquidos calientes.", status: "Activo", createdAt: new Date().toISOString(), stock: 45, rating: 5, color: "bg-slate-50" }
+    ];
+
+    let loadedProducts = [];
     if (savedProducts) {
-      setCustomProducts(JSON.parse(savedProducts));
+      try {
+        loadedProducts = JSON.parse(savedProducts);
+      } catch (e) {
+        console.error('Error parsing loaded products:', e);
+      }
+    }
+
+    let needsUpdate = false;
+    const mergedProducts = [...loadedProducts];
+
+    // Automatically add default products that are not present
+    defaultProducts.forEach(defProd => {
+      const exists = mergedProducts.some(p => p.id.toString() === defProd.id.toString());
+      if (!exists) {
+        mergedProducts.push(defProd);
+        needsUpdate = true;
+      }
+    });
+
+    if (needsUpdate || !savedProducts) {
+      localStorage.setItem('bumsy_crm_products', JSON.stringify(mergedProducts));
+      setCustomProducts(mergedProducts);
     } else {
-      const defaultProducts = [
-        { id: 1, name: "Peluche Bumsy Fox (XXL)", price: 29.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.", status: "Activo", createdAt: new Date().toISOString(), stock: 15, rating: 5, color: "bg-orange-50" },
-        { id: 2, name: "Camiseta Arcoíris Uni", price: 19.99, category: "Ropa", image: "/assets/banners/mercha.webp", description: "Camiseta oficial con diseño de arcoíris de Bumsy Town. Algodón 100% orgánico.", status: "Activo", createdAt: new Date().toISOString(), stock: 8, rating: 4, color: "bg-pink-50" },
-        { id: 3, name: "Cuento: Aventuras en el Bosque", price: 14.99, category: "Libros", image: "/assets/banners/books.webp", description: "El cuento oficial ilustrado que narra las divertidas aventuras de Bumsy y sus amigos.", status: "Activo", createdAt: new Date().toISOString(), stock: 20, rating: 5, color: "bg-green-50" },
-        { id: 4, name: "Mochila Tarta Turtle", price: 34.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Mochila escolar resistente y colorida de Tarta Turtle con compartimentos especiales.", status: "Activo", createdAt: new Date().toISOString(), stock: 12, rating: 5, color: "bg-emerald-50" },
-        { id: 5, name: "Pack de Pegatinas Mágicas", price: 5.99, category: "Accesorios", image: "/assets/banners/pintar.png", description: "Paquete de 50 pegatinas de vinilo resistentes al agua con todos los personajes.", status: "Activo", createdAt: new Date().toISOString(), stock: 50, rating: 4, color: "bg-yellow-50" },
-        { id: 6, name: "Gorra Pipo Penguin", price: 12.99, category: "Ropa", image: "/assets/banners/mercha.webp", description: "Gorra ajustable oficial con bordado premium de Pipo Penguin.", status: "Activo", createdAt: new Date().toISOString(), stock: 30, rating: 5, color: "bg-blue-50" },
-        { id: 7, name: "Peluche Tarta Extra Suave", price: 24.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche coleccionable de Tarta Turtle, suave, tierno y con colores brillantes.", status: "Activo", createdAt: new Date().toISOString(), stock: 10, rating: 4, color: "bg-green-50" },
-        { id: 8, name: "Libro para Colorear Bumsy", price: 9.99, category: "Libros", image: "/assets/banners/pintar.png", description: "Libro físico con más de 60 páginas de plantillas e ilustraciones para colorear.", status: "Activo", createdAt: new Date().toISOString(), stock: 40, rating: 5, color: "bg-purple-50" },
-        { id: 9, name: "Coloreable Bubu Mágico", price: 0, category: "Regalos", image: "/assets/ecommerce/bubu_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/bubu_portada.png", description: "Plantilla digital gratuita de Bubu Mágico para descargar y pintar.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-        { id: 10, name: "Bumsy Word Search (Sopa de Letras)", price: 0, category: "Regalos", image: "/assets/ecommerce/bumsy_word_01.webp", isFree: true, downloadUrl: "/assets/ecommerce/bumsy_word_01.png", description: "Divertido juego de sopa de letras imprimible con vocabulario de Bumsy Town.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-        { id: 11, name: "Coloreable Especial Flamy Colors", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_colors.webp", isFree: true, downloadUrl: "/assets/ecommerce/flamy_colors.png", description: "Dibujo especial descargable de Flamy para colorear con tus mejores tonos.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-        { id: 12, name: "Libro Portada Flamy y Amigos", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/flamy_portada.png", description: "Precioso libro digital de colorear de Flamy y sus inseparables amigos.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-        { id: 13, name: "Coloreable Lola Unicornio", price: 0, category: "Regalos", image: "/assets/ecommerce/lola_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/lola_portada.png", description: "Divertida plantilla digital de Lola Unicornio para pintar y decorar.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-        { id: 14, name: "Coloreable Pipa Portada 2", price: 0, category: "Regalos", image: "/assets/ecommerce/pipa_portada_2.webp", isFree: true, downloadUrl: "/assets/ecommerce/pipa_portada_2.png", description: "Nueva plantilla interactiva oficial de Pipa para colorear gratis.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-        { id: "custom_1", name: "Taza Mágica Bumsy (CRM)", price: 14.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Taza de cerámica premium que cambia de color al verter líquidos calientes.", status: "Activo", createdAt: new Date().toISOString(), stock: 45, rating: 5, color: "bg-slate-50" }
-      ];
-      localStorage.setItem("bumsy_crm_products", JSON.stringify(defaultProducts));
-      setCustomProducts(defaultProducts);
+      setCustomProducts(loadedProducts);
     }
 
     // Stock overrides to manage static products' inventory
@@ -167,12 +193,12 @@ const CRM = () => {
       setInquiries(JSON.parse(savedInquiries));
     } else {
       const defaultInquiries = [
-        { 
-          id: 1, 
-          buyerEmail: 'juan@perez.com', 
-          buyerName: 'Juan Pérez', 
-          productName: 'Peluche Bumsy Fox (XXL)', 
-          message: '¿Tienen existencias disponibles para enviar a Ciudad de México hoy mismo?', 
+        {
+          id: 1,
+          buyerEmail: 'juan@perez.com',
+          buyerName: 'Juan Pérez',
+          productName: 'Peluche Bumsy Fox (XXL)',
+          message: '¿Tienen existencias disponibles para enviar a Ciudad de México hoy mismo?',
           createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
           status: 'Pendiente'
         }
@@ -264,11 +290,11 @@ const CRM = () => {
     const updatedClients = [...clients, newClient];
     setClients(updatedClients);
     localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
-    
+
     setCurrentUser(newClient);
     triggerNotification('¡Registro exitoso! Bienvenido al Club de Amigos Bumsy.');
     setPortal('buyer_dashboard');
-    
+
     // Clear form
     setRegName('');
     setRegEmail('');
@@ -353,65 +379,87 @@ const CRM = () => {
     e.preventDefault();
     if (!currentUser || !activeCheckoutProduct) return;
 
-    const stockVal = getProductStock(activeCheckoutProduct);
-    if (stockVal <= 0) {
-      triggerNotification('Lo sentimos, este producto está agotado.', 'error');
-      return;
-    }
+    const isGiftProduct = activeCheckoutProduct.category === 'Regalos' || activeCheckoutProduct.price === 0;
 
-    // Deduct stock in override state & localStorage
-    const newStock = stockVal - 1;
-    const updatedOverrides = {
-      ...stockOverrides,
-      [activeCheckoutProduct.id]: newStock
-    };
-    setStockOverrides(updatedOverrides);
-    localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(updatedOverrides));
+    if (isGiftProduct) {
+      // 1. FREE GIFTS: Instant checkout directly registered local
+      const addressVal = 'Descarga Digital (Club de Amigos)';
+      const phoneVal = currentUser.phone || 'N/A';
+      const birthdayVal = currentUser.birthday || 'N/A';
 
-    // Also deduct stock in customProducts if it's dynamic
-    if (activeCheckoutProduct.id.toString().startsWith('custom_')) {
-      const updatedCustoms = customProducts.map(p => {
-        if (p.id === activeCheckoutProduct.id) {
-          return { ...p, stock: newStock };
+      const newSale = {
+        id: `sale_${Date.now()}`,
+        buyerEmail: currentUser.email,
+        buyerName: currentUser.name,
+        productName: activeCheckoutProduct.name,
+        price: activeCheckoutProduct.price,
+        pdfFile: activeCheckoutProduct.pdfFile || '',
+        downloadUrl: activeCheckoutProduct.downloadUrl || '',
+        address: addressVal,
+        birthday: birthdayVal,
+        date: new Date().toISOString()
+      };
+
+      const updatedSales = [newSale, ...sales];
+      setSales(updatedSales);
+      localStorage.setItem('bumsy_crm_sales', JSON.stringify(updatedSales));
+
+      triggerNotification(`¡Regalo "${activeCheckoutProduct.name}" agregado a tus descargas!`);
+      setActiveCheckoutProduct(null);
+      setBuyerTab('my_purchases');
+    } else {
+      // 2. PAID PRODUCTS: Secure Mercado Pago Preference API Flow
+      const stockVal = getProductStock(activeCheckoutProduct);
+      if (stockVal <= 0) {
+        triggerNotification('Lo sentimos, este producto está agotado.', 'error');
+        return;
+      }
+
+      triggerNotification('Conectando de forma segura con Mercado Pago...', 'info');
+
+      // Save checkout states in localStorage to process after return
+      const pendingPurchase = {
+        product: activeCheckoutProduct,
+        buyerEmail: currentUser.email,
+        buyerName: currentUser.name,
+        address: checkoutAddress,
+        phone: checkoutPhone,
+        birthday: checkoutBirthday
+      };
+      localStorage.setItem('bumsy_pending_purchase', JSON.stringify(pendingPurchase));
+
+      fetch('/mercadopago_preference.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: activeCheckoutProduct.id,
+          name: activeCheckoutProduct.name,
+          price: activeCheckoutProduct.price,
+          buyerEmail: currentUser.email,
+          buyerName: currentUser.name
+        })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Network response not ok');
+        return res.json();
+      })
+      .then(data => {
+        if (data.init_point) {
+          setActiveCheckoutProduct(null);
+          triggerNotification('Redirigiendo a Mercado Pago para realizar tu pago seguro...', 'success');
+          // Redirect the buyer directly to sandbox payment
+          window.location.href = data.init_point;
+        } else {
+          triggerNotification('Error al iniciar el portal de pagos de Mercado Pago.', 'error');
         }
-        return p;
+      })
+      .catch(err => {
+        console.error(err);
+        triggerNotification('Error de comunicación con la pasarela. Inténtalo de nuevo.', 'error');
       });
-      setCustomProducts(updatedCustoms);
-      localStorage.setItem('bumsy_crm_products', JSON.stringify(updatedCustoms));
     }
-
-    // Create new global sales record
-    const newSale = {
-      id: `sale_${Date.now()}`,
-      buyerEmail: currentUser.email,
-      buyerName: currentUser.name,
-      productName: activeCheckoutProduct.name,
-      price: activeCheckoutProduct.price,
-      address: checkoutAddress,
-      birthday: checkoutBirthday,
-      date: new Date().toISOString()
-    };
-
-    const updatedSales = [newSale, ...sales];
-    setSales(updatedSales);
-    localStorage.setItem('bumsy_crm_sales', JSON.stringify(updatedSales));
-
-    // Save profile details to user session
-    const updatedUser = {
-      ...currentUser,
-      phone: checkoutPhone,
-      address: checkoutAddress,
-      birthday: checkoutBirthday
-    };
-    setCurrentUser(updatedUser);
-
-    const updatedClients = clients.map(c => c.id === currentUser.id ? updatedUser : c);
-    setClients(updatedClients);
-    localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
-
-    triggerNotification(`¡Compra de "${activeCheckoutProduct.name}" simulada con éxito!`);
-    setActiveCheckoutProduct(null);
-    setBuyerTab('my_purchases'); // direct to purchases history
   };
 
   // --- Seller Dashboard Handlers ---
@@ -443,6 +491,27 @@ const CRM = () => {
     }
   };
 
+  const handlePdfUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        triggerNotification('El archivo seleccionado debe ser un PDF.', 'error');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        triggerNotification('El PDF excede los 5MB. Elige un archivo más pequeño.', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProdPdfUrl(reader.result);
+        setProdPdfName(file.name);
+        triggerNotification('¡Dibujo PDF cargado y procesado con éxito!');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleProductSubmit = (e) => {
     e.preventDefault();
     if (!prodName || !prodPrice) {
@@ -463,6 +532,9 @@ const CRM = () => {
             category: prodCategory,
             description: prodDescription,
             image: prodImageUrl,
+            pdfFile: prodPdfUrl,
+            pdfName: prodPdfName,
+            isFree: parseFloat(prodPrice) === 0 || prodCategory === 'Regalos',
             stock: stockParsed
           };
         }
@@ -479,7 +551,7 @@ const CRM = () => {
       setStockOverrides(updatedOverrides);
       localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(updatedOverrides));
 
-      triggerNotification('Producto y stock actualizados correctamente en el catálogo.');
+      triggerNotification('Producto, stock y archivos actualizados correctamente.');
       setEditingProduct(null);
     } else {
       // Create mode
@@ -491,6 +563,9 @@ const CRM = () => {
         category: prodCategory,
         description: prodDescription,
         image: prodImageUrl,
+        pdfFile: prodPdfUrl,
+        pdfName: prodPdfName,
+        isFree: parseFloat(prodPrice) === 0 || prodCategory === 'Regalos',
         status: 'Activo',
         createdAt: new Date().toISOString(),
         stock: stockParsed
@@ -518,6 +593,8 @@ const CRM = () => {
     setProdDescription('');
     setProdImageUrl(IMAGE_PRESETS[0].url);
     setProdStock('25');
+    setProdPdfUrl('');
+    setProdPdfName('');
   };
 
   const handleEditProductClick = (product) => {
@@ -528,6 +605,8 @@ const CRM = () => {
     setProdDescription(product.description || '');
     setProdImageUrl(product.image);
     setProdStock(product.stock !== undefined ? product.stock.toString() : '25');
+    setProdPdfUrl(product.pdfFile || '');
+    setProdPdfName(product.pdfName || '');
     setSellerTab('products'); // Switch tab to see form
   };
 
@@ -586,10 +665,160 @@ const CRM = () => {
     return p.stock !== undefined ? p.stock : 25;
   };
 
+  // Detect Mercado Pago URL Callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentStatus = params.get('payment_status');
+
+    if (paymentStatus === 'success') {
+      const emailParam = params.get('buyer_email');
+      const prodIdParam = params.get('product_id');
+
+      // Load pending purchase details from localStorage
+      const pendingStr = localStorage.getItem('bumsy_pending_purchase');
+      let pending = null;
+      if (pendingStr) {
+        try {
+          pending = JSON.parse(pendingStr);
+          localStorage.removeItem('bumsy_pending_purchase');
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      // Fallback session restoration if buyer got logged out
+      let activeUser = currentUser;
+      if (!activeUser && emailParam) {
+        const savedClients = localStorage.getItem('bumsy_crm_clients');
+        if (savedClients) {
+          try {
+            const parsed = JSON.parse(savedClients);
+            const foundUser = parsed.find(c => c.email.toLowerCase() === emailParam.toLowerCase());
+            if (foundUser) {
+              activeUser = foundUser;
+              setCurrentUser(foundUser);
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+
+      if (activeUser) {
+        const targetProd = allProductsList.find(p => p.id.toString() === prodIdParam?.toString()) || (pending ? pending.product : null);
+        
+        if (targetProd) {
+          const isGiftProduct = targetProd.category === 'Regalos' || targetProd.price === 0;
+
+          // Process stock deduction if physical item
+          if (!isGiftProduct) {
+            const stockVal = getProductStock(targetProd);
+            const newStock = Math.max(0, stockVal - 1);
+            const updatedOverrides = {
+              ...stockOverrides,
+              [targetProd.id]: newStock
+            };
+            setStockOverrides(updatedOverrides);
+            localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(updatedOverrides));
+
+            if (targetProd.id.toString().startsWith('custom_')) {
+              const updatedCustoms = customProducts.map(p => {
+                if (p.id === targetProd.id) {
+                  return { ...p, stock: newStock };
+                }
+                return p;
+              });
+              setCustomProducts(updatedCustoms);
+              localStorage.setItem('bumsy_crm_products', JSON.stringify(updatedCustoms));
+            }
+          }
+
+          // Register new official sale
+          const newSale = {
+            id: `sale_${Date.now()}`,
+            buyerEmail: activeUser.email,
+            buyerName: activeUser.name,
+            productName: targetProd.name,
+            price: targetProd.price,
+            pdfFile: targetProd.pdfFile || '',
+            downloadUrl: targetProd.downloadUrl || '',
+            address: pending?.address || activeUser.address || 'Hostinger Checkout',
+            birthday: pending?.birthday || activeUser.birthday || 'N/A',
+            date: new Date().toISOString()
+          };
+
+          const updatedSales = [newSale, ...sales];
+          setSales(updatedSales);
+          localStorage.setItem('bumsy_crm_sales', JSON.stringify(updatedSales));
+
+          // Set user session parameters
+          if (!isGiftProduct && pending) {
+            const updatedUser = {
+              ...activeUser,
+              phone: pending.phone,
+              address: pending.address,
+              birthday: pending.birthday
+            };
+            setCurrentUser(updatedUser);
+
+            const savedClients = localStorage.getItem('bumsy_crm_clients');
+            if (savedClients) {
+              try {
+                const parsedClients = JSON.parse(savedClients);
+                const updatedClients = parsedClients.map(c => c.id === activeUser.id ? updatedUser : c);
+                setClients(updatedClients);
+                localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
+              } catch (e) {
+                console.error(e);
+              }
+            }
+          }
+
+          // Trigger celebratory popup modal
+          setPaymentSuccessData(targetProd);
+          setPortal('buyer_dashboard');
+          setBuyerTab('my_purchases');
+        }
+      }
+
+      // Clean URL params to keep the portal interface clean
+      const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+
+    } else if (paymentStatus === 'failure') {
+      triggerNotification('El pago fue cancelado o rechazado por Mercado Pago.', 'error');
+      const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+    }
+  }, [sales, stockOverrides, customProducts, clients, currentUser]);
+
+  // Handle automatic checkout redirection from Storefront (Shop)
+  useEffect(() => {
+    const redirectStr = localStorage.getItem('bumsy_checkout_redirect');
+    if (redirectStr) {
+      try {
+        const product = JSON.parse(redirectStr);
+        
+        if (currentUser) {
+          localStorage.removeItem('bumsy_checkout_redirect');
+          setPortal('buyer_dashboard');
+          setBuyerTab('catalog');
+          setActiveCheckoutProduct(product);
+          triggerNotification(`¡Listos para tu compra de "${product.name}"!`);
+        } else {
+          setPortal('buyer_login');
+          triggerNotification(`¡Inicia sesión o regístrate para comprar "${product.name}"!`, 'info');
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [currentUser]);
+
   // Filtering products for buyer viewer
   const filteredCatalog = allProductsList.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(catalogSearch.toLowerCase()) || 
-                          (p.description && p.description.toLowerCase().includes(catalogSearch.toLowerCase()));
+    const matchesSearch = p.name.toLowerCase().includes(catalogSearch.toLowerCase()) ||
+      (p.description && p.description.toLowerCase().includes(catalogSearch.toLowerCase()));
     const matchesCategory = activeCatalogCategory === 'Todos' || p.category === activeCatalogCategory;
     return matchesSearch && matchesCategory;
   });
@@ -600,11 +829,11 @@ const CRM = () => {
 
   return (
     <div className="pt-24 min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none relative overflow-hidden">
-      
+
       {/* Dynamic Glass Notification Banner */}
       <AnimatePresence>
         {notification && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.9 }}
@@ -627,7 +856,7 @@ const CRM = () => {
 
       {/* Main Container */}
       <div className="container mx-auto px-4 py-8 flex-1 flex flex-col max-w-7xl z-10">
-        
+
         {/* HEADER BRANDING */}
         <div className="text-center mb-10">
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center justify-center gap-2 mb-2">
@@ -648,28 +877,28 @@ const CRM = () => {
         {portal === 'gateway' && (
           <div className="flex-1 flex flex-col items-center justify-center py-6">
             {/* Card 1: Club de Amigos (Featured Card with high visual weight) */}
-            <motion.div 
+            <motion.div
               whileHover={{ y: -6, scale: 1.01 }}
               onClick={() => setPortal('buyer_login')}
               className="bg-slate-900/40 border-2 border-pink-500/30 hover:border-pink-500 rounded-3xl p-10 cursor-pointer flex flex-col items-center text-center backdrop-blur-lg shadow-2xl group transition-all duration-300 relative overflow-hidden max-w-2xl w-full"
             >
               {/* Highlight Background Glow */}
               <div className="absolute inset-0 bg-pink-500/5 opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-              
+
               <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-pink-500/20 blur-xl group-hover:bg-pink-500/30 transition-colors"></div>
-              
+
               <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-pink-500 to-amber-400 flex items-center justify-center text-white mb-6 group-hover:scale-110 shadow-[0_10px_25px_rgba(236,72,153,0.3)] transition-transform">
                 <Sparkles size={38} className="animate-pulse" />
               </div>
-              
+
               <h3 className="text-3xl font-black mb-3 text-white uppercase tracking-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>
                 ¡Entrar al Club de Amigos!
               </h3>
-              
+
               <p className="text-slate-350 text-base font-semibold mb-8 leading-relaxed max-w-lg">
                 Colecciona tus personajes favoritos, descarga las plantillas gratis para colorear con Pipa, obtén regalos de cumpleaños y guarda tus datos para envíos rápidos de tus peluches mágicos.
               </p>
-              
+
               <span className="bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 text-white font-black text-sm px-10 py-4.5 rounded-full flex items-center gap-3 uppercase tracking-wider shadow-lg shadow-pink-500/25 transition-all transform group-hover:scale-105 active:scale-95">
                 ¡Ingresar Ahora! ✨ <ArrowRight size={16} />
               </span>
@@ -677,7 +906,7 @@ const CRM = () => {
 
             {/* Subtle, Low-Profile Staff Gateway Access */}
             <div className="mt-14 opacity-50 hover:opacity-100 transition-opacity">
-              <button 
+              <button
                 onClick={() => setPortal('seller_login')}
                 className="inline-flex items-center gap-2 text-xs font-semibold text-slate-450 hover:text-indigo-400 border border-slate-800 rounded-full px-6 py-3 bg-slate-950/40 hover:bg-slate-950 transition-all hover:border-slate-700"
               >
@@ -692,12 +921,12 @@ const CRM = () => {
           <div className="max-w-md w-full mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-md">
             <h2 className="text-2xl font-black uppercase mb-2 text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>¡Hola de nuevo, Amigo!</h2>
             <p className="text-slate-400 text-xs font-semibold text-center mb-6">Inicia sesión en tu espacio mágico del Club</p>
-            
+
             <form onSubmit={handleBuyerLogin} className="flex flex-col gap-4">
               <div>
                 <label className="text-xs font-black text-slate-400 uppercase block mb-1">Correo Electrónico</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   placeholder="ejemplo@correo.com"
@@ -707,8 +936,8 @@ const CRM = () => {
               </div>
               <div>
                 <label className="text-xs font-black text-slate-400 uppercase block mb-1">Contraseña</label>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   placeholder="••••••••"
@@ -716,7 +945,7 @@ const CRM = () => {
                   required
                 />
               </div>
-              
+
               <button type="submit" className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-sm py-4 rounded-xl shadow-lg mt-3 uppercase tracking-wider transition-colors">
                 Iniciar Sesión
               </button>
@@ -739,12 +968,12 @@ const CRM = () => {
           <div className="max-w-md w-full mx-auto bg-slate-900/50 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-md">
             <h2 className="text-2xl font-black uppercase mb-2 text-center" style={{ fontFamily: "'Poppins', sans-serif" }}>¡Únete al Club de Amigos!</h2>
             <p className="text-slate-400 text-xs font-semibold text-center mb-6">Regístrate gratis para empezar a recibir sorpresas mágicas</p>
-            
+
             <form onSubmit={handleBuyerRegister} className="flex flex-col gap-4">
               <div>
                 <label className="text-xs font-black text-slate-400 uppercase block mb-1">Nombre Completo</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={regName}
                   onChange={(e) => setRegName(e.target.value)}
                   placeholder="Tu Nombre"
@@ -754,8 +983,8 @@ const CRM = () => {
               </div>
               <div>
                 <label className="text-xs font-black text-slate-400 uppercase block mb-1">Correo Electrónico</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="ejemplo@correo.com"
@@ -767,8 +996,8 @@ const CRM = () => {
                 <label className="text-xs font-black text-slate-400 uppercase block mb-1">Teléfono Móvil</label>
                 <div className="relative">
                   <Phone size={16} className="absolute left-4 top-3.5 text-slate-500" />
-                  <input 
-                    type="tel" 
+                  <input
+                    type="tel"
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
                     placeholder="+52 55 1234 5678"
@@ -779,8 +1008,8 @@ const CRM = () => {
               </div>
               <div>
                 <label className="text-xs font-black text-slate-400 uppercase block mb-1">Contraseña</label>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
                   placeholder="••••••••"
@@ -829,12 +1058,12 @@ const CRM = () => {
             <p className="text-slate-400 text-xs font-semibold text-center mb-6 leading-relaxed">
               Ingresa el PIN / Contraseña seguro para administrar la base de datos interna.
             </p>
-            
+
             <form onSubmit={handleSellerLogin} className="flex flex-col gap-4">
               <div>
                 <label className="text-xs font-black text-slate-400 uppercase block mb-1">Nombre de Usuario</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value="admin"
                   disabled
                   className="w-full bg-slate-950/70 text-slate-550 border border-slate-850 rounded-xl px-4 py-3 text-sm focus:outline-none cursor-not-allowed"
@@ -845,8 +1074,8 @@ const CRM = () => {
                   <label className="text-xs font-black text-slate-400 uppercase">PIN / Contraseña de Acceso</label>
                   <span className="text-[10px] text-slate-500 font-mono">Defecto: `bumsyking`</span>
                 </div>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={sellerPassInput}
                   onChange={(e) => setSellerPassInput(e.target.value)}
                   placeholder="••••••••"
@@ -855,7 +1084,7 @@ const CRM = () => {
                   autoFocus
                 />
               </div>
-              
+
               <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm py-4 rounded-xl shadow-lg mt-3 uppercase tracking-wider transition-colors">
                 Verificar Credenciales
               </button>
@@ -872,7 +1101,7 @@ const CRM = () => {
         {/* ── BUYER DASHBOARD ───────────────────────────────────────────────────── */}
         {portal === 'buyer_dashboard' && currentUser && (
           <div className="flex-1 flex flex-col gap-6">
-            
+
             {/* Header info bar */}
             <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 backdrop-blur-md">
               <div className="flex items-center gap-4">
@@ -890,26 +1119,26 @@ const CRM = () => {
               </div>
 
               <div className="flex items-center flex-wrap gap-2.5">
-                <button 
-                  onClick={() => setBuyerTab('catalog')} 
+                <button
+                  onClick={() => setBuyerTab('catalog')}
                   className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'catalog' ? 'bg-pink-600 text-white shadow-lg' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800'}`}
                 >
                   Catálogo
                 </button>
-                <button 
-                  onClick={() => setBuyerTab('my_profile')} 
+                <button
+                  onClick={() => setBuyerTab('my_profile')}
                   className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'my_profile' ? 'bg-pink-600 text-white shadow-lg' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800'}`}
                 >
                   Mi Perfil
                 </button>
-                <button 
-                  onClick={() => setBuyerTab('my_purchases')} 
+                <button
+                  onClick={() => setBuyerTab('my_purchases')}
                   className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'my_purchases' ? 'bg-pink-600 text-white shadow-lg' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800'}`}
                 >
                   Mis Compras ({sales.filter(s => s.buyerEmail === currentUser.email).length})
                 </button>
-                <button 
-                  onClick={() => setBuyerTab('my_inquiries')} 
+                <button
+                  onClick={() => setBuyerTab('my_inquiries')}
                   className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'my_inquiries' ? 'bg-pink-600 text-white shadow-lg' : 'bg-slate-800/60 text-slate-300 hover:bg-slate-800'}`}
                 >
                   Consultas ({inquiries.filter(i => i.buyerEmail === currentUser.email).length})
@@ -923,7 +1152,7 @@ const CRM = () => {
             {/* TAB: CATALOG EXPLORER */}
             {buyerTab === 'catalog' && (
               <div className="flex-1 flex flex-col gap-6">
-                
+
                 {/* Filters Row */}
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                   <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-1 hide-scrollbar">
@@ -940,8 +1169,8 @@ const CRM = () => {
 
                   <div className="w-full md:w-80 relative flex items-center bg-slate-900 border border-slate-800 rounded-full px-4 py-2">
                     <Search size={16} className="text-slate-400 mr-2" />
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="Buscar en el catálogo..."
                       value={catalogSearch}
                       onChange={(e) => setCatalogSearch(e.target.value)}
@@ -966,17 +1195,22 @@ const CRM = () => {
                         <div key={p.id} className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col group hover:border-pink-500/30 transition-all duration-300 relative overflow-hidden">
                           <div className="aspect-video w-full rounded-2xl overflow-hidden bg-slate-950 mb-4 border border-slate-850 relative">
                             <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            
+
                             {/* Stock status badge */}
-                            <span className={`absolute top-3 left-3 font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider ${
-                              isOutOfStock 
-                                ? 'bg-red-500/90 text-white shadow-md' 
-                                : stockLevel <= 5 
-                                  ? 'bg-amber-500/90 text-slate-950 shadow-md' 
-                                  : 'bg-slate-900/80 text-slate-300'
-                            }`}>
-                              {isOutOfStock ? 'Agotado' : `Stock: ${stockLevel} u.`}
-                            </span>
+                            {!(p.price === 0 || p.category === 'Regalos') ? (
+                              <span className={`absolute top-3 left-3 font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider ${isOutOfStock
+                                  ? 'bg-red-500/90 text-white shadow-md'
+                                  : stockLevel <= 5
+                                    ? 'bg-amber-500/90 text-slate-950 shadow-md'
+                                    : 'bg-slate-900/80 text-slate-300'
+                                }`}>
+                                {isOutOfStock ? 'Agotado' : `Stock: ${stockLevel} u.`}
+                              </span>
+                            ) : (
+                              <span className="absolute top-3 left-3 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider shadow-md">
+                                Descarga Libre ✨
+                              </span>
+                            )}
 
                             <span className="absolute top-3 right-3 bg-pink-600/90 text-white font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider">
                               {p.category}
@@ -990,33 +1224,47 @@ const CRM = () => {
                           </p>
                           <div className="flex items-center justify-between border-t border-slate-850 pt-4 mt-auto">
                             <span className="text-pink-500 font-black text-2xl" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                              ${p.price} <span className="text-xs text-slate-500 font-bold font-sans">USD</span>
+                              {p.price === 0 || p.category === 'Regalos' ? (
+                                <span className="text-amber-450 font-black text-lg uppercase tracking-wider animate-pulse flex items-center gap-1">
+                                  <Gift size={16} className="text-amber-400 shrink-0 animate-bounce" /> Gratis
+                                </span>
+                              ) : (
+                                <>${p.price} <span className="text-xs text-slate-500 font-bold font-sans">USD</span></>
+                              )}
                             </span>
-                            
+
                             <div className="flex items-center gap-1.5">
-                              <button 
-                                onClick={() => handleInquirySubmit(p)}
-                                className="bg-slate-800 hover:bg-slate-755 border border-slate-700 text-slate-300 font-black text-[10px] uppercase tracking-wider px-3 py-2 rounded-full transition-all flex items-center gap-1"
-                                title="Enviar consulta de preventa"
-                              >
-                                <MessageSquare size={12} />
-                              </button>
-                              <button 
+                              {!(p.price === 0 || p.category === 'Regalos') && (
+                                <button
+                                  onClick={() => handleInquirySubmit(p)}
+                                  className="bg-slate-800 hover:bg-slate-755 border border-slate-700 text-slate-300 font-black text-[10px] uppercase tracking-wider px-3 py-2 rounded-full transition-all flex items-center gap-1"
+                                  title="Enviar consulta de preventa"
+                                >
+                                  <MessageSquare size={12} />
+                                </button>
+                              )}
+                              <button
                                 onClick={() => {
-                                  if (isOutOfStock) {
+                                  const isGift = p.price === 0 || p.category === 'Regalos';
+                                  if (!isGift && isOutOfStock) {
                                     triggerNotification('Producto agotado.', 'error');
                                     return;
                                   }
                                   setActiveCheckoutProduct(p);
                                 }}
-                                disabled={isOutOfStock}
-                                className={`font-black text-[10px] uppercase tracking-wider px-4 py-2 rounded-full transition-all flex items-center gap-1 shadow-lg ${
-                                  isOutOfStock 
-                                    ? 'bg-slate-800 text-slate-600 border border-slate-850 cursor-not-allowed' 
-                                    : 'bg-pink-600 hover:bg-pink-500 text-white'
-                                }`}
+                                disabled={!(p.price === 0 || p.category === 'Regalos') && isOutOfStock}
+                                className={`font-black text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-full transition-all flex items-center gap-1 shadow-lg ${(p.price === 0 || p.category === 'Regalos')
+                                    ? 'bg-amber-400 hover:bg-amber-500 text-slate-950 font-black'
+                                    : isOutOfStock
+                                      ? 'bg-slate-800 text-slate-600 border border-slate-850 cursor-not-allowed'
+                                      : 'bg-pink-600 hover:bg-pink-500 text-white'
+                                  }`}
                               >
-                                <ShoppingBag size={12} /> Comprar
+                                {(p.price === 0 || p.category === 'Regalos') ? (
+                                  <><Gift size={12} /> Obtener</>
+                                ) : (
+                                  <><ShoppingBag size={12} /> Comprar</>
+                                )}
                               </button>
                             </div>
                           </div>
@@ -1040,8 +1288,8 @@ const CRM = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nombre Completo</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={profileName}
                         onChange={(e) => setProfileName(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-semibold"
@@ -1050,8 +1298,8 @@ const CRM = () => {
                     </div>
                     <div>
                       <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Teléfono Móvil</label>
-                      <input 
-                        type="tel" 
+                      <input
+                        type="tel"
                         value={profilePhone}
                         onChange={(e) => setProfilePhone(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-mono"
@@ -1063,8 +1311,8 @@ const CRM = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Correo Electrónico (No editable)</label>
-                      <input 
-                        type="email" 
+                      <input
+                        type="email"
                         value={currentUser.email}
                         disabled
                         className="w-full bg-slate-950/50 border border-slate-850 rounded-xl px-4 py-3 text-xs text-slate-500 cursor-not-allowed font-semibold"
@@ -1074,8 +1322,8 @@ const CRM = () => {
                       <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Fecha de Cumpleaños</label>
                       <div className="relative">
                         <Calendar size={14} className="absolute left-4 top-3.5 text-slate-500" />
-                        <input 
-                          type="date" 
+                        <input
+                          type="date"
                           value={profileBirthday}
                           onChange={(e) => setProfileBirthday(e.target.value)}
                           className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl pl-11 pr-4 py-3 text-xs focus:outline-none text-slate-300 font-mono"
@@ -1089,8 +1337,8 @@ const CRM = () => {
                     <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Dirección de Envío Completa</label>
                     <div className="relative">
                       <MapPin size={14} className="absolute left-4 top-3.5 text-slate-500" />
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={profileAddress}
                         onChange={(e) => setProfileAddress(e.target.value)}
                         placeholder="Calle, Número, Colonia, Ciudad, Estado, Código Postal"
@@ -1121,7 +1369,7 @@ const CRM = () => {
                 <h3 className="text-xl font-black uppercase mb-6 flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   <ShoppingBag size={20} className="text-pink-400" /> Mi Historial de Compras
                 </h3>
-                
+
                 {sales.filter(s => s.buyerEmail === currentUser.email).length === 0 ? (
                   <div className="py-12 text-center text-slate-500 font-semibold flex flex-col items-center justify-center">
                     <ShoppingBag size={40} className="mb-3 text-slate-750" />
@@ -1138,10 +1386,27 @@ const CRM = () => {
                           <span className="text-[10px] text-slate-500 font-mono mt-1">{new Date(order.date).toLocaleString()}</span>
                         </div>
                         <div className="flex flex-col md:items-end gap-2 shrink-0">
-                          <span className="font-mono text-pink-500 font-black text-xl">${order.price.toFixed(2)} USD</span>
-                          <span className="text-[9px] font-black uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full flex items-center gap-1">
-                            <CheckCircle size={10} /> Procesado & Enviado
+                          <span className="font-mono text-pink-500 font-black text-xl">
+                            {order.price === 0 ? (
+                              <span className="text-amber-440 font-black text-sm uppercase tracking-wider">¡Gratis!</span>
+                            ) : (
+                              <>${order.price.toFixed(2)} USD</>
+                            )}
                           </span>
+                          <div className="flex flex-wrap items-center gap-2 justify-end">
+                            {(order.pdfFile || order.downloadUrl) && (
+                              <a
+                                href={order.pdfFile || order.downloadUrl}
+                                download={`${order.productName}.pdf`}
+                                className="bg-pink-600 hover:bg-pink-500 text-white font-black text-[10px] uppercase tracking-wider px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-md shadow-pink-500/25 shrink-0"
+                              >
+                                <Download size={12} /> Descargar PDF
+                              </a>
+                            )}
+                            <span className="text-[9px] font-black uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-2 rounded-xl flex items-center gap-1">
+                              <CheckCircle size={10} /> Procesado
+                            </span>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -1156,7 +1421,7 @@ const CRM = () => {
                 <h3 className="text-xl font-black uppercase mb-6 flex items-center gap-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   <FileText size={20} className="text-pink-400" /> Historial de Consultas
                 </h3>
-                
+
                 {inquiries.filter(i => i.buyerEmail === currentUser.email).length === 0 ? (
                   <div className="py-12 text-center text-slate-500 font-semibold flex flex-col items-center justify-center">
                     <MessageSquare size={40} className="mb-3 text-slate-750" />
@@ -1169,11 +1434,10 @@ const CRM = () => {
                         <div className="flex flex-col gap-1 text-left">
                           <div className="flex items-center gap-2.5">
                             <h4 className="font-black text-base text-slate-200 uppercase" style={{ fontFamily: "'Poppins', sans-serif" }}>{inq.productName}</h4>
-                            <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                              inq.status === 'Pendiente' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
-                              inq.status === 'En Seguimiento' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                              'bg-green-500/20 text-green-400 border border-green-500/30'
-                            }`}>
+                            <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${inq.status === 'Pendiente' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
+                                inq.status === 'En Seguimiento' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                                  'bg-green-500/20 text-green-400 border border-green-500/30'
+                              }`}>
                               {inq.status}
                             </span>
                           </div>
@@ -1204,10 +1468,10 @@ const CRM = () => {
         {/* ── SELLER DASHBOARD ─────────────────────────────────────────────────── */}
         {portal === 'seller_dashboard' && isSellerAuthenticated && (
           <div className="flex flex-col lg:flex-row gap-8 flex-1 text-left" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
-            
+
             {/* Sidebar Navigation */}
             <div className="w-full lg:w-64 bg-slate-900/40 border border-slate-800 rounded-3xl p-6 h-fit backdrop-blur-md flex flex-col gap-6">
-              
+
               <div className="flex items-center gap-3 border-b border-slate-800 pb-5 text-left">
                 <span className="p-2 rounded-xl bg-indigo-500/20 border border-indigo-500/35 text-indigo-400">
                   <Shield size={20} />
@@ -1218,31 +1482,30 @@ const CRM = () => {
                 </div>
               </div>
 
-                {[
-                  { id: 'summary', name: 'Resumen', icon: Sparkles },
-                  { id: 'sales', name: 'Ventas / Pedidos', icon: CreditCard },
-                  { id: 'clients', name: 'Clientes CRM', icon: Users },
-                  { id: 'products', name: 'Subir/Stock', icon: Plus },
-                  { id: 'inquiries', name: 'Bandeja Leads', icon: MessageSquare },
-                  { id: 'settings', name: 'Seguridad', icon: Key }
-                ].map(tab => {
-                  const IconComp = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setSellerTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${
-                        sellerTab === tab.id 
-                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+              {[
+                { id: 'summary', name: 'Resumen', icon: Sparkles },
+                { id: 'sales', name: 'Ventas / Pedidos', icon: CreditCard },
+                { id: 'clients', name: 'Clientes CRM', icon: Users },
+                { id: 'products', name: 'Subir/Stock', icon: Plus },
+                { id: 'inquiries', name: 'Bandeja Leads', icon: MessageSquare },
+                { id: 'settings', name: 'Seguridad', icon: Key }
+              ].map(tab => {
+                const IconComp = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSellerTab(tab.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${sellerTab === tab.id
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
                       }`}
-                    >
-                      <IconComp size={16} /> {tab.name}
-                    </button>
-                  );
-                })}
+                  >
+                    <IconComp size={16} /> {tab.name}
+                  </button>
+                );
+              })}
 
-              <button 
+              <button
                 onClick={handleLogout}
                 className="w-full mt-4 flex items-center gap-3 px-4 py-3 border border-red-500/30 bg-red-950/20 hover:bg-red-950/40 text-red-400 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
               >
@@ -1256,7 +1519,7 @@ const CRM = () => {
               {/* TAB: SUMMARY / OVERVIEW */}
               {sellerTab === 'summary' && (
                 <div className="flex flex-col gap-6">
-                  
+
                   {/* Grid Stat Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 flex items-center justify-between backdrop-blur-md">
@@ -1296,7 +1559,7 @@ const CRM = () => {
 
                   {/* Activity Feeds */}
                   <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-                    
+
                     {/* Recent Sales log */}
                     <div className="xl:col-span-7 bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
                       <div className="flex items-center justify-between mb-5">
@@ -1376,11 +1639,11 @@ const CRM = () => {
                     <h3 className="font-bold text-xl uppercase tracking-wider flex items-center gap-2 text-slate-200">
                       <CreditCard size={20} className="text-indigo-400" /> Registro de Ventas & Pedidos
                     </h3>
-                    
+
                     <div className="relative flex items-center bg-slate-955 border border-slate-855 rounded-full px-4 py-2 w-full sm:w-64">
                       <Search size={14} className="text-slate-500 mr-2" />
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         placeholder="Buscar por comprador o producto..."
                         value={salesSearch}
                         onChange={(e) => setSalesSearch(e.target.value)}
@@ -1402,8 +1665,8 @@ const CRM = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {sales.filter(s => 
-                          s.buyerName.toLowerCase().includes(salesSearch.toLowerCase()) || 
+                        {sales.filter(s =>
+                          s.buyerName.toLowerCase().includes(salesSearch.toLowerCase()) ||
                           s.productName.toLowerCase().includes(salesSearch.toLowerCase())
                         ).map(sale => (
                           <tr key={sale.id} className="border-b border-slate-850 hover:bg-slate-900/30 transition-colors">
@@ -1448,11 +1711,11 @@ const CRM = () => {
                     <h3 className="font-bold text-xl uppercase tracking-wider flex items-center gap-2 text-slate-200">
                       <Users size={20} className="text-indigo-400" /> Directorio de Clientes (CRM)
                     </h3>
-                    
+
                     <div className="relative flex items-center bg-slate-955 border border-slate-855 rounded-full px-4 py-2 w-full sm:w-64">
                       <Search size={14} className="text-slate-500 mr-2" />
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         placeholder="Buscar cliente..."
                         value={clientSearch}
                         onChange={(e) => setClientSearch(e.target.value)}
@@ -1505,7 +1768,7 @@ const CRM = () => {
                             </td>
                             <td className="p-4">
                               <div className="flex items-center gap-2">
-                                <textarea 
+                                <textarea
                                   defaultValue={client.notes}
                                   placeholder="Notas comerciales..."
                                   onBlur={(e) => handleSaveNotes(client.id, e.target.value)}
@@ -1524,7 +1787,7 @@ const CRM = () => {
               {/* TAB: PRODUCTS UPLOADER & LIST */}
               {sellerTab === 'products' && (
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                  
+
                   {/* Upload Form */}
                   <div className="xl:col-span-5 bg-slate-900/30 border border-slate-800 rounded-3xl p-6 h-fit backdrop-blur-md">
                     <h3 className="font-black text-lg uppercase tracking-tight flex items-center gap-2 mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -1534,8 +1797,8 @@ const CRM = () => {
                     <form onSubmit={handleProductSubmit} className="flex flex-col gap-4">
                       <div>
                         <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nombre del Producto</label>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           placeholder="Peluche Bumsy Gold, Taza, etc."
                           value={prodName}
                           onChange={(e) => setProdName(e.target.value)}
@@ -1547,8 +1810,8 @@ const CRM = () => {
                       <div className="grid grid-cols-3 gap-3">
                         <div className="col-span-1">
                           <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Precio ($)</label>
-                          <input 
-                            type="number" 
+                          <input
+                            type="number"
                             step="0.01"
                             placeholder="19.99"
                             value={prodPrice}
@@ -1559,8 +1822,8 @@ const CRM = () => {
                         </div>
                         <div className="col-span-1">
                           <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Stock Físico</label>
-                          <input 
-                            type="number" 
+                          <input
+                            type="number"
                             placeholder="25"
                             value={prodStock}
                             onChange={(e) => setProdStock(e.target.value)}
@@ -1570,7 +1833,7 @@ const CRM = () => {
                         </div>
                         <div className="col-span-1">
                           <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Categoría</label>
-                          <select 
+                          <select
                             value={prodCategory}
                             onChange={(e) => setProdCategory(e.target.value)}
                             className="w-full bg-slate-950 border border-slate-855 focus:border-indigo-500 rounded-xl px-3 py-3 text-xs focus:outline-none transition-colors text-slate-300 font-semibold"
@@ -1584,7 +1847,7 @@ const CRM = () => {
 
                       <div>
                         <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Descripción Corta</label>
-                        <textarea 
+                        <textarea
                           placeholder="Escribe los detalles mágicos de este producto oficial..."
                           value={prodDescription}
                           onChange={(e) => setProdDescription(e.target.value)}
@@ -1601,17 +1864,17 @@ const CRM = () => {
                               <Plus size={16} className="text-slate-500 group-hover:text-indigo-400 mb-0.5 transition-colors" />
                               <span className="text-[9px] font-bold text-slate-400 uppercase group-hover:text-slate-200 transition-colors">Subir foto local</span>
                               <span className="text-[7px] text-slate-600 lowercase mt-0.5">(PNG, JPG, WEBP - Máx 2MB)</span>
-                              <input 
-                                type="file" 
-                                accept="image/*" 
-                                onChange={handleImageUpload} 
-                                className="hidden" 
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
                               />
                             </label>
 
                             {/* Direct URL input */}
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               placeholder="O pega enlace de internet (https://...)"
                               value={prodImageUrl}
                               onChange={(e) => setProdImageUrl(e.target.value)}
@@ -1656,13 +1919,60 @@ const CRM = () => {
                         </div>
                       </div>
 
+                      {/* Archivo Regalo PDF (Opcional o Recomendado para Regalos) */}
+                      <div className="pt-4 border-t border-slate-850/60">
+                        <label className="text-xs font-bold text-slate-400 uppercase block mb-1.5 text-left flex items-center gap-1.5">
+                          <FileText size={13} className="text-indigo-400" /> Archivo de Regalo (Dibujo / Plantilla PDF)
+                        </label>
+                        <div className="flex items-center gap-3 bg-slate-950/20 border border-slate-850 rounded-2xl p-3">
+                          <label className="flex items-center gap-1.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500 px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors shrink-0">
+                            <Upload size={14} className="text-slate-400" />
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-300">Elegir PDF</span>
+                            <input
+                              type="file"
+                              accept="application/pdf"
+                              onChange={handlePdfUpload}
+                              className="hidden"
+                            />
+                          </label>
+
+                          <div className="flex-1 text-left min-w-0">
+                            {prodPdfUrl ? (
+                              <div className="flex items-center gap-1.5 text-green-400">
+                                <CheckCircle size={14} className="shrink-0 animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-wider truncate" title={prodPdfName}>
+                                  {prodPdfName || 'archivo.pdf'} (Listo)
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[10px] font-bold text-slate-500">
+                                {prodCategory === 'Regalos'
+                                  ? '💡 Recomendado para la categoría de regalos'
+                                  : 'Opcional para coloreables / plantillas (Máx 5MB)'
+                                }
+                              </span>
+                            )}
+                          </div>
+
+                          {prodPdfUrl && (
+                            <button
+                              type="button"
+                              onClick={() => { setProdPdfUrl(''); setProdPdfName(''); }}
+                              className="text-red-400 hover:text-red-300 font-bold text-[9px] uppercase tracking-wider bg-red-950/20 px-2.5 py-1.5 rounded-lg border border-red-500/25 transition-colors shrink-0"
+                            >
+                              Remover
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
                       <div className="flex gap-3 mt-4">
                         <button type="submit" className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs py-3.5 rounded-xl shadow-lg uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5">
                           <CheckCircle size={14} /> {editingProduct ? 'Confirmar Edición' : 'Subir Producto'}
                         </button>
                         {editingProduct && (
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             onClick={() => {
                               setEditingProduct(null);
                               setProdName('');
@@ -1713,11 +2023,10 @@ const CRM = () => {
                                     <span className="text-[8px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase font-black tracking-wider">
                                       {p.category}
                                     </span>
-                                    <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${
-                                      stockLevel <= 0 
-                                        ? 'bg-red-500/10 text-red-400 border border-red-500/20' 
+                                    <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${stockLevel <= 0
+                                        ? 'bg-red-500/10 text-red-400 border border-red-500/20'
                                         : 'bg-green-500/10 text-green-400 border border-green-500/20'
-                                    }`}>
+                                      }`}>
                                       Stock: {stockLevel}
                                     </span>
                                   </div>
@@ -1727,14 +2036,14 @@ const CRM = () => {
                               </div>
 
                               <div className="flex items-center gap-2">
-                                <button 
+                                <button
                                   onClick={() => handleEditProductClick(p)}
                                   className="bg-slate-900 border border-slate-800 text-indigo-400 hover:text-indigo-300 p-2.5 rounded-xl transition-colors"
                                   title="Editar"
                                 >
                                   <Edit2 size={12} />
                                 </button>
-                                <button 
+                                <button
                                   onClick={() => handleDeleteProduct(p.id)}
                                   className="bg-slate-900 border border-slate-800 text-red-400 hover:text-red-300 p-2.5 rounded-xl transition-colors"
                                   title="Eliminar"
@@ -1789,7 +2098,7 @@ const CRM = () => {
                               <option value="En Seguimiento">En Seguimiento</option>
                               <option value="Completado">Completado</option>
                             </select>
-                            <button 
+                            <button
                               onClick={() => handleDeleteInquiry(inq.id)}
                               className="bg-slate-900 border border-slate-800 text-slate-500 hover:text-red-400 p-2 rounded-lg transition-all"
                               title="Archivar lead"
@@ -1814,8 +2123,8 @@ const CRM = () => {
                   <form onSubmit={handlePasswordChange} className="flex flex-col gap-4">
                     <div>
                       <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nombre de Usuario Administrador</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value="admin"
                         disabled
                         className="w-full bg-slate-950/50 text-slate-555 border border-slate-855 rounded-xl px-4 py-3 text-xs cursor-not-allowed"
@@ -1823,8 +2132,8 @@ const CRM = () => {
                     </div>
                     <div>
                       <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nuevo PIN / Contraseña de Vendedor</label>
-                      <input 
-                        type="password" 
+                      <input
+                        type="password"
                         name="newPass"
                         placeholder="Ingresa tu nueva clave de acceso privado..."
                         className="w-full bg-slate-950 border border-slate-855 focus:border-indigo-500 rounded-xl px-4 py-3 text-xs focus:outline-none transition-colors text-slate-200 font-mono"
@@ -1848,13 +2157,13 @@ const CRM = () => {
       {/* ── SIMULATED QUICK CHECKOUT MODAL ─────────────────────────────────────── */}
       <AnimatePresence>
         {activeCheckoutProduct && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
@@ -1868,7 +2177,7 @@ const CRM = () => {
                     Formulario de Compra Rápida
                   </h3>
                 </div>
-                <button 
+                <button
                   onClick={() => setActiveCheckoutProduct(null)}
                   className="text-slate-400 hover:text-white text-xs font-black uppercase tracking-wider bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-full"
                 >
@@ -1878,7 +2187,7 @@ const CRM = () => {
 
               {/* Modal Body / Scrollable */}
               <div className="p-6 overflow-y-auto flex flex-col gap-5">
-                
+
                 {/* Product details mini-card */}
                 <div className="bg-slate-950/40 border border-slate-850 rounded-2xl p-4 flex items-center gap-4 text-left">
                   <div className="w-16 h-12 rounded-lg overflow-hidden bg-slate-950 border border-slate-850 shrink-0">
@@ -1886,84 +2195,174 @@ const CRM = () => {
                   </div>
                   <div>
                     <h4 className="font-black text-sm text-slate-200 uppercase leading-tight">{activeCheckoutProduct.name}</h4>
-                    <span className="font-mono text-pink-500 font-bold text-sm block mt-0.5">${activeCheckoutProduct.price} USD</span>
+                    <span className="font-mono text-pink-500 font-bold text-sm block mt-0.5">
+                      {activeCheckoutProduct.price === 0 || activeCheckoutProduct.category === 'Regalos' ? (
+                        <span className="text-amber-400 font-bold">¡GRATIS!</span>
+                      ) : (
+                        <>${activeCheckoutProduct.price} USD</>
+                      )}
+                    </span>
                   </div>
                 </div>
 
                 {/* Pre-fill autofill notice banner */}
-                <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-3 flex gap-2.5 text-left">
-                  <Sparkles size={16} className="text-indigo-400 shrink-0 mt-0.5" />
-                  <p className="text-[10px] text-indigo-300 leading-tight font-semibold">
-                    ¡Autocompletado Activo! Hemos pre-cargado tus datos personales y dirección de envío desde tu perfil de usuario registrado.
-                  </p>
-                </div>
+                {!(activeCheckoutProduct.price === 0 || activeCheckoutProduct.category === 'Regalos') && (
+                  <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-3 flex gap-2.5 text-left">
+                    <Sparkles size={16} className="text-indigo-400 shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-indigo-300 leading-tight font-semibold">
+                      ¡Autocompletado Activo! Hemos pre-cargado tus datos personales y dirección de envío desde tu perfil de usuario registrado.
+                    </p>
+                  </div>
+                )}
 
                 <form onSubmit={handleConfirmPurchase} className="flex flex-col gap-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nombre Completo</label>
-                      <input 
-                        type="text" 
-                        value={currentUser.name} 
-                        disabled
-                        className="w-full bg-slate-950/50 border border-slate-850 rounded-xl px-4 py-3 text-xs text-slate-500 cursor-not-allowed font-semibold"
-                      />
+                  {(activeCheckoutProduct.price === 0 || activeCheckoutProduct.category === 'Regalos') ? (
+                    <div className="bg-pink-500/5 border border-pink-500/10 rounded-2xl p-4 text-left flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-pink-400">
+                        <Sparkles size={18} />
+                        <span className="text-sm font-black uppercase">Regalo Digital Listo</span>
+                      </div>
+                      <p className="text-xs text-pink-300 leading-relaxed font-semibold">
+                        Este es un regalo digital totalmente gratis para los miembros de nuestro Club de Amigos. Al confirmar, se agregará a tu historial y podrás descargarlo de inmediato como un archivo PDF para colorear.
+                      </p>
                     </div>
-                    <div>
-                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Teléfono de Contacto</label>
-                      <input 
-                        type="tel" 
-                        value={checkoutPhone} 
-                        onChange={(e) => setCheckoutPhone(e.target.value)}
-                        placeholder="+52 55 1234 5678"
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-mono"
-                        required
-                      />
-                    </div>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Nombre Completo</label>
+                          <input
+                            type="text"
+                            value={currentUser.name}
+                            disabled
+                            className="w-full bg-slate-950/50 border border-slate-850 rounded-xl px-4 py-3 text-xs text-slate-500 cursor-not-allowed font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Teléfono de Contacto</label>
+                          <input
+                            type="tel"
+                            value={checkoutPhone}
+                            onChange={(e) => setCheckoutPhone(e.target.value)}
+                            placeholder="+52 55 1234 5678"
+                            className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-mono"
+                            required
+                          />
+                        </div>
+                      </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Email del Comprador</label>
-                      <input 
-                        type="email" 
-                        value={currentUser.email} 
-                        disabled
-                        className="w-full bg-slate-950/50 border border-slate-850 rounded-xl px-4 py-3 text-xs text-slate-500 cursor-not-allowed font-semibold"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Fecha de Cumpleaños</label>
-                      <input 
-                        type="date" 
-                        value={checkoutBirthday} 
-                        onChange={(e) => setCheckoutBirthday(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-300 font-mono"
-                        required
-                      />
-                    </div>
-                  </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Email del Comprador</label>
+                          <input
+                            type="email"
+                            value={currentUser.email}
+                            disabled
+                            className="w-full bg-slate-950/50 border border-slate-850 rounded-xl px-4 py-3 text-xs text-slate-500 cursor-not-allowed font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Fecha de Cumpleaños</label>
+                          <input
+                            type="date"
+                            value={checkoutBirthday}
+                            onChange={(e) => setCheckoutBirthday(e.target.value)}
+                            className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-300 font-mono"
+                            required
+                          />
+                        </div>
+                      </div>
 
-                  <div>
-                    <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Dirección de Envío Completa</label>
-                    <input 
-                      type="text" 
-                      value={checkoutAddress} 
-                      onChange={(e) => setCheckoutAddress(e.target.value)}
-                      placeholder="Calle, Número, Colonia, Ciudad, Estado, Código Postal"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-semibold"
-                      required
-                    />
-                  </div>
+                      <div>
+                        <label className="text-xs font-black text-slate-400 uppercase block mb-1 text-left">Dirección de Envío Completa</label>
+                        <input
+                          type="text"
+                          value={checkoutAddress}
+                          onChange={(e) => setCheckoutAddress(e.target.value)}
+                          placeholder="Calle, Número, Colonia, Ciudad, Estado, Código Postal"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-pink-500 rounded-xl px-4 py-3 text-xs focus:outline-none text-slate-200 font-semibold"
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
 
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-sm py-4 rounded-xl shadow-lg mt-3 uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"
                   >
-                    <CreditCard size={14} /> Confirmar Compra (${activeCheckoutProduct.price} USD)
+                    {(activeCheckoutProduct.price === 0 || activeCheckoutProduct.category === 'Regalos') ? (
+                      <><Gift size={14} /> Confirmar y Desbloquear Regalo</>
+                    ) : (
+                      <><CreditCard size={14} /> Confirmar Compra (${activeCheckoutProduct.price} USD)</>
+                    )}
                   </button>
                 </form>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── MERCADO PAGO SUCCESS CELEBRATION MODAL ─────────────────────────────────────── */}
+      <AnimatePresence>
+        {paymentSuccessData && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 40 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 40 }}
+              className="bg-slate-900 border border-slate-800 rounded-[36px] max-w-md w-full p-8 shadow-2xl flex flex-col items-center text-center relative overflow-hidden"
+            >
+              {/* Confetti Particles (Pre-styled absolute shapes for cute kid friendly theme) */}
+              <div className="absolute top-4 left-4 w-3 h-3 bg-pink-500 rounded-full animate-bounce"></div>
+              <div className="absolute top-12 right-6 w-4 h-4 bg-yellow-400 rounded-lg rotate-12 animate-pulse"></div>
+              <div className="absolute bottom-16 left-8 w-3 h-3 bg-indigo-400 rounded-full animate-ping"></div>
+              <div className="absolute bottom-8 right-12 w-4 h-4 bg-emerald-400 rounded-full animate-bounce"></div>
+
+              {/* Big pulsing success checkmark */}
+              <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-6 animate-pulse">
+                <CheckCircle size={48} className="text-emerald-400" />
+              </div>
+
+              <span className="text-[10px] font-black text-emerald-400 tracking-[0.3em] uppercase block mb-2">
+                ¡PAGO CONFIRMADO CON ÉXITO!
+              </span>
+
+              <h3 className="font-black text-2xl uppercase tracking-tight text-white mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                ¡Gracias por tu compra!
+              </h3>
+
+              <p className="text-xs text-slate-400 leading-relaxed mb-6 font-semibold max-w-sm">
+                Hemos procesado tu pago de forma 100% segura a través de **Mercado Pago**. Tu pedido ha sido registrado con éxito y ya está disponible en tu cuenta.
+              </p>
+
+              {/* Product Info Card */}
+              <div className="w-full bg-slate-950/40 border border-slate-850 rounded-2xl p-4 flex items-center gap-4 text-left mb-8">
+                <div className="w-16 h-12 rounded-lg overflow-hidden bg-slate-950 border border-slate-850 shrink-0">
+                  <img src={paymentSuccessData.image} alt={paymentSuccessData.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-black text-sm text-slate-200 uppercase leading-tight truncate">{paymentSuccessData.name}</h4>
+                  <span className="text-[10px] text-slate-500 font-bold block mt-0.5">Categoría: {paymentSuccessData.category}</span>
+                </div>
+                <div className="text-right">
+                  <span className="font-mono text-emerald-400 font-bold text-sm block">${paymentSuccessData.price} USD</span>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button 
+                onClick={() => setPaymentSuccessData(null)}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs py-4 rounded-xl shadow-[0_12px_30px_rgba(16,185,129,0.2)] uppercase tracking-wider transition-all hover:scale-102 active:scale-98 flex items-center justify-center gap-2"
+              >
+                <Sparkles size={14} fill="currentColor" /> Ir a Mis Compras
+              </button>
             </motion.div>
           </motion.div>
         )}
