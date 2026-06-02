@@ -75,7 +75,7 @@ if ($httpCode >= 200 && $httpCode < 300) {
     $resData = json_decode($response, true);
     echo json_encode([
         "preference_id" => $resData['id'] ?? '',
-        "init_point" => $resData['sandbox_init_point'] ?? $resData['init_point'] ?? ''
+        "init_point" => $resData['init_point'] ?? ''
     ]);
 } else {
     echo json_encode([
