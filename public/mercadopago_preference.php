@@ -73,9 +73,13 @@ curl_close($ch);
 
 if ($httpCode >= 200 && $httpCode < 300) {
     $resData = json_decode($response, true);
+    // Automatically detect if we are using a test/sandbox seller account (ID 3440257554 or token starts with TEST-)
+    $isTestMode = (strpos($accessToken, 'TEST-') === 0) || (isset($resData['collector_id']) && $resData['collector_id'] == 3440257554);
+    $initPoint = ($isTestMode && !empty($resData['sandbox_init_point'])) ? $resData['sandbox_init_point'] : ($resData['init_point'] ?? '');
+
     echo json_encode([
         "preference_id" => $resData['id'] ?? '',
-        "init_point" => $resData['init_point'] ?? ''
+        "init_point" => $initPoint
     ]);
 } else {
     echo json_encode([
