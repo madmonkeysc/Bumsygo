@@ -26,7 +26,7 @@ $buyerEmail = $data['buyerEmail'] ?? 'test_user@test.com';
 $buyerName = $data['buyerName'] ?? 'Comprador Bumsy';
 
 // 2. Mercado Pago Sandbox Access Token
-$accessToken = "APP_USR-1936480768921556-053122-c9f30d58ec69d210d235a95f7a1d2373-3440257554";
+$accessToken = "APP_USR-4126169954775238-053122-3986ebcd4b81182fcc46b8f43ade5b05-268062769"; // Production account
 
 // 3. Determine base redirection URL dynamically
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';

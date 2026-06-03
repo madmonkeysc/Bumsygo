@@ -41,7 +41,8 @@ const CRM = () => {
   const [sellerPassword, setSellerPassword] = useState('bumsyking');
 
   // UI Tabs
-  const [buyerTab, setBuyerTab] = useState('catalog'); // catalog, my_profile, my_purchases, my_inquiries
+  const [buyerTab, setBuyerTab] = useState('catalog'); // catalog, my_profile, my_purchases, my_inquiries, membership
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const [sellerTab, setSellerTab] = useState('summary'); // summary, sales, clients, products, inquiries, settings
 
   // Form states - Auth
@@ -459,6 +460,36 @@ const CRM = () => {
         console.error(err);
         triggerNotification('Error de comunicación con la pasarela. Inténtalo de nuevo.', 'error');
       });
+    }
+  };
+
+  // --- Subscription Handler ---
+  const handleSubscribe = async (currency = 'MXN') => {
+    if (!currentUser) return;
+    setIsSubscribing(true);
+    triggerNotification('Conectando con Mercado Pago para activar tu membresía...', 'info');
+    try {
+      const res = await fetch('/mercadopago_subscription.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          buyerEmail: currentUser.email,
+          buyerName: currentUser.name,
+          currency
+        })
+      });
+      const data = await res.json();
+      if (data.init_point) {
+        triggerNotification('Redirigiendo a Mercado Pago...', 'success');
+        window.location.href = data.init_point;
+      } else {
+        triggerNotification('Error al iniciar suscripción. Intenta de nuevo.', 'error');
+        setIsSubscribing(false);
+      }
+    } catch (err) {
+      console.error(err);
+      triggerNotification('Error de conexión con la pasarela. Intenta de nuevo.', 'error');
+      setIsSubscribing(false);
     }
   };
 
@@ -1143,6 +1174,12 @@ const CRM = () => {
                 >
                   Consultas ({inquiries.filter(i => i.buyerEmail === currentUser.email).length})
                 </button>
+                <button
+                  onClick={() => setBuyerTab('membership')}
+                  className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'membership' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30'}`}
+                >
+                  ⭐ Membresía
+                </button>
                 <button onClick={handleLogout} className="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-full transition-colors" title="Cerrar Sesión">
                   <LogOut size={16} />
                 </button>
@@ -1462,8 +1499,76 @@ const CRM = () => {
               </div>
             )}
 
+            {/* TAB: MEMBERSHIP */}
+            {buyerTab === 'membership' && (
+              <div className="flex flex-col gap-6">
+                <div className="bg-slate-900/40 border border-amber-500/20 rounded-3xl p-8 backdrop-blur-md text-center">
+                  <div className="text-5xl mb-4">⭐</div>
+                  <h3 className="text-2xl font-black uppercase mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Club Mágico Bumsy Go</h3>
+                  <p className="text-slate-400 text-sm font-semibold mb-8 max-w-md mx-auto">Acceso ilimitado a contenido exclusivo, regalos digitales, descuentos y mucho más. Cancela cuando quieras.</p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+
+                    {/* MXN Plan */}
+                    <div className="bg-gradient-to-br from-pink-600/20 to-purple-600/20 border border-pink-500/30 rounded-2xl p-6 flex flex-col gap-4 text-left relative overflow-hidden">
+                      <div className="absolute top-3 right-3 bg-pink-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase">🇲🇽 México</div>
+                      <div className="mt-4">
+                        <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Membresía Mensual</p>
+                        <div className="flex items-end gap-1">
+                          <span className="text-4xl font-black text-white">$99</span>
+                          <span className="text-pink-400 font-bold text-sm mb-1">MXN / mes</span>
+                        </div>
+                      </div>
+                      <ul className="flex flex-col gap-2 text-xs text-slate-300 font-semibold flex-1">
+                        <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Regalos digitales exclusivos cada mes</li>
+                        <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Descuentos especiales en tienda</li>
+                        <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Acceso anticipado a nuevos productos</li>
+                        <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Cancela cuando quieras</li>
+                      </ul>
+                      <button
+                        onClick={() => handleSubscribe('MXN')}
+                        disabled={isSubscribing}
+                        className="w-full bg-pink-600 hover:bg-pink-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-sm py-3.5 rounded-xl shadow-lg transition-colors uppercase tracking-wider"
+                      >
+                        {isSubscribing ? 'Conectando...' : 'Suscribirme por $99 MXN/mes'}
+                      </button>
+                    </div>
+
+                    {/* USD Plan */}
+                    <div className="bg-gradient-to-br from-amber-600/20 to-orange-600/20 border border-amber-500/30 rounded-2xl p-6 flex flex-col gap-4 text-left relative overflow-hidden">
+                      <div className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase">🌎 Internacional</div>
+                      <div className="mt-4">
+                        <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Membresía Mensual</p>
+                        <div className="flex items-end gap-1">
+                          <span className="text-4xl font-black text-white">$9</span>
+                          <span className="text-amber-400 font-bold text-sm mb-1">USD / mes</span>
+                        </div>
+                      </div>
+                      <ul className="flex flex-col gap-2 text-xs text-slate-300 font-semibold flex-1">
+                        <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Regalos digitales exclusivos cada mes</li>
+                        <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Descuentos especiales en tienda</li>
+                        <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Acceso anticipado a nuevos productos</li>
+                        <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Cancela cuando quieras</li>
+                      </ul>
+                      <button
+                        onClick={() => handleSubscribe('USD')}
+                        disabled={isSubscribing}
+                        className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-sm py-3.5 rounded-xl shadow-lg transition-colors uppercase tracking-wider"
+                      >
+                        {isSubscribing ? 'Conectando...' : 'Subscribe for $9 USD/month'}
+                      </button>
+                    </div>
+
+                  </div>
+
+                  <p className="text-slate-600 text-xs mt-6 font-semibold">Pago seguro procesado por Mercado Pago · TLS 1.3 Encrypted</p>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
+
 
         {/* ── SELLER DASHBOARD ─────────────────────────────────────────────────── */}
         {portal === 'seller_dashboard' && isSellerAuthenticated && (
