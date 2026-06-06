@@ -32,19 +32,23 @@ $baseReturnUrl = $protocol . $host;
 
 // Build Preapproval Plan payload (creates a reusable subscription plan)
 $payload = [
-    "reason"             => $reason,
-    "auto_recurring"     => [
-        "frequency"       => 1,
-        "frequency_type"  => "months",
+    "reason"          => $reason,
+    "auto_recurring"  => [
+        "frequency"          => 1,
+        "frequency_type"     => "months",
         "transaction_amount" => $amount,
-        "currency_id"     => $currencyId
+        "currency_id"        => $currencyId
     ],
-    "back_url"           => $baseReturnUrl . "/crm?subscription_status=success&buyer_email=" . urlencode($buyerEmail),
-    "payer_email"        => $buyerEmail,
-    "status"             => "pending"
+    "back_url"        => $baseReturnUrl . "/crm?subscription_status=success&buyer_email=" . urlencode($buyerEmail),
+    "payment_methods_allowed" => [
+        "payment_types" => [
+            ["id" => "credit_card"],
+            ["id" => "debit_card"]
+        ]
+    ]
 ];
 
-$ch = curl_init('https://api.mercadopago.com/preapproval');
+$ch = curl_init('https://api.mercadopago.com/preapproval_plan');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
