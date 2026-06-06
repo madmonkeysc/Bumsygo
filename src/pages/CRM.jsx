@@ -43,6 +43,7 @@ const CRM = () => {
   // UI Tabs
   const [buyerTab, setBuyerTab] = useState('catalog'); // catalog, my_profile, my_purchases, my_inquiries, membership
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [isPromo, setIsPromo] = useState(false);
   const [sellerTab, setSellerTab] = useState('summary'); // summary, sales, clients, products, inquiries, settings
 
   // Form states - Auth
@@ -490,6 +491,35 @@ const CRM = () => {
       console.error(err);
       triggerNotification('Error de conexión con la pasarela. Intenta de nuevo.', 'error');
       setIsSubscribing(false);
+    }
+  };
+
+  // --- Promo 3 Months Handler ---
+  const handlePromo = async () => {
+    if (!currentUser) return;
+    setIsPromo(true);
+    triggerNotification('Activando tu promo de 3 meses por $3 USD...', 'info');
+    try {
+      const res = await fetch('/mercadopago_promo.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          buyerEmail: currentUser.email,
+          buyerName: currentUser.name
+        })
+      });
+      const data = await res.json();
+      if (data.init_point) {
+        triggerNotification('Redirigiendo a Mercado Pago...', 'success');
+        window.location.href = data.init_point;
+      } else {
+        triggerNotification('Error al activar promo. Intenta de nuevo.', 'error');
+        setIsPromo(false);
+      }
+    } catch (err) {
+      console.error(err);
+      triggerNotification('Error de conexión. Intenta de nuevo.', 'error');
+      setIsPromo(false);
     }
   };
 
@@ -1506,6 +1536,28 @@ const CRM = () => {
                   <div className="text-5xl mb-4">⭐</div>
                   <h3 className="text-2xl font-black uppercase mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Club Mágico Bumsy Go</h3>
                   <p className="text-slate-400 text-sm font-semibold mb-8 max-w-md mx-auto">Acceso ilimitado a contenido exclusivo, regalos digitales, descuentos y mucho más. Cancela cuando quieras.</p>
+
+                  {/* PROMO BANNER */}
+                  <div className="relative max-w-2xl mx-auto mb-6 bg-gradient-to-r from-green-600/20 via-emerald-600/20 to-teal-600/20 border border-green-500/40 rounded-2xl p-6 text-left overflow-hidden">
+                    <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-black px-3 py-1.5 rounded-bl-xl uppercase tracking-wider">🔥 Oferta Limitada</div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <div className="text-4xl">🎁</div>
+                      <div className="flex-1">
+                        <p className="text-green-300 text-xs font-black uppercase tracking-wider mb-0.5">Promo de Bienvenida</p>
+                        <h4 className="text-white font-black text-xl mb-1">3 Meses por solo <span className="text-green-400">$3 USD</span></h4>
+                        <p className="text-slate-400 text-xs font-semibold">Acceso completo al Club Mágico durante 3 meses. Un pago único, sin compromisos. Después puedes suscribirte al plan mensual.</p>
+                      </div>
+                      <button
+                        onClick={handlePromo}
+                        disabled={isPromo || isSubscribing}
+                        className="shrink-0 bg-green-500 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-green-500/20 transition-colors uppercase tracking-wider whitespace-nowrap"
+                      >
+                        {isPromo ? 'Conectando...' : '¡Quiero la Promo!'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-6">— O elige tu plan mensual —</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
 
