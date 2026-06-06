@@ -1210,6 +1210,12 @@ const CRM = () => {
                 >
                   ⭐ Membresía
                 </button>
+                <button
+                  onClick={() => setBuyerTab('bumsy_pro')}
+                  className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${buyerTab === 'bumsy_pro' ? 'bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-lg shadow-violet-500/30' : 'bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 border border-violet-500/30'}`}
+                >
+                  💎 Bumsy Pro
+                </button>
                 <button onClick={handleLogout} className="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-full transition-colors" title="Cerrar Sesión">
                   <LogOut size={16} />
                 </button>
@@ -1543,9 +1549,9 @@ const CRM = () => {
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="text-4xl">🎁</div>
                       <div className="flex-1">
-                        <p className="text-green-300 text-xs font-black uppercase tracking-wider mb-0.5">Promo de Bienvenida</p>
+                        <p className="text-green-300 text-xs font-black uppercase tracking-wider mb-0.5">Promo de Bienvenida · Bumsy Pro</p>
                         <h4 className="text-white font-black text-xl mb-1">3 Meses por solo <span className="text-green-400">$3 USD</span></h4>
-                        <p className="text-slate-400 text-xs font-semibold">Acceso completo al Club Mágico durante 3 meses. Un pago único, sin compromisos. Después puedes suscribirte al plan mensual.</p>
+                        <p className="text-slate-400 text-xs font-semibold">Acceso completo a <strong className="text-white">Bumsy Pro</strong> durante 3 meses. Al terminar, si no cancelas, se activa automáticamente tu membresía a <strong className="text-pink-400">$99 MXN/mes</strong>. Cancela cuando quieras antes de que finalice la promo.</p>
                       </div>
                       <button
                         onClick={handlePromo}
@@ -1618,8 +1624,108 @@ const CRM = () => {
               </div>
             )}
 
+            {/* TAB: BUMSY PRO */}
+            {buyerTab === 'bumsy_pro' && (
+              <div className="flex flex-col gap-6">
+                {/* Hero Banner */}
+                <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-violet-900/60 via-purple-900/60 to-pink-900/60 border border-violet-500/30 p-8 text-center backdrop-blur-md">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-600/20 via-transparent to-transparent pointer-events-none" />
+                  <div className="relative z-10">
+                    <div className="text-5xl mb-3">💎</div>
+                    <h3 className="text-3xl font-black uppercase mb-2 bg-gradient-to-r from-violet-300 via-pink-300 to-amber-300 bg-clip-text text-transparent" style={{ fontFamily: "'Poppins', sans-serif" }}>Bumsy Pro</h3>
+                    <p className="text-slate-300 font-semibold text-sm max-w-lg mx-auto mb-6">La membresía premium del Club Mágico. Desbloquea todos los beneficios exclusivos de Bumsy Go por solo <span className="text-green-400 font-black">$3 USD los primeros 3 meses</span>, luego <span className="text-pink-400 font-black">$99 MXN/mes</span>.</p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <button
+                        onClick={handlePromo}
+                        disabled={isPromo || isSubscribing}
+                        className="bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 disabled:opacity-50 text-white font-black px-8 py-3.5 rounded-xl shadow-lg shadow-violet-500/30 transition-all uppercase tracking-wider text-sm"
+                      >
+                        {isPromo ? 'Conectando...' : '🎁 Promo: 3 Meses por $3 USD'}
+                      </button>
+                      <button
+                        onClick={() => handleSubscribe('MXN')}
+                        disabled={isPromo || isSubscribing}
+                        className="bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600 disabled:opacity-50 text-slate-200 font-black px-8 py-3.5 rounded-xl transition-all uppercase tracking-wider text-sm"
+                      >
+                        {isSubscribing ? 'Conectando...' : '💳 Plan Mensual $99 MXN'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Benefits Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { icon: '🎁', title: 'Regalos Digitales Mensuales', desc: 'Recibe cada mes recursos exclusivos: páginas para colorear, stickers, wallpapers y más de tus personajes favoritos de Bumsy Go.' },
+                    { icon: '🏷️', title: 'Descuentos Exclusivos', desc: 'Accede a descuentos especiales de hasta un 20% en toda la tienda oficial. Tus compras nunca habían sido tan convenientes.' },
+                    { icon: '🚀', title: 'Acceso Anticipado', desc: 'Sé el primero en conocer y comprar los nuevos productos, colecciones y ediciones limitadas antes que nadie.' },
+                    { icon: '🎮', title: 'Contenido Premium de Juegos', desc: 'Desbloquea niveles especiales, personajes exclusivos y recompensas dentro de los minijuegos de Bumsy Go.' },
+                    { icon: '🎵', title: 'Música y Videos Exclusivos', desc: 'Escucha canciones inéditas y accede a videos especiales de Bumsy y sus amigos antes de su lanzamiento oficial.' },
+                    { icon: '⭐', title: 'Eventos Especiales', desc: 'Invitaciones prioritarias a eventos virtuales, meet & greets digitales con los personajes y sorteos exclusivos para miembros Pro.' },
+                    { icon: '💬', title: 'Soporte Prioritario', desc: 'Tu atención es nuestra prioridad. Los miembros Bumsy Pro reciben respuesta en menos de 24 horas.' },
+                    { icon: '📚', title: 'Biblioteca Digital', desc: 'Acceso completo a la colección de cuentos, actividades educativas y recursos pedagógicos descargables de Bumsy Go.' },
+                    { icon: '🔔', title: 'Sin Publicidad', desc: 'Disfruta la plataforma de Bumsy Go sin interrupciones. Una experiencia limpia y fluida para ti y tus pequeños.' },
+                  ].map((b, i) => (
+                    <div key={i} className="bg-slate-900/40 border border-slate-800 hover:border-violet-500/40 rounded-2xl p-5 flex flex-col gap-3 transition-all group">
+                      <div className="text-3xl">{b.icon}</div>
+                      <h4 className="text-white font-black text-sm group-hover:text-violet-300 transition-colors">{b.title}</h4>
+                      <p className="text-slate-500 text-xs font-semibold leading-relaxed">{b.desc}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pricing comparison */}
+                <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md">
+                  <h4 className="text-center text-white font-black uppercase mb-6 text-sm tracking-wider">📊 Comparativa de Planes</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs font-semibold">
+                      <thead>
+                        <tr className="border-b border-slate-800">
+                          <th className="text-left py-3 text-slate-500 font-black uppercase tracking-wider">Beneficio</th>
+                          <th className="py-3 text-slate-500 font-black uppercase tracking-wider text-center">Gratis</th>
+                          <th className="py-3 text-violet-400 font-black uppercase tracking-wider text-center">💎 Pro</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          ['Catálogo de tienda',        '✓', '✓'],
+                          ['Juegos en línea',           '✓', '✓'],
+                          ['Videos y música',           'Básico', 'Completo'],
+                          ['Regalos digitales',         '✗', '✓ Mensual'],
+                          ['Descuentos en tienda',      '✗', 'Hasta 20%'],
+                          ['Acceso anticipado',         '✗', '✓'],
+                          ['Contenido premium',         '✗', '✓'],
+                          ['Biblioteca digital',        '✗', '✓ Completa'],
+                          ['Eventos exclusivos',        '✗', '✓'],
+                          ['Soporte prioritario',       '✗', '< 24 hrs'],
+                          ['Sin publicidad',            '✗', '✓'],
+                        ].map(([feat, free, pro], i) => (
+                          <tr key={i} className="border-b border-slate-800/50">
+                            <td className="py-3 text-slate-300">{feat}</td>
+                            <td className="py-3 text-center text-slate-500">{free}</td>
+                            <td className="py-3 text-center text-violet-300 font-black">{pro}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={handlePromo}
+                      disabled={isPromo || isSubscribing}
+                      className="bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 disabled:opacity-50 text-white font-black px-10 py-4 rounded-xl shadow-lg shadow-violet-500/30 transition-all uppercase tracking-wider text-sm"
+                    >
+                      {isPromo ? 'Conectando...' : '🚀 Activar Bumsy Pro — $3 USD por 3 meses'}
+                    </button>
+                    <p className="text-slate-600 text-xs mt-3 font-semibold">Después de los 3 meses se activa $99 MXN/mes · Cancela antes si no deseas continuar · Pago seguro con Mercado Pago</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
+
 
 
         {/* ── SELLER DASHBOARD ─────────────────────────────────────────────────── */}
