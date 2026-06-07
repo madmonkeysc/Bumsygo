@@ -26,10 +26,16 @@ const CRM = () => {
   });
 
   // --- Core State ---
-  const [portal, setPortal] = useState('gateway'); // gateway, buyer_login, buyer_register, buyer_dashboard, seller_login, seller_dashboard
+  const [portal, setPortal] = useState(() => {
+    const saved = localStorage.getItem('bumsy_crm_logged_user');
+    return saved ? 'buyer_dashboard' : 'gateway';
+  });
 
   // Auth state
-  const [currentUser, setCurrentUser] = useState(null); // active buyer
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('bumsy_crm_logged_user');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [isSellerAuthenticated, setIsSellerAuthenticated] = useState(false);
 
   // Database states loaded from localStorage
@@ -294,6 +300,7 @@ const CRM = () => {
     localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
 
     setCurrentUser(newClient);
+    localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(newClient));
     triggerNotification('¡Registro exitoso! Bienvenido al Club de Amigos Bumsy.');
     setPortal('buyer_dashboard');
 
@@ -309,6 +316,7 @@ const CRM = () => {
     const user = clients.find(c => c.email.toLowerCase() === loginEmail.toLowerCase() && c.password === loginPassword);
     if (user) {
       setCurrentUser(user);
+      localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(user));
       triggerNotification(`¡Bienvenido de vuelta, ${user.name}!`);
       setPortal('buyer_dashboard');
       setLoginEmail('');
@@ -332,6 +340,7 @@ const CRM = () => {
 
   const handleLogout = () => {
     setCurrentUser(null);
+    localStorage.removeItem('bumsy_crm_logged_user');
     setIsSellerAuthenticated(false);
     setPortal('gateway');
     triggerNotification('Sesión cerrada con éxito.');
@@ -371,8 +380,8 @@ const CRM = () => {
 
     const updatedClients = clients.map(c => c.id === currentUser.id ? updatedUser : c);
     setClients(updatedClients);
-    localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
     setCurrentUser(updatedUser);
+    localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(updatedUser));
 
     triggerNotification('¡Perfil actualizado con éxito! Tus datos se auto-completarán en tu próxima compra.');
   };
@@ -821,6 +830,7 @@ const CRM = () => {
               birthday: pending.birthday
             };
             setCurrentUser(updatedUser);
+            localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(updatedUser));
 
             const savedClients = localStorage.getItem('bumsy_crm_clients');
             if (savedClients) {

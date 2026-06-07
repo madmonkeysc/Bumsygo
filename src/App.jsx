@@ -24,6 +24,7 @@ const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Copyright = lazy(() => import('./pages/Copyright'));
 const CRM = lazy(() => import('./pages/CRM'));
+const Pro = lazy(() => import('./pages/Pro'));
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="/news" element={<News />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/business" element={<Business />} />
+            <Route path="/pro" element={<Pro />} />
             <Route path="/play" element={<GamesHub />} />
             <Route path="/play/memorama" element={<MemoryGame />} />
             <Route path="/play/colors" element={<ColoringGame />} />

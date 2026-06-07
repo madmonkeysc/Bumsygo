@@ -7,7 +7,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
-  const isTransparentHeader = location.pathname === '/' || location.pathname === '/business' || location.pathname === '/watch' || location.pathname === '/shop';
+  const isTransparentHeader = location.pathname === '/' || location.pathname === '/business' || location.pathname === '/watch' || location.pathname === '/shop' || location.pathname === '/pro';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +22,7 @@ const Header = () => {
     { name: 'Juegos', path: '/play', icon: <Gamepad2 size={18} /> },
     { name: 'Padres', path: '/meet-and-play', icon: <Users size={18} /> },
     { name: 'Negocios', path: '/business', icon: <Briefcase size={18} /> },
+    { name: 'Bumsy Pro', path: '/pro', icon: <Sparkles size={18} className="text-pink-400" /> },
   ];
 
   return (
