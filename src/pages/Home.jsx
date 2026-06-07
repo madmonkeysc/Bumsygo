@@ -136,7 +136,7 @@ const Home = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="absolute inset-0 bg-black flex flex-col justify-end md:justify-center items-center pb-24 md:pb-0"
+            className="absolute inset-0 bg-black flex flex-col justify-center items-center pt-24 pb-20 md:pt-0 md:pb-0"
           >
             {/* Foto de fondo */}
             <motion.div 

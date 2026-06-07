@@ -30,8 +30,8 @@ const Header = () => {
       isScrolled 
         ? 'bg-white/80 backdrop-blur-xl shadow-[0_10px_30px_rgba(8,112,184,0.08)] py-3 border-b border-white/40' 
         : isTransparentHeader 
-          ? 'bg-transparent py-6' 
-          : 'bg-white/90 backdrop-blur-md py-4 shadow-sm'
+          ? 'bg-transparent py-3 md:py-6' 
+          : 'bg-white/90 backdrop-blur-md py-3 md:py-4 shadow-sm'
     }`}>
       <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
@@ -39,7 +39,7 @@ const Header = () => {
           <img 
             src="/assets/branding/logo.webp" 
             alt="Bumsy Go Logo" 
-            className={`transition-all duration-300 ${isScrolled ? 'h-14' : 'h-28'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
+            className={`transition-all duration-300 ${isScrolled ? 'h-12 md:h-14' : 'h-16 md:h-28'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
           />
         </Link>
 

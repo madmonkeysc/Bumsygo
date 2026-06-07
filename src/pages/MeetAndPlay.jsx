@@ -56,7 +56,7 @@ const MeetAndPlay = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/20" />
         </div>
 
-        <div className="container mx-auto px-6 relative z-20 flex flex-col items-center text-center">
+        <div className="container mx-auto px-6 relative z-20 flex flex-col items-center text-center pt-28 md:pt-0">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

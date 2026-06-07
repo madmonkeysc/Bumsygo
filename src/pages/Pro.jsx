@@ -140,7 +140,7 @@ const Pro = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d091a] text-slate-100 pb-24 pt-32 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0d091a] text-slate-100 pb-24 pt-28 md:pt-44 relative overflow-hidden">
       {/* Decorative Blur Backgrounds */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-1/3 right-1/4 w-[600px] h-[600px] bg-pink-600/10 rounded-full blur-[140px] pointer-events-none" />
