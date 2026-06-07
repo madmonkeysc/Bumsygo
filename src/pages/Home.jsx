@@ -136,7 +136,7 @@ const Home = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="absolute inset-0 bg-black flex flex-col justify-center items-center pt-24 pb-20 md:pt-0 md:pb-0"
+            className="absolute inset-0 bg-black flex flex-col justify-end md:justify-center items-center pb-24 md:pb-0"
           >
             {/* Foto de fondo */}
             <motion.div 
@@ -512,150 +512,134 @@ const Home = () => {
       </section>
 
       {/* 4. YOUTUBE SECTION (Replaces Nuestro Contenido) */}
-      <section className="w-full relative overflow-hidden bg-white">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1 }}
-          className="relative w-full"
-        >
-          {/* Yellow Background Image (Assets from User) */}
+      <section className="w-full relative overflow-hidden bg-white py-16 md:py-28">
+        {/* Yellow Background Image */}
+        <div className="absolute inset-0">
           <img 
             src="/assets/banners/fondo_youtube.webp" 
             alt="YouTube Background" 
-            className="w-full h-auto block" 
+            className="w-full h-full object-cover object-center" 
           />
-          
-          {/* Content Overlay */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            {/* Title inside the image area at the top */}
+        </div>
+        
+        <div className="container mx-auto px-6 md:px-12 relative z-20 flex flex-col items-center">
+          {/* Title inside the image area at the top */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="w-full text-center px-6 mb-12 md:mb-20"
+          >
+            <h2 className="text-4xl md:text-6xl lg:text-8xl font-black text-white tracking-tighter uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)]" style={{ fontFamily: "'Peace Sans', Impact, sans-serif" }}>
+              NUESTROS CONTENIDOS
+            </h2>
+          </motion.div>
+
+          <div className="w-full flex flex-col md:flex-row items-center justify-between gap-10">
+            {/* YouTube Logo/Banner Image */}
             <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="absolute top-10 md:top-20 w-full text-center px-6"
+              transition={{ duration: 0.8 }}
+              className="w-full md:w-1/2"
             >
-              <h2 className="text-4xl md:text-6xl lg:text-8xl font-black text-white tracking-tighter uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)]" style={{ fontFamily: "'Peace Sans', Impact, sans-serif" }}>
-                NUESTROS CONTENIDOS
-              </h2>
+              <img 
+                src="/assets/banners/youtube_banner.webp" 
+                alt="YouTube Bumsy" 
+                className="w-full h-auto drop-shadow-[0_20px_40px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-500" 
+              />
             </motion.div>
 
-            <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-10 mt-20 md:mt-32">
-              {/* YouTube Logo/Banner Image */}
-              <motion.div 
-                initial={{ scale: 0.8, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
+            {/* Text & CTA */}
+            <div className="w-full md:w-1/2 text-center md:text-left">
+              <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="w-full md:w-1/2"
+                transition={{ duration: 0.6 }}
+                className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tighter uppercase leading-none drop-shadow-lg"
+                style={{ fontFamily: "'Peace Sans', Impact, sans-serif" }}
               >
-                <img 
-                  src="/assets/banners/youtube_banner.webp" 
-                  alt="YouTube Bumsy" 
-                  className="w-full h-auto drop-shadow-[0_20px_40px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-500" 
-                />
+                <span className="text-white">Bumsy en </span>
+                <span className="text-[#EC4899]">YouTube</span>
+              </motion.h2>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-xl md:text-3xl font-bold text-black/70 mb-10 leading-tight uppercase"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                Suscríbete ahora para ver <br /> episodios completos y música.
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <a 
+                  href="https://youtube.com/@BumsyGo" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block bg-[#FF0000] text-white px-12 py-5 rounded-full font-black text-2xl uppercase shadow-[0_15px_40px_rgba(255,0,0,0.3)] hover:scale-110 active:scale-95 transition-all"
+                >
+                  ¡IR AL CANAL!
+                </a>
               </motion.div>
-
-              {/* Text & CTA */}
-              <div className="w-full md:w-1/2 text-center md:text-left">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                  className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tighter uppercase leading-none drop-shadow-lg"
-                  style={{ fontFamily: "'Peace Sans', Impact, sans-serif" }}
-                >
-                  <span className="text-white">Bumsy en </span>
-                  <span className="text-[#EC4899]">YouTube</span>
-                </motion.h2>
-                <motion.p 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="text-xl md:text-3xl font-bold text-black/70 mb-10 leading-tight uppercase"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                >
-                  Suscríbete ahora para ver <br /> episodios completos y música.
-                </motion.p>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                >
-                  <a 
-                    href="https://youtube.com/@BumsyGo" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-block bg-[#FF0000] text-white px-12 py-5 rounded-full font-black text-2xl uppercase shadow-[0_15px_40px_rgba(255,0,0,0.3)] hover:scale-110 active:scale-95 transition-all"
-                  >
-                    ¡IR AL CANAL!
-                  </a>
-                </motion.div>
-              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
 
       {/* 6. BUMSY SKOOL (Alianzas Educativas - FULL WIDTH) */}
-      <section className="w-full relative overflow-hidden bg-white">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1 }}
-          className="relative w-full"
-        >
+      <section className="w-full relative overflow-hidden bg-white py-16 md:py-28">
+        <div className="absolute inset-0">
           <img 
             src="/assets/banners/bumsy_skool.webp" 
             alt="Bumsy School" 
-            className="w-full h-auto block" 
+            className="w-full h-full object-cover object-center" 
           />
-          
-          {/* Overlay for text without the heavy "frame" gradient */}
-          <div className="absolute inset-0 flex items-center justify-end">
-            <div className="container mx-auto px-6 md:px-12 flex justify-end">
-              <div className="max-w-2xl text-right z-10 bg-white/10 backdrop-blur-[2px] p-6 md:p-10 rounded-[40px]">
-                <motion.h2 
-                  initial={{ opacity: 0, x: 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                  className="text-4xl md:text-7xl lg:text-8xl font-black text-primary mb-6 tracking-tighter uppercase leading-none drop-shadow-sm"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                >
-                  Aprendiendo <br /> con <span className="text-accent">Bumsy</span>
-                </motion.h2>
-                <motion.p 
-                  initial={{ opacity: 0, x: 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                  className="text-lg md:text-2xl font-bold text-gray-800 mb-10 leading-relaxed max-w-xl ml-auto"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                >
-                  Bumsy llega a las aulas para transformar la educación en una aventura mágica. ¡Descubre cómo tu escuela puede aliarse con el universo Bumsy!
-                </motion.p>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.6 }}
-                >
-                  <Link to="/education" className="inline-block bg-primary text-white px-12 py-5 rounded-full font-black text-xl uppercase shadow-[0_15px_40px_rgba(8,112,184,0.3)] hover:scale-105 active:scale-95 transition-all">
-                    Alianza Educativa
-                  </Link>
-                </motion.div>
-              </div>
-            </div>
+        </div>
+        
+        <div className="container mx-auto px-6 md:px-12 relative z-20 flex justify-end">
+          <div className="max-w-2xl text-right bg-white/70 backdrop-blur-md p-6 md:p-10 rounded-[40px] border border-white/40 shadow-xl">
+            <motion.h2 
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-4xl md:text-7xl lg:text-8xl font-black text-primary mb-6 tracking-tighter uppercase leading-none drop-shadow-sm"
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              Aprendiendo <br /> con <span className="text-accent">Bumsy</span>
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-lg md:text-2xl font-bold text-gray-800 mb-10 leading-relaxed max-w-xl ml-auto"
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              Bumsy llega a las aulas para transformar la educación en una aventura mágica. ¡Descubre cómo tu escuela puede aliarse con el universo Bumsy!
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              <Link to="/education" className="inline-block bg-primary text-white px-12 py-5 rounded-full font-black text-xl uppercase shadow-[0_15px_40px_rgba(8,112,184,0.3)] hover:scale-105 active:scale-95 transition-all">
+                Alianza Educativa
+              </Link>
+            </motion.div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* 7. NOTICIAS BUMSY */}

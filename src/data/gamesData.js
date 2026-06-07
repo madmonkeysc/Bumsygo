@@ -4,7 +4,7 @@ export const gamesData = [
     title: 'Magic Memory',
     desc: 'Encuentra a los personajes de Bumsy Town en este clásico juego de memoria.',
     poster: '/assets/games/portada_mm.webp',
-    logo: '/assets/games/magic_memory_logo.webp', // Small 63KB image
+    logo: '/assets/games/magic_memory_logo.png', // Small 63KB image
     path: '/play/memorama',
     color: 'bg-primary',
     stars: 5,
@@ -15,7 +15,7 @@ export const gamesData = [
     title: 'Pinta Pipa',
     desc: 'Prepara tus pinceles para dar color al mundo mágico. ¡Ya disponible!',
     poster: '/assets/games/portada_pipa.webp',
-    logo: '/assets/games/logo_pipa.webp', // Small 82KB image
+    logo: '/assets/games/logo_pipa.png', // Small 82KB image
     path: '/play/colors',
     color: 'bg-accent',
     stars: 5,
