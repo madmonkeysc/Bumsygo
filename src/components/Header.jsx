@@ -39,7 +39,7 @@ const Header = () => {
           <img 
             src="/assets/branding/logo.webp" 
             alt="Bumsy Go Logo" 
-            className={`transition-all duration-300 ${isScrolled ? 'h-14' : 'h-28'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
+            className={`transition-all duration-300 ${isScrolled ? 'h-12' : 'h-18'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
           />
         </Link>
 
