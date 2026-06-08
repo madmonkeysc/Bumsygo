@@ -14,13 +14,26 @@ elif server.startswith("ftps://"):
 if "/" in server:
     server = server.split("/")[0]
 
+import time
+
 print(f"Connecting to FTP server: '{server}'...")
 ftp = FTP()
-try:
-    ftp.connect(server, 21, timeout=30)
-    print("Connected successfully to host!")
-except Exception as e:
-    print(f"🔴 Connection failed: {e}")
+connected = False
+for attempt in range(1, 4):
+    try:
+        print(f"Connection attempt {attempt}/3...")
+        ftp.connect(server, 21, timeout=30)
+        print("Connected successfully to host!")
+        connected = True
+        break
+    except Exception as e:
+        print(f"Connection attempt {attempt} failed: {e}")
+        if attempt < 3:
+            print("Waiting 10 seconds before retrying...")
+            time.sleep(10)
+
+if not connected:
+    print("🔴 Connection failed: timed out after 3 attempts.")
     sys.exit(1)
 
 # 2. Try variations of the username to be resilient
