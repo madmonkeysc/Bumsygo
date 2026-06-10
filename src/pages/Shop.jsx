@@ -2,27 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Heart, Search, Filter, Star, Truck, ShieldCheck, RefreshCcw, ShoppingBag, Gift, Sparkles, Trash2, CreditCard } from 'lucide-react';
 import useSEO from '../hooks/useSEO';
+import { supabase } from '../lib/supabase';
 
 const Shop = () => {
   const [activeCategory, setActiveCategory] = useState('Todos');
-  const [allProducts, setAllProducts] = useState([
-    { id: 1, name: 'Peluche Bumsy Fox (XXL)', price: 29.99, category: 'Peluches', image: '/assets/banners/mercha.webp', color: 'bg-orange-50', rating: 5 },
-    { id: 2, name: 'Camiseta Arcoíris Uni', price: 19.99, category: 'Ropa', image: '/assets/banners/mercha.webp', color: 'bg-pink-50', rating: 4 },
-    { id: 3, name: 'Cuento: Aventuras en el Bosque', price: 14.99, category: 'Libros', image: '/assets/banners/books.webp', color: 'bg-green-50', rating: 5 },
-    { id: 4, name: 'Mochila Tarta Turtle', price: 34.99, category: 'Accesorios', image: '/assets/banners/mercha.webp', color: 'bg-emerald-50', rating: 5 },
-    { id: 5, name: 'Pack de Pegatinas Mágicas', price: 5.99, category: 'Accesorios', image: '/assets/banners/pintar.png', color: 'bg-yellow-50', rating: 4 },
-    { id: 6, name: 'Gorra Pipo Penguin', price: 12.99, category: 'Ropa', image: '/assets/banners/mercha.webp', color: 'bg-blue-50', rating: 5 },
-    { id: 7, name: 'Peluche Tarta Extra Suave', price: 24.99, category: 'Peluches', image: '/assets/banners/mercha.webp', color: 'bg-green-50', rating: 4 },
-    { id: 8, name: 'Libro para Colorear Bumsy', price: 9.99, category: 'Libros', image: '/assets/banners/pintar.png', color: 'bg-purple-50', rating: 5 },
-    
-    // Regalos para Colorear (Especiales / Gratuitos)
-    { id: 9, name: 'Coloreable Bubu Mágico', price: 0, category: 'Regalos', image: '/assets/ecommerce/bubu_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/bubu_portada.png', rating: 5 },
-    { id: 10, name: 'Bumsy Word Search (Sopa de Letras)', price: 0, category: 'Regalos', image: '/assets/ecommerce/bumsy_word_01.webp', isFree: true, downloadUrl: '/assets/ecommerce/bumsy_word_01.png', rating: 5 },
-    { id: 11, name: 'Coloreable Especial Flamy Colors', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_colors.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_colors.png', rating: 5 },
-    { id: 12, name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_portada.png', rating: 5 },
-    { id: 13, name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/lola_portada.png', rating: 5 },
-    { id: 14, name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', isFree: true, downloadUrl: '/assets/ecommerce/pipa_portada_2.png', rating: 5 }
-  ]);
+  const [allProducts, setAllProducts] = useState([]);
 
   useSEO({
     title: 'Tienda Oficial',
@@ -31,7 +15,6 @@ const Shop = () => {
   });
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [stockOverrides, setStockOverrides] = useState({});
   const [notification, setNotification] = useState(null);
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -96,74 +79,71 @@ const Shop = () => {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
-    // Centralized CRM products database loading
-    const savedProducts = localStorage.getItem('bumsy_crm_products');
-    if (savedProducts) {
+    const fetchProducts = async () => {
       try {
-        const parsed = JSON.parse(savedProducts);
-        const formatted = parsed.map(p => ({
-          id: p.id,
-          name: p.name,
-          price: Number(p.price),
-          category: p.category,
-          image: p.image,
-          color: p.color || 'bg-slate-50',
-          rating: p.rating || 5,
-          isFree: p.isFree || Number(p.price) === 0 || p.category === 'Regalos',
-          downloadUrl: p.pdfFile || p.downloadUrl
-        }));
-        setAllProducts(formatted);
-      } catch (e) {
-        console.error('Error parsing CRM products:', e);
-      }
-    } else {
-      // Seed initial catalog if empty so both modules share the same database
-      const defaultProducts = [
-        { id: 1, name: 'Peluche Bumsy Fox (XXL)', price: 29.99, category: 'Peluches', image: '/assets/banners/mercha.webp', description: 'Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.', stock: 15, rating: 5, color: 'bg-orange-50' },
-        { id: 2, name: 'Camiseta Arcoíris Uni', price: 19.99, category: 'Ropa', image: '/assets/banners/mercha.webp', description: 'Camiseta oficial con diseño de arcoíris de Bumsy Town. Algodón 100% orgánico.', stock: 8, rating: 4, color: 'bg-pink-50' },
-        { id: 3, name: 'Cuento: Aventuras en el Bosque', price: 14.99, category: 'Libros', image: '/assets/banners/books.webp', description: 'El cuento oficial ilustrado que narra las divertidas aventuras de Bumsy y sus amigos.', stock: 20, rating: 5, color: 'bg-green-50' },
-        { id: 4, name: 'Mochila Tarta Turtle', price: 34.99, category: 'Accesorios', image: '/assets/banners/mercha.webp', description: 'Mochila escolar resistente y colorida de Tarta Turtle con compartimentos especiales.', stock: 12, rating: 5, color: 'bg-emerald-50' },
-        { id: 5, name: 'Pack de Pegatinas Mágicas', price: 5.99, category: 'Accesorios', image: '/assets/banners/pintar.png', description: 'Paquete de 50 pegatinas de vinilo resistentes al agua con todos los personajes.', stock: 50, rating: 4, color: 'bg-yellow-50' },
-        { id: 6, name: 'Gorra Pipo Penguin', price: 12.99, category: 'Ropa', image: '/assets/banners/mercha.webp', description: 'Gorra ajustable oficial con bordado premium de Pipo Penguin.', stock: 30, rating: 5, color: 'bg-blue-50' },
-        { id: 7, name: 'Peluche Tarta Extra Suave', price: 24.99, category: 'Peluches', image: '/assets/banners/mercha.webp', description: 'Peluche coleccionable de Tarta Turtle, suave, tierno y con colores brillantes.', stock: 10, rating: 4, color: 'bg-green-50' },
-        { id: 8, name: 'Libro para Colorear Bumsy', price: 9.99, category: 'Libros', image: '/assets/banners/pintar.png', description: 'Libro físico con más de 60 páginas de plantillas e ilustraciones para colorear.', stock: 40, rating: 5, color: 'bg-purple-50' },
-        { id: 9, name: 'Coloreable Bubu Mágico', price: 0, category: 'Regalos', image: '/assets/ecommerce/bubu_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/bubu_portada.png', description: 'Plantilla digital gratuita de Bubu Mágico para descargar y pintar.', stock: 999, rating: 5, color: 'bg-slate-50' },
-        { id: 10, name: 'Bumsy Word Search (Sopa de Letras)', price: 0, category: 'Regalos', image: '/assets/ecommerce/bumsy_word_01.webp', isFree: true, downloadUrl: '/assets/ecommerce/bumsy_word_01.png', description: 'Divertido juego de sopa de letras imprimible con vocabulario de Bumsy Town.', stock: 999, rating: 5, color: 'bg-slate-50' },
-        { id: 11, name: 'Coloreable Especial Flamy Colors', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_colors.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_colors.png', description: 'Dibujo especial descargable de Flamy para colorear con tus mejores tonos.', stock: 999, rating: 5, color: 'bg-slate-50' },
-        { id: 12, name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_portada.png', description: 'Precioso libro digital de colorear de Flamy y sus inseparables amigos.', stock: 999, rating: 5, color: 'bg-slate-50' },
-        { id: 13, name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/lola_portada.png', description: 'Divertida plantilla digital de Lola Unicornio para pintar y decorar.', stock: 999, rating: 5, color: 'bg-slate-50' },
-        { id: 14, name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', isFree: true, downloadUrl: '/assets/ecommerce/pipa_portada_2.png', description: 'Nueva plantilla interactiva oficial de Pipa para colorear gratis.', stock: 999, rating: 5, color: 'bg-slate-50' },
-        { id: 'custom_1', name: 'Taza Mágica Bumsy (CRM)', price: 14.99, category: 'Accesorios', image: '/assets/banners/mercha.webp', description: 'Taza de cerámica premium que cambia de color al verter líquidos calientes.', stock: 45, rating: 5, color: 'bg-slate-50' }
-      ];
-      localStorage.setItem('bumsy_crm_products', JSON.stringify(defaultProducts));
-      setAllProducts(defaultProducts);
-    }
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: true });
 
-    // Dynamic stock overrides loading
-    const savedOverrides = localStorage.getItem('bumsy_crm_stock_overrides');
-    if (savedOverrides) {
-      try {
-        setStockOverrides(JSON.parse(savedOverrides));
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const formatted = data.map(p => ({
+            id: p.id,
+            name: p.name,
+            price: Number(p.price),
+            category: p.category,
+            image: p.image,
+            color: p.color || 'bg-slate-50',
+            rating: p.rating || 5,
+            isFree: p.is_free || Number(p.price) === 0 || p.category === 'Regalos',
+            downloadUrl: p.download_url || p.pdf_file,
+            stock: p.stock
+          }));
+          setAllProducts(formatted);
+        } else {
+          // Seed initial catalog if empty so both modules share the same database
+          const defaultProducts = [
+            { id: 'static_1', name: 'Peluche Bumsy Fox (XXL)', price: 29.99, category: 'Peluches', image: '/assets/banners/mercha.webp', description: 'Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.', stock: 15, rating: 5, color: 'bg-orange-50', is_free: false, download_url: '' },
+            { id: 'static_2', name: 'Camiseta Arcoíris Uni', price: 19.99, category: 'Ropa', image: '/assets/banners/mercha.webp', description: 'Camiseta oficial con diseño de arcoíris de Bumsy Town. Algodón 100% orgánico.', stock: 8, rating: 4, color: 'bg-pink-50', is_free: false, download_url: '' },
+            { id: 'static_3', name: 'Cuento: Aventuras en el Bosque', price: 14.99, category: 'Libros', image: '/assets/banners/books.webp', description: 'El cuento oficial ilustrado que narra las divertidas aventuras de Bumsy y sus amigos.', stock: 20, rating: 5, color: 'bg-green-50', is_free: false, download_url: '' },
+            { id: 'static_4', name: 'Mochila Tarta Turtle', price: 34.99, category: 'Accesorios', image: '/assets/banners/mercha.webp', description: 'Mochila escolar resistente y colorida de Tarta Turtle con compartimentos especiales.', stock: 12, rating: 5, color: 'bg-emerald-50', is_free: false, download_url: '' },
+            { id: 'static_5', name: 'Pack de Pegatinas Mágicas', price: 5.99, category: 'Accesorios', image: '/assets/banners/pintar.png', description: 'Paquete de 50 pegatinas de vinilo resistentes al agua con todos los personajes.', stock: 50, rating: 4, color: 'bg-yellow-50', is_free: false, download_url: '' },
+            { id: 'static_6', name: 'Gorra Pipo Penguin', price: 12.99, category: 'Ropa', image: '/assets/banners/mercha.webp', description: 'Gorra ajustable oficial con bordado premium de Pipo Penguin.', stock: 30, rating: 5, color: 'bg-blue-50', is_free: false, download_url: '' },
+            { id: 'static_7', name: 'Peluche Tarta Extra Suave', price: 24.99, category: 'Peluches', image: '/assets/banners/mercha.webp', description: 'Peluche coleccionable de Tarta Turtle, suave, tierno y con colores brillantes.', stock: 10, rating: 4, color: 'bg-green-50', is_free: false, download_url: '' },
+            { id: 'static_8', name: 'Libro para Colorear Bumsy', price: 9.99, category: 'Libros', image: '/assets/banners/pintar.png', description: 'Libro físico con más de 60 páginas de plantillas e ilustraciones para colorear.', stock: 40, rating: 5, color: 'bg-purple-50', is_free: false, download_url: '' },
+            { id: 'static_9', name: 'Coloreable Bubu Mágico', price: 0, category: 'Regalos', image: '/assets/ecommerce/bubu_portada.webp', is_free: true, download_url: '/assets/ecommerce/bubu_portada.png', description: 'Plantilla digital gratuita de Bubu Mágico para descargar y pintar.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_10', name: 'Bumsy Word Search (Sopa de Letras)', price: 0, category: 'Regalos', image: '/assets/ecommerce/bumsy_word_01.webp', is_free: true, download_url: '/assets/ecommerce/bumsy_word_01.png', description: 'Divertido juego de sopa de letras imprimible con vocabulario de Bumsy Town.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_11', name: 'Coloreable Especial Flamy Colors', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_colors.webp', is_free: true, download_url: '/assets/ecommerce/flamy_colors.png', description: 'Dibujo especial descargable de Flamy para colorear con tus mejores tonos.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_12', name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.webp', is_free: true, download_url: '/assets/ecommerce/flamy_portada.png', description: 'Precioso libro digital de colorear de Flamy y sus inseparables amigos.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_13', name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.webp', is_free: true, download_url: '/assets/ecommerce/lola_portada.png', description: 'Divertida plantilla digital de Lola Unicornio para pintar y decorar.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_14', name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', is_free: true, download_url: '/assets/ecommerce/pipa_portada_2.png', description: 'Nueva plantilla interactiva oficial de Pipa para colorear gratis.', stock: 999, rating: 5, color: 'bg-slate-50' }
+          ];
+
+          const { error: insertError } = await supabase
+            .from('products')
+            .insert(defaultProducts);
+
+          if (insertError) throw insertError;
+          
+          setAllProducts(defaultProducts.map(p => ({
+            ...p,
+            isFree: p.is_free,
+            downloadUrl: p.download_url
+          })));
+        }
       } catch (e) {
-        console.error('Error parsing stock overrides:', e);
+        console.error('Error fetching/seeding products from Supabase:', e);
       }
-    }
+    };
+
+    fetchProducts();
   }, []);
 
   const getProductStock = (product) => {
     if (product.isFree) return 999;
-    const strId = product.id.toString();
-    const key = strId.startsWith('custom_') ? strId : `static_${product.id}`;
-    if (key in stockOverrides) {
-      return stockOverrides[key];
-    }
-    const defaults = {
-      'static_1': 15,
-      'static_2': 8,
-      'static_3': 20,
-      'static_4': 12,
-    };
-    return defaults[key] !== undefined ? defaults[key] : 25;
+    return product.stock !== undefined ? product.stock : 25;
   };
 
   const triggerNotification = (text) => {
@@ -394,48 +374,52 @@ const Shop = () => {
                     >
                       {product.name}
                     </h3>
-                    <div className="flex items-center justify-between mt-auto pt-5 border-t border-slate-100">
-                      {product.isFree ? (
-                        <>
+                    <div className="flex flex-col gap-4 mt-auto pt-5 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        {product.isFree ? (
                           <span 
                             className="text-2xl font-black text-rose-500 tracking-tight flex items-center gap-2"
                             style={{ fontFamily: "'Poppins', sans-serif" }}
                           >
                             <Gift size={22} className="animate-bounce text-amber-500" /> GRATIS
                           </span>
-                          <a 
-                            href={product.downloadUrl} 
-                            download={product.downloadUrl?.startsWith('data:application/pdf') ? `${product.name}.pdf` : `${product.name}.png`}
-                            className="bg-amber-400 text-slate-950 hover:bg-slate-950 hover:text-white p-4 rounded-full transition-all border border-amber-300 hover:border-slate-950 shadow-md active:scale-90"
-                          >
-                            <Gift size={20} />
-                          </a>
-                        </>
-                      ) : (
-                        <>
+                        ) : (
                           <span 
                             className="text-3xl font-extrabold text-slate-950 tracking-tight"
                             style={{ fontFamily: "'Poppins', sans-serif" }}
                           >
-                            ${product.price}
+                            ${product.price} <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">USD</span>
                           </span>
-                          <button 
-                            onClick={() => {
-                              if (isOutOfStock) {
-                                triggerNotification('Lo sentimos, este producto está temporalmente agotado.');
-                              } else {
-                                addToCart(product);
-                              }
-                            }}
-                            className={`p-4 rounded-full transition-all border shadow-sm active:scale-90 ${
-                              isOutOfStock 
-                                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' 
-                                : 'bg-slate-50 text-slate-700 hover:bg-slate-950 hover:text-white border-slate-100 hover:border-slate-950'
-                            }`}
-                          >
-                            <ShoppingBag size={20} />
-                          </button>
-                        </>
+                        )}
+                      </div>
+
+                      {product.isFree ? (
+                        <a 
+                          href={product.downloadUrl} 
+                          download={product.downloadUrl?.startsWith('data:application/pdf') ? `${product.name}.pdf` : `${product.name}.png`}
+                          className="w-full bg-rose-500 hover:bg-rose-600 text-white font-black text-xs uppercase tracking-widest py-4 rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
+                          <Gift size={16} /> ¡LO QUIERO GRATIS!
+                        </a>
+                      ) : (
+                        <button 
+                          onClick={() => {
+                            if (isOutOfStock) {
+                              triggerNotification('Lo sentimos, este producto está temporalmente agotado.');
+                            } else {
+                              addToCart(product);
+                            }
+                          }}
+                          className={`w-full font-black text-xs uppercase tracking-widest py-4 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 ${
+                            isOutOfStock 
+                              ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed' 
+                              : 'bg-slate-950 hover:bg-slate-800 text-white hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg'
+                          }`}
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
+                          <ShoppingBag size={16} /> {isOutOfStock ? 'AGOTADO' : '¡LO QUIERO!'}
+                        </button>
                       )}
                     </div>
                   </div>
