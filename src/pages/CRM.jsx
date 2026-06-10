@@ -7,6 +7,7 @@ import {
   Upload, Download, Gift
 } from 'lucide-react';
 import useSEO from '../hooks/useSEO';
+import { supabase } from '../lib/supabase';
 
 // --- Preset Categories for Products ---
 const CATEGORIES = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos'];
@@ -38,12 +39,11 @@ const CRM = () => {
   });
   const [isSellerAuthenticated, setIsSellerAuthenticated] = useState(false);
 
-  // Database states loaded from localStorage
+  // Database states loaded from Supabase / localStorage
   const [clients, setClients] = useState([]);
   const [customProducts, setCustomProducts] = useState([]);
   const [inquiries, setInquiries] = useState([]);
   const [sales, setSales] = useState([]);
-  const [stockOverrides, setStockOverrides] = useState({});
   const [sellerPassword, setSellerPassword] = useState('bumsyking');
 
   // UI Tabs
@@ -97,150 +97,197 @@ const CRM = () => {
 
   // --- Database Initialization ---
   useEffect(() => {
-    // Clients (with shipping address and birthdays)
-    const savedClients = localStorage.getItem('bumsy_crm_clients');
-    if (savedClients) {
-      setClients(JSON.parse(savedClients));
-    } else {
-      const defaultClients = [
-        {
-          id: 1,
-          name: 'Juan Pérez',
-          email: 'juan@perez.com',
-          phone: '+52 55 1234 5678',
-          password: 'buyer123',
-          interest: 'Peluches',
-          registeredAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          notes: 'Cliente premium sumamente interesado en el Peluche Bumsy Fox XXL.',
-          address: 'Av. Reforma 123, Colonia Centro, Ciudad de México',
-          birthday: '1995-04-12'
-        },
-        {
-          id: 2,
-          name: 'María Gómez',
-          email: 'maria@gomez.com',
-          phone: '+52 55 8765 4321',
-          password: 'buyer123',
-          interest: 'Libros',
-          registeredAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          notes: 'Prefiere libros de colorear interactivos para sus hijos.',
-          address: 'Calle 50 #456, Monterrey, Nuevo León',
-          birthday: '1998-08-24'
-        }
-      ];
-      localStorage.setItem('bumsy_crm_clients', JSON.stringify(defaultClients));
-      setClients(defaultClients);
-    }
-
-    // Centralized Products Database (with self-healing automatic merge)
-    const savedProducts = localStorage.getItem('bumsy_crm_products');
-    const defaultProducts = [
-      { id: 1, name: "Peluche Bumsy Fox (XXL)", price: 29.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.", status: "Activo", createdAt: new Date().toISOString(), stock: 15, rating: 5, color: "bg-orange-50" },
-      { id: 2, name: "Camiseta Arcoíris Uni", price: 19.99, category: "Ropa", image: "/assets/banners/mercha.webp", description: "Camiseta oficial con diseño de arcoíris de Bumsy Town. Algodón 100% orgánico.", status: "Activo", createdAt: new Date().toISOString(), stock: 8, rating: 4, color: "bg-pink-50" },
-      { id: 3, name: "Cuento: Aventuras en el Bosque", price: 14.99, category: "Libros", image: "/assets/banners/books.webp", description: "El cuento oficial ilustrado que narra las divertidas aventuras de Bumsy y sus amigos.", status: "Activo", createdAt: new Date().toISOString(), stock: 20, rating: 5, color: "bg-green-50" },
-      { id: 4, name: "Mochila Tarta Turtle", price: 34.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Mochila escolar resistente y colorida de Tarta Turtle con compartimentos especiales.", status: "Activo", createdAt: new Date().toISOString(), stock: 12, rating: 5, color: "bg-emerald-50" },
-      { id: 5, name: "Pack de Pegatinas Mágicas", price: 5.99, category: "Accesorios", image: "/assets/banners/pintar.png", description: "Paquete de 50 pegatinas de vinilo resistentes al agua con todos los personajes.", status: "Activo", createdAt: new Date().toISOString(), stock: 50, rating: 4, color: "bg-yellow-50" },
-      { id: 6, name: "Gorra Pipo Penguin", price: 12.99, category: "Ropa", image: "/assets/banners/mercha.webp", description: "Gorra ajustable oficial con bordado premium de Pipo Penguin.", status: "Activo", createdAt: new Date().toISOString(), stock: 30, rating: 5, color: "bg-blue-50" },
-      { id: 7, name: "Peluche Tarta Extra Suave", price: 24.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche coleccionable de Tarta Turtle, suave, tierno y con colores brillantes.", status: "Activo", createdAt: new Date().toISOString(), stock: 10, rating: 4, color: "bg-green-50" },
-      { id: 8, name: "Libro para Colorear Bumsy", price: 9.99, category: "Libros", image: "/assets/banners/pintar.png", description: "Libro físico con más de 60 páginas de plantillas e ilustraciones para colorear.", status: "Activo", createdAt: new Date().toISOString(), stock: 40, rating: 5, color: "bg-purple-50" },
-      { id: 9, name: "Coloreable Bubu Mágico", price: 0, category: "Regalos", image: "/assets/ecommerce/bubu_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/bubu_portada.png", description: "Plantilla digital gratuita de Bubu Mágico para descargar y pintar.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-      { id: 10, name: "Bumsy Word Search (Sopa de Letras)", price: 0, category: "Regalos", image: "/assets/ecommerce/bumsy_word_01.webp", isFree: true, downloadUrl: "/assets/ecommerce/bumsy_word_01.png", description: "Divertido juego de sopa de letras imprimible con vocabulario de Bumsy Town.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-      { id: 11, name: "Coloreable Especial Flamy Colors", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_colors.webp", isFree: true, downloadUrl: "/assets/ecommerce/flamy_colors.png", description: "Dibujo especial descargable de Flamy para colorear con tus mejores tonos.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-      { id: 12, name: "Libro Portada Flamy y Amigos", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/flamy_portada.png", description: "Precioso libro digital de colorear de Flamy y sus inseparables amigos.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-      { id: 13, name: "Coloreable Lola Unicornio", price: 0, category: "Regalos", image: "/assets/ecommerce/lola_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/lola_portada.png", description: "Divertida plantilla digital de Lola Unicornio para pintar y decorar.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-      { id: 14, name: "Coloreable Pipa Portada 2", price: 0, category: "Regalos", image: "/assets/ecommerce/pipa_portada_2.webp", isFree: true, downloadUrl: "/assets/ecommerce/pipa_portada_2.png", description: "Nueva plantilla interactiva oficial de Pipa para colorear gratis.", status: "Activo", createdAt: new Date().toISOString(), stock: 999, rating: 5, color: "bg-slate-50" },
-      { id: 'custom_1', name: "Taza Mágica Bumsy (CRM)", price: 14.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Taza de cerámica premium que cambia de color al verter líquidos calientes.", status: "Activo", createdAt: new Date().toISOString(), stock: 45, rating: 5, color: "bg-slate-50" }
-    ];
-
-    let loadedProducts = [];
-    if (savedProducts) {
+    // 1. Fetch Clients from Supabase
+    const loadClients = async () => {
       try {
-        loadedProducts = JSON.parse(savedProducts);
+        const { data, error } = await supabase.from('clients').select('*').order('registered_at', { ascending: false });
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          setClients(data.map(c => ({
+            id: c.id,
+            name: c.name,
+            email: c.email,
+            phone: c.phone,
+            password: c.password,
+            interest: c.interest,
+            registeredAt: c.registered_at,
+            notes: c.notes || '',
+            address: c.address || '',
+            birthday: c.birthday || ''
+          })));
+        } else {
+          // Seed initial clients
+          const defaultClients = [
+            { name: 'Juan Pérez', email: 'juan@perez.com', phone: '+52 55 1234 5678', password: 'buyer123', interest: 'Peluches', notes: 'Cliente premium sumamente interesado en el Peluche Bumsy Fox XXL.', address: 'Av. Reforma 123, Colonia Centro, Ciudad de México', birthday: '1995-04-12' },
+            { name: 'María Gómez', email: 'maria@gomez.com', phone: '+52 55 8765 4321', password: 'buyer123', interest: 'Libros', notes: 'Prefiere libros de colorear interactivos para sus hijos.', address: 'Calle 50 #456, Monterrey, Nuevo León', birthday: '1998-08-24' }
+          ];
+          const { data: inserted, error: insertError } = await supabase.from('clients').insert(defaultClients).select();
+          if (insertError) throw insertError;
+          if (inserted) {
+            setClients(inserted.map(c => ({
+              id: c.id,
+              name: c.name,
+              email: c.email,
+              phone: c.phone,
+              password: c.password,
+              interest: c.interest,
+              registeredAt: c.registered_at,
+              notes: c.notes || '',
+              address: c.address || '',
+              birthday: c.birthday || ''
+            })));
+          }
+        }
       } catch (e) {
-        console.error('Error parsing loaded products:', e);
+        console.error("Error loading/seeding clients:", e);
       }
-    }
+    };
 
-    let needsUpdate = false;
-    const mergedProducts = [...loadedProducts];
+    // 2. Fetch Products from Supabase
+    const loadProducts = async () => {
+      try {
+        const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: true });
+        if (error) throw error;
 
-    // Automatically add default products that are not present
-    defaultProducts.forEach(defProd => {
-      const exists = mergedProducts.some(p => p.id.toString() === defProd.id.toString());
-      if (!exists) {
-        mergedProducts.push(defProd);
-        needsUpdate = true;
+        if (data && data.length > 0) {
+          setCustomProducts(data.map(p => ({
+            id: p.id,
+            name: p.name,
+            price: Number(p.price),
+            category: p.category,
+            image: p.image,
+            description: p.description,
+            status: p.status,
+            createdAt: p.created_at,
+            stock: p.stock,
+            rating: p.rating,
+            color: p.color,
+            isFree: p.is_free,
+            pdfFile: p.pdf_file,
+            pdfName: p.pdf_name,
+            downloadUrl: p.download_url
+          })));
+        } else {
+          // Seed default products
+          const defaultProducts = [
+            { id: 'static_1', name: "Peluche Bumsy Fox (XXL)", price: 29.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.", status: "Activo", stock: 15, rating: 5, color: "bg-orange-50", is_free: false },
+            { id: 'static_2', name: "Camiseta Arcoíris Uni", price: 19.99, category: "Ropa", image: "/assets/banners/mercha.webp", description: "Camiseta oficial con diseño de arcoíris de Bumsy Town. Algodón 100% orgánico.", status: "Activo", stock: 8, rating: 4, color: "bg-pink-50", is_free: false },
+            { id: 'static_3', name: "Cuento: Aventuras en el Bosque", price: 14.99, category: "Libros", image: "/assets/banners/books.webp", description: "El cuento oficial ilustrado que narra las divertidas aventuras de Bumsy y sus amigos.", status: "Activo", stock: 20, rating: 5, color: "bg-green-50", is_free: false },
+            { id: 'static_4', name: "Mochila Tarta Turtle", price: 34.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Mochila escolar resistente y colorida de Tarta Turtle con compartimentos especiales.", status: "Activo", stock: 12, rating: 5, color: "bg-emerald-50", is_free: false },
+            { id: 'static_5', name: "Pack de Pegatinas Mágicas", price: 5.99, category: "Accesorios", image: "/assets/banners/pintar.png", description: "Paquete de 50 pegatinas de vinilo resistentes al agua con todos los personajes.", status: "Activo", stock: 50, rating: 4, color: "bg-yellow-50", is_free: false },
+            { id: 'static_6', name: "Gorra Pipo Penguin", price: 12.99, category: "Ropa", image: "/assets/banners/mercha.webp", description: "Gorra ajustable oficial con bordado premium de Pipo Penguin.", status: "Activo", stock: 30, rating: 5, color: "bg-blue-50", is_free: false },
+            { id: 'static_7', name: "Peluche Tarta Extra Suave", price: 24.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche coleccionable de Tarta Turtle, suave, tierno y con colores brillantes.", status: "Activo", stock: 10, rating: 4, color: "bg-green-50", is_free: false },
+            { id: 'static_8', name: "Libro para Colorear Bumsy", price: 9.99, category: "Libros", image: "/assets/banners/pintar.png", description: "Libro físico con más de 60 páginas de plantillas e ilustraciones para colorear.", status: "Activo", stock: 40, rating: 5, color: "bg-purple-50", is_free: false },
+            { id: 'static_9', name: "Coloreable Bubu Mágico", price: 0, category: "Regalos", image: "/assets/ecommerce/bubu_portada.webp", is_free: true, download_url: "/assets/ecommerce/bubu_portada.png", description: "Plantilla digital gratuita de Bubu Mágico para descargar y pintar.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
+            { id: 'static_10', name: "Bumsy Word Search (Sopa de Letras)", price: 0, category: "Regalos", image: "/assets/ecommerce/bumsy_word_01.webp", is_free: true, download_url: "/assets/ecommerce/bumsy_word_01.png", description: "Divertido juego de sopa de letras imprimible con vocabulario de Bumsy Town.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
+            { id: 'static_11', name: "Coloreable Especial Flamy Colors", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_colors.webp", is_free: true, download_url: "/assets/ecommerce/flamy_colors.png", description: "Dibujo especial descargable de Flamy para colorear con tus mejores tonos.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
+            { id: 'static_12', name: "Libro Portada Flamy y Amigos", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_portada.webp", is_free: true, download_url: "/assets/ecommerce/flamy_portada.png", description: "Precioso libro digital de colorear de Flamy y sus inseparables amigos.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
+            { id: 'static_13', name: "Coloreable Lola Unicornio", price: 0, category: "Regalos", image: "/assets/ecommerce/lola_portada.webp", is_free: true, download_url: "/assets/ecommerce/lola_portada.png", description: "Divertida plantilla digital de Lola Unicornio para pintar y decorar.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
+            { id: 'static_14', name: "Coloreable Pipa Portada 2", price: 0, category: "Regalos", image: "/assets/ecommerce/pipa_portada_2.webp", is_free: true, download_url: "/assets/ecommerce/pipa_portada_2.png", description: "Nueva plantilla interactiva oficial de Pipa para colorear gratis.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
+            { id: 'custom_1', name: "Taza Mágica Bumsy (CRM)", price: 14.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Taza de cerámica premium que cambia de color al verter líquidos calientes.", status: "Activo", stock: 45, rating: 5, color: "bg-slate-50", is_free: false }
+          ];
+
+          const { error: insertError } = await supabase.from('products').insert(defaultProducts);
+          if (insertError) throw insertError;
+          setCustomProducts(defaultProducts.map(p => ({
+            ...p,
+            isFree: p.is_free,
+            downloadUrl: p.download_url
+          })));
+        }
+      } catch (e) {
+        console.error("Error loading/seeding products:", e);
       }
-    });
+    };
 
-    if (needsUpdate || !savedProducts) {
-      localStorage.setItem('bumsy_crm_products', JSON.stringify(mergedProducts));
-      setCustomProducts(mergedProducts);
-    } else {
-      setCustomProducts(loadedProducts);
-    }
+    // 3. Fetch Inquiries from Supabase
+    const loadInquiries = async () => {
+      try {
+        const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
 
-    // Stock overrides to manage static products' inventory
-    const savedOverrides = localStorage.getItem('bumsy_crm_stock_overrides');
-    if (savedOverrides) {
-      setStockOverrides(JSON.parse(savedOverrides));
-    } else {
-      const defaultOverrides = {
-        'static_1': 15,
-        'static_2': 8,
-        'static_3': 20,
-        'static_4': 12,
-      };
-      localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(defaultOverrides));
-      setStockOverrides(defaultOverrides);
-    }
-
-    // Inquiries
-    const savedInquiries = localStorage.getItem('bumsy_crm_inquiries');
-    if (savedInquiries) {
-      setInquiries(JSON.parse(savedInquiries));
-    } else {
-      const defaultInquiries = [
-        {
-          id: 1,
-          buyerEmail: 'juan@perez.com',
-          buyerName: 'Juan Pérez',
-          productName: 'Peluche Bumsy Fox (XXL)',
-          message: '¿Tienen existencias disponibles para enviar a Ciudad de México hoy mismo?',
-          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          status: 'Pendiente'
+        if (data && data.length > 0) {
+          setInquiries(data.map(i => ({
+            id: i.id,
+            buyerEmail: i.buyer_email,
+            buyerName: i.buyer_name,
+            productName: i.product_name,
+            message: i.message,
+            createdAt: i.created_at,
+            status: i.status
+          })));
+        } else {
+          // Seed inquiries
+          const defaultInquiries = [
+            { buyer_email: 'juan@perez.com', buyer_name: 'Juan Pérez', product_name: 'Peluche Bumsy Fox (XXL)', message: '¿Tienen existencias disponibles para enviar a Ciudad de México hoy mismo?', status: 'Pendiente' }
+          ];
+          const { data: inserted, error: insertError } = await supabase.from('inquiries').insert(defaultInquiries).select();
+          if (insertError) throw insertError;
+          if (inserted) setInquiries(inserted.map(i => ({
+            id: i.id,
+            buyerEmail: i.buyer_email,
+            buyerName: i.buyer_name,
+            productName: i.product_name,
+            message: i.message,
+            createdAt: i.created_at,
+            status: i.status
+          })));
         }
-      ];
-      localStorage.setItem('bumsy_crm_inquiries', JSON.stringify(defaultInquiries));
-      setInquiries(defaultInquiries);
-    }
+      } catch (e) {
+        console.error("Error loading/seeding inquiries:", e);
+      }
+    };
 
-    // Sales (Simulated purchase history)
-    const savedSales = localStorage.getItem('bumsy_crm_sales');
-    if (savedSales) {
-      setSales(JSON.parse(savedSales));
-    } else {
-      const defaultSales = [
-        {
-          id: 'sale_1',
-          buyerEmail: 'juan@perez.com',
-          buyerName: 'Juan Pérez',
-          productName: 'Peluche Bumsy Fox (XXL)',
-          price: 29.99,
-          address: 'Av. Reforma 123, Colonia Centro, Ciudad de México',
-          birthday: '1995-04-12',
-          date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+    // 4. Fetch Sales from Supabase
+    const loadSales = async () => {
+      try {
+        const { data, error } = await supabase.from('sales').select('*').order('date', { ascending: false });
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setSales(data.map(s => ({
+            id: s.id,
+            buyerEmail: s.buyer_email,
+            buyerName: s.buyer_name,
+            productName: s.product_name,
+            price: Number(s.price),
+            pdfFile: s.pdf_file,
+            downloadUrl: s.download_url,
+            address: s.address,
+            birthday: s.birthday,
+            date: s.date
+          })));
+        } else {
+          // Seed sales
+          const defaultSales = [
+            { id: 'sale_1', buyer_email: 'juan@perez.com', buyer_name: 'Juan Pérez', product_name: 'Peluche Bumsy Fox (XXL)', price: 29.99, address: 'Av. Reforma 123, Colonia Centro, Ciudad de México', birthday: '1995-04-12' }
+          ];
+          const { error: insertError } = await supabase.from('sales').insert(defaultSales);
+          if (insertError) throw insertError;
+          setSales(defaultSales.map(s => ({
+            ...s,
+            buyerEmail: s.buyer_email,
+            buyerName: s.buyer_name,
+            productName: s.product_name,
+            date: new Date().toISOString()
+          })));
         }
-      ];
-      localStorage.setItem('bumsy_crm_sales', JSON.stringify(defaultSales));
-      setSales(defaultSales);
-    }
+      } catch (e) {
+        console.error("Error loading/seeding sales:", e);
+      }
+    };
 
-    // Seller Settings
+    // 5. Load Password
     const savedPass = localStorage.getItem('bumsy_crm_seller_password');
     if (savedPass) {
       setSellerPassword(savedPass);
     }
+
+    loadClients();
+    loadProducts();
+    loadInquiries();
+    loadSales();
   }, []);
 
   // Sync profile form when tab changes
@@ -283,26 +330,46 @@ const CRM = () => {
     }
 
     const newClient = {
-      id: Date.now(),
       name: regName,
       email: regEmail,
       phone: regPhone,
       password: regPassword,
       interest: regInterest,
-      registeredAt: new Date().toISOString(),
       notes: '',
       address: '',
       birthday: ''
     };
 
-    const updatedClients = [...clients, newClient];
-    setClients(updatedClients);
-    localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
+    const registerInSupabase = async () => {
+      try {
+        const { data, error } = await supabase.from('clients').insert([newClient]).select();
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const registeredUser = {
+            id: data[0].id,
+            name: data[0].name,
+            email: data[0].email,
+            phone: data[0].phone,
+            password: data[0].password,
+            interest: data[0].interest,
+            registeredAt: data[0].registered_at,
+            notes: data[0].notes || '',
+            address: data[0].address || '',
+            birthday: data[0].birthday || ''
+          };
+          setClients([registeredUser, ...clients]);
+          setCurrentUser(registeredUser);
+          localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(registeredUser));
+          triggerNotification('¡Registro exitoso! Bienvenido al Club de Amigos Bumsy.');
+          setPortal('buyer_dashboard');
+        }
+      } catch (e) {
+        console.error("Error registering client:", e);
+        triggerNotification('Error al registrarse en el servidor. Inténtalo de nuevo.', 'error');
+      }
+    };
 
-    setCurrentUser(newClient);
-    localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(newClient));
-    triggerNotification('¡Registro exitoso! Bienvenido al Club de Amigos Bumsy.');
-    setPortal('buyer_dashboard');
+    registerInSupabase();
 
     // Clear form
     setRegName('');
@@ -350,40 +417,80 @@ const CRM = () => {
   const handleInquirySubmit = (product, customMessage = '') => {
     if (!currentUser) return;
 
-    const newInquiry = {
-      id: Date.now(),
-      buyerEmail: currentUser.email,
-      buyerName: currentUser.name,
-      productName: product.name,
-      message: customMessage || `Me gustaría recibir información de precio y disponibilidad de: ${product.name}.`,
-      createdAt: new Date().toISOString(),
-      status: 'Pendiente'
+    const submitInquiryInSupabase = async () => {
+      try {
+        const newInquiry = {
+          buyer_email: currentUser.email,
+          buyer_name: currentUser.name,
+          product_name: product.name,
+          message: customMessage || `Me gustaría recibir información de precio y disponibilidad de: ${product.name}.`,
+          status: 'Pendiente'
+        };
+
+        const { data, error } = await supabase.from('inquiries').insert([newInquiry]).select();
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          setInquiries([
+            {
+              id: data[0].id,
+              buyerEmail: data[0].buyer_email,
+              buyerName: data[0].buyer_name,
+              productName: data[0].product_name,
+              message: data[0].message,
+              createdAt: data[0].created_at,
+              status: data[0].status
+            },
+            ...inquiries
+          ]);
+          triggerNotification('¡Consulta enviada! El vendedor responderá muy pronto.');
+        }
+      } catch (e) {
+        console.error("Error submitting inquiry:", e);
+        triggerNotification('Error al enviar la consulta.', 'error');
+      }
     };
 
-    const updated = [...inquiries, newInquiry];
-    setInquiries(updated);
-    localStorage.setItem('bumsy_crm_inquiries', JSON.stringify(updated));
-    triggerNotification('¡Consulta enviada! El vendedor responderá muy pronto.');
+    submitInquiryInSupabase();
   };
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
     if (!currentUser) return;
 
-    const updatedUser = {
-      ...currentUser,
-      name: profileName,
-      phone: profilePhone,
-      address: profileAddress,
-      birthday: profileBirthday
+    const saveProfileInSupabase = async () => {
+      try {
+        const { error } = await supabase
+          .from('clients')
+          .update({
+            name: profileName,
+            phone: profilePhone,
+            address: profileAddress,
+            birthday: profileBirthday
+          })
+          .eq('id', currentUser.id);
+
+        if (error) throw error;
+
+        const updatedUser = {
+          ...currentUser,
+          name: profileName,
+          phone: profilePhone,
+          address: profileAddress,
+          birthday: profileBirthday
+        };
+
+        setClients(clients.map(c => c.id === currentUser.id ? updatedUser : c));
+        setCurrentUser(updatedUser);
+        localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(updatedUser));
+        triggerNotification('¡Perfil actualizado con éxito! Tus datos se auto-completarán en tu próxima compra.');
+      } catch (e) {
+        console.error("Error updating profile:", e);
+        triggerNotification('Error al guardar el perfil en el servidor.', 'error');
+      }
     };
 
-    const updatedClients = clients.map(c => c.id === currentUser.id ? updatedUser : c);
-    setClients(updatedClients);
-    setCurrentUser(updatedUser);
-    localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(updatedUser));
-
-    triggerNotification('¡Perfil actualizado con éxito! Tus datos se auto-completarán en tu próxima compra.');
+    saveProfileInSupabase();
   };
 
   const handleConfirmPurchase = (e) => {
@@ -393,31 +500,52 @@ const CRM = () => {
     const isGiftProduct = activeCheckoutProduct.category === 'Regalos' || activeCheckoutProduct.price === 0;
 
     if (isGiftProduct) {
-      // 1. FREE GIFTS: Instant checkout directly registered local
+      // 1. FREE GIFTS: Instant checkout directly registered in Supabase
       const addressVal = 'Descarga Digital (Club de Amigos)';
       const phoneVal = currentUser.phone || 'N/A';
       const birthdayVal = currentUser.birthday || 'N/A';
 
       const newSale = {
-        id: `sale_${Date.now()}`,
-        buyerEmail: currentUser.email,
-        buyerName: currentUser.name,
-        productName: activeCheckoutProduct.name,
+        buyer_email: currentUser.email,
+        buyer_name: currentUser.name,
+        product_name: activeCheckoutProduct.name,
         price: activeCheckoutProduct.price,
-        pdfFile: activeCheckoutProduct.pdfFile || '',
-        downloadUrl: activeCheckoutProduct.downloadUrl || '',
+        pdf_file: activeCheckoutProduct.pdfFile || activeCheckoutProduct.pdf_file || '',
+        download_url: activeCheckoutProduct.downloadUrl || activeCheckoutProduct.download_url || '',
         address: addressVal,
-        birthday: birthdayVal,
-        date: new Date().toISOString()
+        birthday: birthdayVal
       };
 
-      const updatedSales = [newSale, ...sales];
-      setSales(updatedSales);
-      localStorage.setItem('bumsy_crm_sales', JSON.stringify(updatedSales));
+      const registerFreeSaleInSupabase = async () => {
+        try {
+          const { data, error } = await supabase.from('sales').insert([newSale]).select();
+          if (error) throw error;
 
-      triggerNotification(`¡Regalo "${activeCheckoutProduct.name}" agregado a tus descargas!`);
-      setActiveCheckoutProduct(null);
-      setBuyerTab('my_purchases');
+          if (data && data.length > 0) {
+            setSales([{
+              id: data[0].id,
+              buyerEmail: data[0].buyer_email,
+              buyerName: data[0].buyer_name,
+              productName: data[0].product_name,
+              price: Number(data[0].price),
+              pdfFile: data[0].pdf_file,
+              downloadUrl: data[0].download_url,
+              address: data[0].address,
+              birthday: data[0].birthday,
+              date: data[0].date
+            }, ...sales]);
+
+            triggerNotification(`¡Regalo "${activeCheckoutProduct.name}" agregado a tus descargas!`);
+            setActiveCheckoutProduct(null);
+            setBuyerTab('my_purchases');
+          }
+        } catch (e) {
+          console.error("Error registering free sale:", e);
+          triggerNotification('Error al registrar la descarga en el servidor.', 'error');
+        }
+      };
+
+      registerFreeSaleInSupabase();
     } else {
       // 2. PAID PRODUCTS: Secure Mercado Pago Preference API Flow
       const stockVal = getProductStock(activeCheckoutProduct);
@@ -534,15 +662,23 @@ const CRM = () => {
 
   // --- Seller Dashboard Handlers ---
   const handleSaveNotes = (clientId, notes) => {
-    const updatedClients = clients.map(c => {
-      if (c.id === clientId) {
-        return { ...c, notes };
+    const saveNotesInSupabase = async () => {
+      try {
+        const { error } = await supabase
+          .from('clients')
+          .update({ notes })
+          .eq('id', clientId);
+
+        if (error) throw error;
+
+        setClients(clients.map(c => c.id === clientId ? { ...c, notes } : c));
+        triggerNotification('Notas del cliente actualizadas en el CRM.');
+      } catch (e) {
+        console.error("Error saving notes:", e);
+        triggerNotification('Error al guardar notas en el servidor.', 'error');
       }
-      return c;
-    });
-    setClients(updatedClients);
-    localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
-    triggerNotification('Notas del cliente actualizadas en el CRM.');
+    };
+    saveNotesInSupabase();
   };
 
   const handleImageUpload = (e) => {
@@ -590,70 +726,88 @@ const CRM = () => {
     }
 
     const stockParsed = parseInt(prodStock) || 0;
+    const priceParsed = parseFloat(prodPrice) || 0;
+    const isFreeVal = priceParsed === 0 || prodCategory === 'Regalos';
 
     if (editingProduct) {
       // Edit mode
-      const updated = customProducts.map(p => {
-        if (p.id === editingProduct.id) {
-          return {
+      const updateProductInSupabase = async () => {
+        try {
+          const { error } = await supabase
+            .from('products')
+            .update({
+              name: prodName,
+              price: priceParsed,
+              category: prodCategory,
+              description: prodDescription,
+              image: prodImageUrl,
+              pdf_file: prodPdfUrl,
+              pdf_name: prodPdfName,
+              is_free: isFreeVal,
+              stock: stockParsed
+            })
+            .eq('id', editingProduct.id);
+
+          if (error) throw error;
+
+          setCustomProducts(customProducts.map(p => p.id === editingProduct.id ? {
             ...p,
             name: prodName,
-            price: parseFloat(prodPrice),
+            price: priceParsed,
             category: prodCategory,
             description: prodDescription,
             image: prodImageUrl,
             pdfFile: prodPdfUrl,
             pdfName: prodPdfName,
-            isFree: parseFloat(prodPrice) === 0 || prodCategory === 'Regalos',
+            isFree: isFreeVal,
             stock: stockParsed
-          };
+          } : p));
+
+          triggerNotification('Producto, stock y archivos actualizados correctamente.');
+          setEditingProduct(null);
+        } catch (e) {
+          console.error("Error updating product:", e);
+          triggerNotification('Error al actualizar el producto en el servidor.', 'error');
         }
-        return p;
-      });
-      setCustomProducts(updated);
-      localStorage.setItem('bumsy_crm_products', JSON.stringify(updated));
-
-      // Update override
-      const updatedOverrides = {
-        ...stockOverrides,
-        [editingProduct.id]: stockParsed
       };
-      setStockOverrides(updatedOverrides);
-      localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(updatedOverrides));
-
-      triggerNotification('Producto, stock y archivos actualizados correctamente.');
-      setEditingProduct(null);
+      updateProductInSupabase();
     } else {
       // Create mode
-      const newId = `custom_${Date.now()}`;
-      const newProduct = {
-        id: newId,
-        name: prodName,
-        price: parseFloat(prodPrice),
-        category: prodCategory,
-        description: prodDescription,
-        image: prodImageUrl,
-        pdfFile: prodPdfUrl,
-        pdfName: prodPdfName,
-        isFree: parseFloat(prodPrice) === 0 || prodCategory === 'Regalos',
-        status: 'Activo',
-        createdAt: new Date().toISOString(),
-        stock: stockParsed
+      const createProductInSupabase = async () => {
+        try {
+          const newId = `custom_${Date.now()}`;
+          const newProduct = {
+            id: newId,
+            name: prodName,
+            price: priceParsed,
+            category: prodCategory,
+            description: prodDescription,
+            image: prodImageUrl,
+            pdf_file: prodPdfUrl,
+            pdf_name: prodPdfName,
+            is_free: isFreeVal,
+            status: 'Activo',
+            stock: stockParsed
+          };
+
+          const { error } = await supabase.from('products').insert([newProduct]);
+          if (error) throw error;
+
+          setCustomProducts([...customProducts, {
+            ...newProduct,
+            isFree: isFreeVal,
+            pdfFile: prodPdfUrl,
+            pdfName: prodPdfName,
+            createdAt: new Date().toISOString()
+          }]);
+
+          triggerNotification('¡Nuevo producto subido con éxito con stock inicial!');
+        } catch (e) {
+          console.error("Error creating product:", e);
+          triggerNotification('Error al subir el producto al servidor.', 'error');
+        }
       };
-
-      const updated = [...customProducts, newProduct];
-      setCustomProducts(updated);
-      localStorage.setItem('bumsy_crm_products', JSON.stringify(updated));
-
-      // Register override
-      const updatedOverrides = {
-        ...stockOverrides,
-        [newId]: stockParsed
-      };
-      setStockOverrides(updatedOverrides);
-      localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(updatedOverrides));
-
-      triggerNotification('¡Nuevo producto subido con éxito con stock inicial!');
+      createProductInSupabase();
     }
 
     // Reset Form
@@ -681,29 +835,63 @@ const CRM = () => {
   };
 
   const handleDeleteProduct = (prodId) => {
-    const updated = customProducts.filter(p => p.id !== prodId);
-    setCustomProducts(updated);
-    localStorage.setItem('bumsy_crm_products', JSON.stringify(updated));
-    triggerNotification('Producto removido del catálogo.');
+    const deleteProductInSupabase = async () => {
+      try {
+        const { error } = await supabase
+          .from('products')
+          .delete()
+          .eq('id', prodId);
+
+        if (error) throw error;
+
+        setCustomProducts(customProducts.filter(p => p.id !== prodId));
+        triggerNotification('Producto removido del catálogo.');
+      } catch (e) {
+        console.error("Error deleting product:", e);
+        triggerNotification('Error al eliminar el producto en el servidor.', 'error');
+      }
+    };
+    deleteProductInSupabase();
   };
 
   const handleInquiryStatusChange = (inquiryId, newStatus) => {
-    const updated = inquiries.map(i => {
-      if (i.id === inquiryId) {
-        return { ...i, status: newStatus };
+    const updateInquiryStatusInSupabase = async () => {
+      try {
+        const { error } = await supabase
+          .from('inquiries')
+          .update({ status: newStatus })
+          .eq('id', inquiryId);
+
+        if (error) throw error;
+
+        setInquiries(inquiries.map(i => i.id === inquiryId ? { ...i, status: newStatus } : i));
+        triggerNotification(`Estado de consulta cambiado a: ${newStatus}`);
+      } catch (e) {
+        console.error("Error updating inquiry status:", e);
+        triggerNotification('Error al actualizar estado en el servidor.', 'error');
       }
-      return i;
-    });
-    setInquiries(updated);
-    localStorage.setItem('bumsy_crm_inquiries', JSON.stringify(updated));
-    triggerNotification(`Estado de consulta cambiado a: ${newStatus}`);
+    };
+    updateInquiryStatusInSupabase();
   };
 
   const handleDeleteInquiry = (inquiryId) => {
-    const updated = inquiries.filter(i => i.id !== inquiryId);
-    setInquiries(updated);
-    localStorage.setItem('bumsy_crm_inquiries', JSON.stringify(updated));
-    triggerNotification('Consulta archivada.');
+    const deleteInquiryInSupabase = async () => {
+      try {
+        const { error } = await supabase
+          .from('inquiries')
+          .delete()
+          .eq('id', inquiryId);
+
+        if (error) throw error;
+
+        setInquiries(inquiries.filter(i => i.id !== inquiryId));
+        triggerNotification('Consulta archivada.');
+      } catch (e) {
+        console.error("Error deleting inquiry:", e);
+        triggerNotification('Error al archivar consulta en el servidor.', 'error');
+      }
+    };
+    deleteInquiryInSupabase();
   };
 
   const handlePasswordChange = (e) => {
@@ -717,21 +905,10 @@ const CRM = () => {
   };
 
   // Combine static shop products + custom CRM uploaded products for Catalog Viewers
-  const allProductsList = [
-    // Pre-populated catalog items
-    { id: 'static_1', name: 'Peluche Bumsy Fox (XXL)', price: 29.99, category: 'Peluches', image: '/assets/banners/mercha.webp', description: 'Peluche gigante ultra suave ideal para abrazos mágicos.' },
-    { id: 'static_2', name: 'Camiseta Arcoíris Uni', price: 19.99, category: 'Ropa', image: '/assets/banners/mercha.webp', description: 'Camiseta infantil colorida de algodón orgánico.' },
-    { id: 'static_3', name: 'Cuento: Aventuras en el Bosque', price: 14.99, category: 'Libros', image: '/assets/banners/books.webp', description: 'Cuento de pasta dura con ilustraciones a todo color.' },
-    { id: 'static_4', name: 'Mochila Tarta Turtle', price: 34.99, category: 'Accesorios', image: '/assets/banners/mercha.webp', description: 'Mochila escolar resistente y súper cómoda.' },
-    // Custom uploaded products
-    ...customProducts
-  ];
+  const allProductsList = customProducts;
 
   // Helper to extract stock level for any product dynamically
   const getProductStock = (p) => {
-    if (p.id in stockOverrides) {
-      return stockOverrides[p.id];
-    }
     return p.stock !== undefined ? p.stock : 25;
   };
 
@@ -759,18 +936,10 @@ const CRM = () => {
       // Fallback session restoration if buyer got logged out
       let activeUser = currentUser;
       if (!activeUser && emailParam) {
-        const savedClients = localStorage.getItem('bumsy_crm_clients');
-        if (savedClients) {
-          try {
-            const parsed = JSON.parse(savedClients);
-            const foundUser = parsed.find(c => c.email.toLowerCase() === emailParam.toLowerCase());
-            if (foundUser) {
-              activeUser = foundUser;
-              setCurrentUser(foundUser);
-            }
-          } catch (e) {
-            console.error(e);
-          }
+        const foundUser = clients.find(c => c.email.toLowerCase() === emailParam.toLowerCase());
+        if (foundUser) {
+          activeUser = foundUser;
+          setCurrentUser(foundUser);
         }
       }
 
@@ -780,75 +949,118 @@ const CRM = () => {
         if (targetProd) {
           const isGiftProduct = targetProd.category === 'Regalos' || targetProd.price === 0;
 
-          // Process stock deduction if physical item
-          if (!isGiftProduct) {
-            const stockVal = getProductStock(targetProd);
-            const newStock = Math.max(0, stockVal - 1);
-            const updatedOverrides = {
-              ...stockOverrides,
-              [targetProd.id]: newStock
-            };
-            setStockOverrides(updatedOverrides);
-            localStorage.setItem('bumsy_crm_stock_overrides', JSON.stringify(updatedOverrides));
-
-            if (targetProd.id.toString().startsWith('custom_')) {
-              const updatedCustoms = customProducts.map(p => {
-                if (p.id === targetProd.id) {
-                  return { ...p, stock: newStock };
-                }
-                return p;
-              });
-              setCustomProducts(updatedCustoms);
-              localStorage.setItem('bumsy_crm_products', JSON.stringify(updatedCustoms));
-            }
-          }
-
-          // Register new official sale
-          const newSale = {
-            id: `sale_${Date.now()}`,
-            buyerEmail: activeUser.email,
-            buyerName: activeUser.name,
-            productName: targetProd.name,
-            price: targetProd.price,
-            pdfFile: targetProd.pdfFile || '',
-            downloadUrl: targetProd.downloadUrl || '',
-            address: pending?.address || activeUser.address || 'Hostinger Checkout',
-            birthday: pending?.birthday || activeUser.birthday || 'N/A',
-            date: new Date().toISOString()
-          };
-
-          const updatedSales = [newSale, ...sales];
-          setSales(updatedSales);
-          localStorage.setItem('bumsy_crm_sales', JSON.stringify(updatedSales));
-
-          // Set user session parameters
-          if (!isGiftProduct && pending) {
-            const updatedUser = {
-              ...activeUser,
-              phone: pending.phone,
-              address: pending.address,
-              birthday: pending.birthday
-            };
-            setCurrentUser(updatedUser);
-            localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(updatedUser));
-
-            const savedClients = localStorage.getItem('bumsy_crm_clients');
-            if (savedClients) {
-              try {
-                const parsedClients = JSON.parse(savedClients);
-                const updatedClients = parsedClients.map(c => c.id === activeUser.id ? updatedUser : c);
-                setClients(updatedClients);
-                localStorage.setItem('bumsy_crm_clients', JSON.stringify(updatedClients));
-              } catch (e) {
-                console.error(e);
+          const registerPaidSaleInSupabase = async () => {
+            try {
+              // 1. Decrement stock in Supabase
+              if (!isGiftProduct) {
+                const stockVal = getProductStock(targetProd);
+                const newStock = Math.max(0, stockVal - 1);
+                
+                await supabase
+                  .from('products')
+                  .update({ stock: newStock })
+                  .eq('id', targetProd.id);
               }
-            }
-          }
 
-          // Trigger celebratory popup modal
-          setPaymentSuccessData(targetProd);
-          setPortal('buyer_dashboard');
-          setBuyerTab('my_purchases');
+              // 2. Register sale in Supabase
+              const newSale = {
+                buyer_email: activeUser.email,
+                buyer_name: activeUser.name,
+                product_name: targetProd.name,
+                price: targetProd.price,
+                pdf_file: targetProd.pdfFile || targetProd.pdf_file || '',
+                download_url: targetProd.downloadUrl || targetProd.download_url || '',
+                address: pending?.address || activeUser.address || 'Hostinger Checkout',
+                birthday: pending?.birthday || activeUser.birthday || 'N/A'
+              };
+
+              await supabase.from('sales').insert([newSale]);
+
+              // 3. Update active user details if pending purchase details exist
+              if (pending) {
+                await supabase
+                  .from('clients')
+                  .update({
+                    phone: pending.phone,
+                    address: pending.address,
+                    birthday: pending.birthday
+                  })
+                  .eq('id', activeUser.id);
+              }
+
+              // Re-fetch all data to ensure sync
+              const { data: updatedProducts } = await supabase.from('products').select('*').order('created_at', { ascending: true });
+              if (updatedProducts) {
+                setCustomProducts(updatedProducts.map(p => ({
+                  id: p.id,
+                  name: p.name,
+                  price: Number(p.price),
+                  category: p.category,
+                  image: p.image,
+                  description: p.description,
+                  status: p.status,
+                  createdAt: p.created_at,
+                  stock: p.stock,
+                  rating: p.rating,
+                  color: p.color,
+                  isFree: p.is_free,
+                  pdfFile: p.pdf_file,
+                  pdfName: p.pdf_name,
+                  downloadUrl: p.download_url
+                })));
+              }
+
+              const { data: updatedSales } = await supabase.from('sales').select('*').order('date', { ascending: false });
+              if (updatedSales) {
+                setSales(updatedSales.map(s => ({
+                  id: s.id,
+                  buyerEmail: s.buyer_email,
+                  buyerName: s.buyer_name,
+                  productName: s.product_name,
+                  price: Number(s.price),
+                  pdfFile: s.pdf_file,
+                  downloadUrl: s.download_url,
+                  address: s.address,
+                  birthday: s.birthday,
+                  date: s.date
+                })));
+              }
+
+              const { data: updatedClients } = await supabase.from('clients').select('*').order('registered_at', { ascending: false });
+              if (updatedClients) {
+                setClients(updatedClients.map(c => ({
+                  id: c.id,
+                  name: c.name,
+                  email: c.email,
+                  phone: c.phone,
+                  password: c.password,
+                  interest: c.interest,
+                  registeredAt: c.registered_at,
+                  notes: c.notes || '',
+                  address: c.address || '',
+                  birthday: c.birthday || ''
+                })));
+              }
+
+              if (pending) {
+                const updatedUser = {
+                  ...activeUser,
+                  phone: pending.phone,
+                  address: pending.address,
+                  birthday: pending.birthday
+                };
+                setCurrentUser(updatedUser);
+                localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(updatedUser));
+              }
+
+              setPaymentSuccessData(targetProd);
+              setPortal('buyer_dashboard');
+              setBuyerTab('my_purchases');
+            } catch (e) {
+              console.error("Error processing successful paid sale:", e);
+            }
+          };
+          registerPaidSaleInSupabase();
         }
       }
 
@@ -861,7 +1073,7 @@ const CRM = () => {
       const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
     }
-  }, [sales, stockOverrides, customProducts, clients, currentUser]);
+  }, [sales, customProducts, clients, currentUser]);
 
   // Handle automatic checkout redirection from Storefront (Shop)
   useEffect(() => {
