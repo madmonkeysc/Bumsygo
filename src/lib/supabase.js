@@ -1,1 +1,10 @@
-import { createClient } from '@supabase/supabase-js'; const supabaseUrl = import.meta.env.VITE_SUPABASE_URL; const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY; if (!supabaseUrl || !supabaseAnonKey) { console.warn("Supabase credentials missing."); } const mock = { from: () => mock, select: () => ({ then: (cb) => cb({ data: [], error: null }), order: () => Promise.resolve({ data: [], error: null }) }), insert: () => mock, update: () => mock, delete: () => mock, eq: () => Promise.resolve({ data: [], error: null }) }; export const supabase = (supabaseUrl && supabaseAnonKey) ? createClient(supabaseUrl, supabaseAnonKey) : mock;
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://bbueiikkhuhagszyrpej.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_NwzJGl5IG6DlzXsuM7mmEw_Cn53opjs';
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn("Supabase credentials missing. Please make sure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your environment.");
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
