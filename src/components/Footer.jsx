@@ -10,7 +10,7 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="max-w-xs">
             <Link to="/" className="flex items-center gap-3 mb-8 group">
-              <img src="/assets/branding/logo.webp?v=20260610_logo7" alt="Bumsy Go Logo" className="h-14 object-contain group-hover:scale-105 transition-transform" />
+              <img src="/assets/branding/logo.webp?v=20260611_logo8" alt="Bumsy Go Logo" className="h-14 object-contain group-hover:scale-105 transition-transform" />
             </Link>
             <p className="text-slate-500 text-lg leading-relaxed mb-10 font-medium">
               Contenidos, educación y diversión para los primeros momentos de los niños. Alegría en cada día.

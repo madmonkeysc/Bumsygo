@@ -6,7 +6,7 @@ const PageLoader = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
       <div className="flex flex-col items-center">
         <motion.img 
-          src="/assets/branding/logo.webp?v=20260610_logo7" 
+          src="/assets/branding/logo.webp?v=20260611_logo8" 
           alt="Bumsy Go Loading" 
           className="h-24 md:h-32 mb-8 object-contain"
           animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}

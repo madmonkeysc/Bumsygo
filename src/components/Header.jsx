@@ -37,7 +37,7 @@ const Header = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
           <img 
-            src="/assets/branding/logo.webp?v=20260610_logo7" 
+            src="/assets/branding/logo.webp?v=20260611_logo8" 
             alt="Bumsy Go Logo" 
             className={`transition-all duration-300 ${isScrolled ? 'h-10' : 'h-14'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
           />
@@ -49,7 +49,7 @@ const Header = () => {
             <Link
               key={link.path}
               to={link.path}
-              className={`font-black text-[15px] uppercase tracking-widest hover:text-accent transition-all relative group flex items-center gap-2 ${
+              className={`font-bold text-[15px] uppercase tracking-wider hover:text-accent transition-all relative group flex items-center gap-2 ${
                 location.pathname === link.path 
                   ? 'text-accent' 
                   : (isScrolled || !isTransparentHeader) ? 'text-primary' : 'text-white'
@@ -64,7 +64,7 @@ const Header = () => {
 
         {/* Right Actions */}
         <div className="hidden lg:flex items-center gap-4">
-          <Link to="/shop" className="bg-[#FCF200] hover:bg-[#EDE400] text-black px-6 py-2.5 rounded-full font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md active:scale-95">
+          <Link to="/shop" className="bg-[#FCF200] hover:bg-[#EDE400] text-black px-6 py-2.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-md active:scale-95">
             <ShoppingBag size={18} /> Tienda
           </Link>
           <Link to="/crm" className={`font-bold hover:text-accent flex items-center gap-1 transition-colors ${
@@ -93,17 +93,17 @@ const Header = () => {
               key={link.path}
               to={link.path}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-4 font-black text-2xl p-4 rounded-3xl ${location.pathname === link.path ? 'bg-accent/10 text-accent' : 'text-primary hover:bg-primary/5'}`}
+              className={`flex items-center gap-4 font-bold text-xl p-4 rounded-3xl ${location.pathname === link.path ? 'bg-accent/10 text-accent' : 'text-primary hover:bg-primary/5'}`}
             >
               <div className={location.pathname === link.path ? 'text-accent' : 'text-primary/40'}>{link.icon}</div>
               {link.name}
             </Link>
           ))}
           <hr className="border-primary/10" />
-          <Link to="/shop" onClick={() => setIsOpen(false)} className="flex items-center gap-4 font-black text-2xl text-primary p-4 rounded-3xl hover:bg-primary/5">
+          <Link to="/shop" onClick={() => setIsOpen(false)} className="flex items-center gap-4 font-bold text-xl text-primary p-4 rounded-3xl hover:bg-primary/5">
             <ShoppingBag size={24} className="text-primary/40" /> Tienda
           </Link>
-          <Link to="/crm" onClick={() => setIsOpen(false)} className="flex items-center gap-4 font-black text-2xl text-primary p-4 rounded-3xl hover:bg-primary/5 text-left">
+          <Link to="/crm" onClick={() => setIsOpen(false)} className="flex items-center gap-4 font-bold text-xl text-primary p-4 rounded-3xl hover:bg-primary/5 text-left">
             <LogIn size={24} className="text-primary/40" /> Acceso
           </Link>
         </div>
