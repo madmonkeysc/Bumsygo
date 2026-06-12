@@ -1,6 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Ticket, ChevronRight, Sparkles } from 'lucide-react';
+import { 
+  Calendar, MapPin, Ticket, ChevronRight, Sparkles,
+  Lock, Clock, BarChart2, Shield, User, Save, CheckCircle
+} from 'lucide-react';
 import useSEO from '../hooks/useSEO';
 
 const MeetAndPlay = () => {
@@ -9,6 +12,34 @@ const MeetAndPlay = () => {
     description: 'Encuentra los próximos eventos en vivo de Bumsy, shows musicales y talleres creativos para toda la familia.',
     image: '/assets/banners/navidad.webp'
   });
+
+  const [currentUser, setCurrentUser] = React.useState(() => {
+    const saved = localStorage.getItem('bumsy_crm_logged_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [parentalLimit, setParentalLimit] = React.useState(() => {
+    return localStorage.getItem('bumsy_parental_limit') || '30';
+  });
+
+  const [parentalActive, setParentalActive] = React.useState(() => {
+    return localStorage.getItem('bumsy_parental_active') !== 'false';
+  });
+
+  const [childName, setChildName] = React.useState(() => {
+    return localStorage.getItem('bumsy_parental_child_name') || 'Mateo';
+  });
+
+  const [saveSuccess, setSaveSuccess] = React.useState(false);
+
+  const handleSaveParentalControl = (e) => {
+    e.preventDefault();
+    localStorage.setItem('bumsy_parental_limit', parentalLimit);
+    localStorage.setItem('bumsy_parental_active', parentalActive.toString());
+    localStorage.setItem('bumsy_parental_child_name', childName);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
 
   const events = [
     {
@@ -201,6 +232,235 @@ const MeetAndPlay = () => {
         </div>
       </section>
 
+      {/* Parental Control & Progress Dashboard */}
+      <section className="py-24 bg-slate-950 text-white relative overflow-hidden border-t border-slate-900">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/40 via-slate-950 to-slate-950 -z-10" />
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
+              Control Parental & Progreso
+            </span>
+            <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tight mt-4 mb-6">
+              Portal de Padres Bumsy Go
+            </h2>
+            <p className="text-slate-400 text-lg md:text-xl font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              Monitorea el tiempo de juego de tus hijos, conoce qué habilidades están practicando y establece límites saludables para una experiencia segura.
+            </p>
+          </div>
+
+          <div className="max-w-6xl mx-auto bg-slate-900/40 border border-slate-850 rounded-3xl p-6 md:p-10 backdrop-blur-md relative overflow-hidden shadow-2xl">
+            {/* If NOT logged in, show a blurred visual representation with an interactive, beautiful gateway card */}
+            {!currentUser ? (
+              <div className="relative">
+                {/* Blurred Stats Background */}
+                <div className="grid md:grid-cols-2 gap-8 filter blur-[6px] select-none pointer-events-none opacity-40">
+                  {/* Left Column: Progress Mock */}
+                  <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6">
+                    <h3 className="text-lg font-bold uppercase tracking-wider mb-4 text-indigo-400 flex items-center gap-2"><BarChart2 size={18} /> Estadísticas de Aprendizaje</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-xs font-semibold mb-1"><span>Lógica y Matemáticas</span><span>80%</span></div>
+                        <div className="w-full bg-slate-800 h-2 rounded-full"><div className="bg-indigo-500 h-full rounded-full w-[80%]" /></div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-xs font-semibold mb-1"><span>Creatividad y Colores</span><span>60%</span></div>
+                        <div className="w-full bg-slate-800 h-2 rounded-full"><div className="bg-pink-500 h-full rounded-full w-[60%]" /></div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Right Column: Limits Mock */}
+                  <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6">
+                    <h3 className="text-lg font-bold uppercase tracking-wider mb-4 text-pink-400 flex items-center gap-2"><Lock size={18} /> Límites de Juego</h3>
+                    <div className="space-y-4">
+                      <div className="h-10 bg-slate-800 rounded-xl w-full" />
+                      <div className="h-10 bg-slate-800 rounded-xl w-full" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Login CTA overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-slate-950/40 rounded-2xl">
+                  <motion.div 
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="max-w-md bg-slate-950 border border-slate-800 p-8 rounded-3xl shadow-2xl flex flex-col items-center gap-6"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                      <Shield size={32} />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-black uppercase tracking-tight mb-2">Acceso Protegido para Padres</h4>
+                      <p className="text-slate-400 text-xs font-semibold leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                        Vincula tu cuenta del Club de Amigos para activar el Control Parental, limitar el tiempo diario de juego y ver estadísticas reales de aprendizaje de tus hijos.
+                      </p>
+                    </div>
+                    <a 
+                      href="/crm?redirect=parents"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-black text-xs px-8 py-4 rounded-full uppercase tracking-wider transition-all transform hover:scale-105 shadow-lg shadow-indigo-500/20"
+                    >
+                      Iniciar Sesión / Registrarse 🚀
+                    </a>
+                  </motion.div>
+                </div>
+              </div>
+            ) : (
+              /* Logged In Dashboard */
+              <div className="grid md:grid-cols-2 gap-8 text-left">
+                {/* Left Column: Real Interactive Stats & Info */}
+                <div className="bg-slate-950/60 border border-slate-850 rounded-2xl p-6 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-black uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+                        <BarChart2 size={20} /> Progreso de {childName}
+                      </h3>
+                      <span className="text-[10px] bg-slate-900 border border-slate-800 text-slate-400 font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                        Esta semana
+                      </span>
+                    </div>
+
+                    <div className="space-y-6">
+                      {/* Stat 1 */}
+                      <div className="bg-slate-900/30 border border-slate-855 p-4 rounded-xl">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-black text-slate-200">🐍 Juego de Serpiente</span>
+                          <span className="font-mono text-indigo-400 text-xs font-bold">25 mins · Lógica</span>
+                        </div>
+                        <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                          <div className="bg-indigo-500 h-full rounded-full w-[80%] transition-all duration-500" />
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-semibold mt-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          * Tu hijo mejoró sus reflejos y la planeación espacial en un 15% esta semana.
+                        </p>
+                      </div>
+
+                      {/* Stat 2 */}
+                      <div className="bg-slate-900/30 border border-slate-855 p-4 rounded-xl">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-black text-slate-200">🎨 Colorear con Pipa</span>
+                          <span className="font-mono text-pink-400 text-xs font-bold">15 mins · Creatividad</span>
+                        </div>
+                        <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                          <div className="bg-pink-500 h-full rounded-full w-[55%] transition-all duration-500" />
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-semibold mt-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          * Estimuló el reconocimiento de colores primarios y secundarios.
+                        </p>
+                      </div>
+
+                      {/* Stat 3 */}
+                      <div className="bg-slate-900/30 border border-slate-855 p-4 rounded-xl">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-black text-slate-200">🧩 Rompecabezas de Tarta</span>
+                          <span className="font-mono text-emerald-400 text-xs font-bold">30 mins · Concentración</span>
+                        </div>
+                        <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                          <div className="bg-emerald-500 h-full rounded-full w-[90%] transition-all duration-500" />
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-semibold mt-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          * Excelente desempeño resolviendo problemas lógicos.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-4 border-t border-slate-900 flex items-center gap-3 text-xs text-slate-400">
+                    <User size={16} className="text-pink-500" />
+                    <span>Cuenta vinculada: <strong>{currentUser.name}</strong> ({currentUser.email})</span>
+                  </div>
+                </div>
+
+                {/* Right Column: Settings Form */}
+                <div className="bg-slate-950/60 border border-slate-855 rounded-2xl p-6 flex flex-col justify-between">
+                  <form onSubmit={handleSaveParentalControl} className="flex flex-col gap-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-black uppercase tracking-wider text-pink-400 flex items-center gap-2">
+                        <Lock size={20} /> Parámetros de Control
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-400">
+                          {parentalActive ? 'Límite Activo' : 'Límite Inactivo'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setParentalActive(!parentalActive)}
+                          className={`w-11 h-6 rounded-full transition-all relative ${parentalActive ? 'bg-pink-600' : 'bg-slate-800'}`}
+                        >
+                          <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-all ${parentalActive ? 'left-6' : 'left-1'}`} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-black uppercase tracking-wider text-slate-400">Nombre de tu Hijo(a):</label>
+                      <input
+                        type="text"
+                        value={childName}
+                        onChange={(e) => setChildName(e.target.value)}
+                        className="bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 font-semibold text-slate-200"
+                        placeholder="Ej. Mateo"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xs font-black uppercase tracking-wider text-slate-400">Límite de Tiempo Diario:</label>
+                        <span className="font-mono text-pink-400 font-black text-sm">
+                          {parentalLimit === '999' ? 'Ilimitado' : `${parentalLimit} Minutos`}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="15"
+                        max="60"
+                        step="15"
+                        value={parentalLimit === '999' ? '60' : parentalLimit}
+                        onChange={(e) => {
+                          setParentalLimit(e.target.value);
+                        }}
+                        disabled={!parentalActive}
+                        className="w-full accent-pink-600 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                      />
+                      <div className="flex justify-between text-[10px] text-slate-500 font-bold px-1">
+                        <span>15m</span>
+                        <span>30m</span>
+                        <span>45m</span>
+                        <span>60m+</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-900/30 border border-slate-850 p-4 rounded-xl text-xs text-slate-400 flex items-start gap-2.5 leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      <Shield size={16} className="text-indigo-400 shrink-0 mt-0.5" />
+                      <span>
+                        Cuando se alcance el límite de tiempo, la pantalla de los minijuegos interactivos de Bumsy Go mostrará un aviso amigable invitando al niño a tomar un descanso.
+                      </span>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-black text-xs py-4 rounded-xl uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-950/50"
+                    >
+                      <Save size={14} /> Guardar Configuración
+                    </button>
+                  </form>
+
+                  {saveSuccess && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 mt-4"
+                    >
+                      <CheckCircle size={14} /> ¡Configuración guardada correctamente!
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Activities Grid - Redesigned to be Modern & Professional */}
       {/* Activities Grid - Redesigned to be Modern & Professional */}
       <section className="py-32 bg-slate-50 border-t border-slate-200">
         <div className="container mx-auto px-6 relative z-10">

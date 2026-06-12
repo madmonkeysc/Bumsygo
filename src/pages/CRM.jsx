@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, ShoppingBag, MessageSquare, Plus, Trash2, Edit2, LogOut, CheckCircle,
   Clock, ArrowRight, UserCheck, Shield, Sparkles, Phone, Mail, Key,
   FileText, Search, Package, AlertCircle, Calendar, MapPin, CreditCard, TrendingUp, Tag,
-  Upload, Download, Gift
+  Upload, Download, Gift, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import useSEO from '../hooks/useSEO';
 import { supabase } from '../lib/supabase';
@@ -51,6 +51,17 @@ const CRM = () => {
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [isPromo, setIsPromo] = useState(false);
   const [sellerTab, setSellerTab] = useState('summary'); // summary, sales, clients, products, inquiries, settings
+
+  const buyerCarouselRef = useRef(null);
+  const scrollBuyerCarousel = (direction) => {
+    if (buyerCarouselRef.current) {
+      const scrollAmount = 320;
+      buyerCarouselRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   // Form states - Auth
   const [loginEmail, setLoginEmail] = useState('');
@@ -348,6 +359,15 @@ const CRM = () => {
     setTimeout(() => setNotification(null), 4000);
   };
 
+  const handleSuccessAuthRedirect = () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('redirect') === 'parents') {
+      window.location.href = '/meet-and-play';
+    } else {
+      setPortal('buyer_dashboard');
+    }
+  };
+
   // --- Auth Handlers ---
   const handleBuyerRegister = (e) => {
     e.preventDefault();
@@ -391,7 +411,7 @@ const CRM = () => {
         setCurrentUser(registeredUser);
         localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(registeredUser));
         triggerNotification('¡Registro exitoso! Bienvenido al Club de Amigos Bumsy.');
-        setPortal('buyer_dashboard');
+        handleSuccessAuthRedirect();
       } catch (e) {
         console.error("Error registering client, falling back to LocalStorage:", e);
         const registeredUser = {
@@ -404,7 +424,7 @@ const CRM = () => {
         setCurrentUser(registeredUser);
         localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(registeredUser));
         triggerNotification('¡Registro temporal exitoso! (Guardado localmente. Recuerda ejecutar supabase_schema.sql en tu editor SQL de Supabase).', 'warning');
-        setPortal('buyer_dashboard');
+        handleSuccessAuthRedirect();
       }
     };
 
@@ -424,7 +444,7 @@ const CRM = () => {
       setCurrentUser(user);
       localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(user));
       triggerNotification(`¡Bienvenido de vuelta, ${user.name}!`);
-      setPortal('buyer_dashboard');
+      handleSuccessAuthRedirect();
       setLoginEmail('');
       setLoginPassword('');
     } else {
@@ -1804,61 +1824,113 @@ const CRM = () => {
                 >
                   💎 Bumsy Pro
                 </button>
-                <button onClick={handleLogout} className="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-full transition-colors" title="Cerrar Sesión">
+                <button onClick={handleLogout} className="bg-slate-850 hover:bg-slate-750 text-slate-300 p-2.5 rounded-full transition-colors" title="Cerrar Sesión">
                   <LogOut size={16} />
                 </button>
               </div>
             </div>
 
-            {/* TAB: CATALOG EXPLORER */}
             {buyerTab === 'catalog' && (
-              <div className="flex-1 flex flex-col gap-6">
+              <div className="flex-1 flex flex-col gap-8">
 
-                {/* Filters Row */}
-                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                  <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-1 hide-scrollbar">
-                    {CATEGORIES.map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => setActiveCatalogCategory(cat)}
-                        className={`px-4 py-2 rounded-full text-xs font-bold uppercase transition-all whitespace-nowrap ${activeCatalogCategory === cat ? 'bg-slate-100 text-slate-950 font-black' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'}`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
+                {/* Dashboard Welcome Card */}
+                <div className="bg-gradient-to-r from-pink-600/20 to-indigo-600/20 border border-slate-800 rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 text-left">
+                  <div className="flex-1">
+                    <span className="bg-pink-500/10 text-pink-400 border border-pink-500/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                      Área de Amigos Bumsy
+                    </span>
+                    <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight mt-2 mb-3">
+                      ¡Tu Club de Actividades y Juegos!
+                    </h2>
+                    <p className="text-slate-400 text-xs md:text-sm font-medium leading-relaxed max-w-xl" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      Accede a plantillas descargables ilimitadas para tus pequeños y configura el Control Parental para los juegos de Bumsy Go.
+                    </p>
                   </div>
-
-                  <div className="w-full md:w-80 relative flex items-center bg-slate-900 border border-slate-800 rounded-full px-4 py-2">
-                    <Search size={16} className="text-slate-400 mr-2" />
-                    <input
-                      type="text"
-                      placeholder="Buscar en el catálogo..."
-                      value={catalogSearch}
-                      onChange={(e) => setCatalogSearch(e.target.value)}
-                      className="bg-transparent text-xs w-full focus:outline-none font-semibold text-slate-200 placeholder-slate-500"
-                    />
+                  <div className="flex items-center gap-3 shrink-0">
+                    <a 
+                      href="/meet-and-play"
+                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs px-5 py-3 rounded-full uppercase tracking-wider transition-all shadow-lg"
+                    >
+                      🛡️ Control Parental
+                    </a>
                   </div>
                 </div>
 
-                {/* Grid */}
-                {filteredCatalog.length === 0 ? (
-                  <div className="bg-slate-900/20 border border-slate-850 rounded-3xl p-12 text-center text-slate-500 font-semibold flex flex-col items-center justify-center">
-                    <Package size={48} className="mb-4 text-slate-700" />
-                    No se encontraron productos en el catálogo con los filtros seleccionados.
+                {/* Descargas Gratuitas Recomendadas Grid */}
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Gift className="text-amber-400" size={20} />
+                    <h3 className="text-md font-black uppercase tracking-wider text-slate-200">
+                      Plantillas y Regalos para Descargar
+                    </h3>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredCatalog.map(p => {
-                      const stockLevel = getProductStock(p);
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {customProducts.filter(p => p.price === 0 || p.category === 'Regalos').slice(0, 3).map(p => (
+                      <div key={p.id} className="bg-slate-900/30 border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-3 text-left">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <img src={p.image} alt={p.name} className="w-12 h-12 rounded-xl object-cover shrink-0 border border-slate-800" />
+                          <div className="min-w-0">
+                            <h4 className="font-black text-xs text-slate-200 truncate uppercase">{p.name}</h4>
+                            <span className="text-[9px] text-amber-500 font-bold uppercase tracking-wider">Gratis ✨</span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setActiveCheckoutProduct(p)}
+                          className="bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider px-3.5 py-2 rounded-full shrink-0 flex items-center gap-1 transition-all"
+                        >
+                          <Download size={11} /> Descargar
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Lo que otros compraron - 6 Products Carousel */}
+                <div className="mt-4 border-t border-slate-850 pt-8 flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="text-left">
+                      <span className="text-pink-500 font-black text-[10px] uppercase tracking-widest block mb-0.5">Destacados</span>
+                      <h3 className="text-lg font-black uppercase tracking-wider text-slate-200">
+                        🔥 Lo que otros compraron / Los más vendidos
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => scrollBuyerCarousel('left')}
+                        className="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white p-2 rounded-full transition-all"
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button
+                        onClick={() => scrollBuyerCarousel('right')}
+                        className="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white p-2 rounded-full transition-all"
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Horizontal Scrollable Carousel Container */}
+                  <div 
+                    ref={buyerCarouselRef}
+                    className="flex gap-6 overflow-x-auto pb-4 scroll-smooth snap-x hide-scrollbar"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  >
+                    {customProducts.slice(0, 6).map(p => {
+                      const stockLevel = getProductStock ? getProductStock(p) : (p.stock || 0);
                       const isOutOfStock = stockLevel <= 0;
+                      const isGift = p.price === 0 || p.category === 'Regalos';
 
                       return (
-                        <div key={p.id} className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col group hover:border-pink-500/30 transition-all duration-300 relative overflow-hidden">
+                        <div 
+                          key={p.id} 
+                          className="w-[280px] md:w-[310px] shrink-0 bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col group hover:border-pink-500/30 transition-all duration-300 relative overflow-hidden snap-start"
+                        >
                           <div className="aspect-video w-full rounded-2xl overflow-hidden bg-slate-950 mb-4 border border-slate-850 relative">
                             <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
 
-                            {/* Stock status badge */}
-                            {!(p.price === 0 || p.category === 'Regalos') ? (
+                            {!isGift ? (
                               <span className={`absolute top-3 left-3 font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider ${isOutOfStock
                                   ? 'bg-red-500/90 text-white shadow-md'
                                   : stockLevel <= 5
@@ -1877,54 +1949,53 @@ const CRM = () => {
                               {p.category}
                             </span>
                           </div>
-                          <h4 className="font-black text-lg text-slate-200 mb-1 leading-tight group-hover:text-pink-400 transition-colors uppercase text-left" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          <h4 className="font-black text-sm text-slate-200 mb-1 leading-tight group-hover:text-pink-400 transition-colors uppercase text-left truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
                             {p.name}
                           </h4>
-                          <p className="text-slate-400 text-xs font-semibold mb-4 flex-1 line-clamp-2 text-left">
+                          <p className="text-slate-400 text-[11px] font-semibold mb-4 flex-1 line-clamp-2 text-left" style={{ fontFamily: "'Poppins', sans-serif" }}>
                             {p.description || 'Sin descripción adicional disponible.'}
                           </p>
-                          <div className="flex items-center justify-between border-t border-slate-850 pt-4 mt-auto">
-                            <span className="text-pink-500 font-black text-2xl" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                              {p.price === 0 || p.category === 'Regalos' ? (
-                                <span className="text-amber-450 font-black text-lg uppercase tracking-wider animate-pulse flex items-center gap-1">
-                                  <Gift size={16} className="text-amber-400 shrink-0 animate-bounce" /> Gratis
+                          <div className="flex items-center justify-between border-t border-slate-855 pt-4 mt-auto">
+                            <span className="text-pink-500 font-black text-xl" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              {isGift ? (
+                                <span className="text-amber-450 font-black text-sm uppercase tracking-wider animate-pulse flex items-center gap-1">
+                                  <Gift size={14} className="text-amber-400 shrink-0 animate-bounce" /> Gratis
                                 </span>
                               ) : (
-                                <>${p.price} <span className="text-xs text-slate-500 font-bold font-sans">USD</span></>
+                                <>${p.price} <span className="text-[10px] text-slate-500 font-bold font-sans">USD</span></>
                               )}
                             </span>
 
                             <div className="flex items-center gap-1.5">
-                              {!(p.price === 0 || p.category === 'Regalos') && (
+                              {!isGift && (
                                 <button
                                   onClick={() => handleInquirySubmit(p)}
-                                  className="bg-slate-800 hover:bg-slate-755 border border-slate-700 text-slate-300 font-black text-[10px] uppercase tracking-wider px-3 py-2 rounded-full transition-all flex items-center gap-1"
+                                  className="bg-slate-800 hover:bg-slate-750 border border-slate-700 text-slate-300 font-black text-[9px] uppercase tracking-wider px-2.5 py-1.5 rounded-full transition-all flex items-center gap-1"
                                   title="Enviar consulta de preventa"
                                 >
-                                  <MessageSquare size={12} />
+                                  <MessageSquare size={11} />
                                 </button>
                               )}
                               <button
                                 onClick={() => {
-                                  const isGift = p.price === 0 || p.category === 'Regalos';
                                   if (!isGift && isOutOfStock) {
                                     triggerNotification('Producto agotado.', 'error');
                                     return;
                                   }
                                   setActiveCheckoutProduct(p);
                                 }}
-                                disabled={!(p.price === 0 || p.category === 'Regalos') && isOutOfStock}
-                                className={`font-black text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-full transition-all flex items-center gap-1 shadow-lg ${(p.price === 0 || p.category === 'Regalos')
+                                disabled={!isGift && isOutOfStock}
+                                className={`font-black text-[9px] uppercase tracking-wider px-3.5 py-2 rounded-full transition-all flex items-center gap-1 shadow-lg ${isGift
                                     ? 'bg-amber-400 hover:bg-amber-500 text-slate-950 font-black'
                                     : isOutOfStock
-                                      ? 'bg-slate-800 text-slate-600 border border-slate-850 cursor-not-allowed'
+                                      ? 'bg-slate-800 text-slate-600 border border-slate-855 cursor-not-allowed'
                                       : 'bg-pink-600 hover:bg-pink-500 text-white'
                                   }`}
                               >
-                                {(p.price === 0 || p.category === 'Regalos') ? (
-                                  <><Gift size={12} /> Obtener</>
+                                {isGift ? (
+                                  <><Gift size={11} /> Obtener</>
                                 ) : (
-                                  <><ShoppingBag size={12} /> Comprar</>
+                                  <><ShoppingBag size={11} /> Comprar</>
                                 )}
                               </button>
                             </div>
@@ -1933,7 +2004,8 @@ const CRM = () => {
                       );
                     })}
                   </div>
-                )}
+                </div>
+
               </div>
             )}
 
