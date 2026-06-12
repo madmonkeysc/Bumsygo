@@ -2211,7 +2211,10 @@ const CRM = () => {
                       <div className="flex-1">
                         <p className="text-green-300 text-xs font-black uppercase tracking-wider mb-0.5">Promo de Bienvenida · Bumsy Pro</p>
                         <h4 className="text-white font-black text-xl mb-1">3 Meses por solo <span className="text-green-400">$3 USD</span></h4>
-                        <p className="text-slate-400 text-xs font-semibold">Acceso completo a <strong className="text-white">Bumsy Pro</strong> durante 3 meses. Al terminar, si no cancelas, se activa automáticamente tu membresía a <strong className="text-pink-400">$99 MXN/mes</strong>. Cancela cuando quieras antes de que finalice la promo.</p>
+                        <p className="text-slate-400 text-xs font-semibold">Acceso completo a <strong className="text-white">Bumsy Pro</strong> durante 3 meses.</p>
+                        <div className="bg-amber-500/10 border border-amber-500/25 text-amber-400 text-[10px] font-bold px-3 py-2 rounded-xl mt-2 leading-relaxed">
+                          ⚠️ <strong>Nota de Renovación:</strong> Después de los 3 meses promocionales, la suscripción renovará automáticamente a <strong>$99 MXN/mes</strong> de manera automática si no se cancela previamente.
+                        </div>
                       </div>
                       <button
                         onClick={handlePromo}
@@ -2377,7 +2380,9 @@ const CRM = () => {
                     >
                       {isPromo ? 'Conectando...' : '🚀 Activar Bumsy Pro — $3 USD por 3 meses'}
                     </button>
-                    <p className="text-slate-600 text-xs mt-3 font-semibold">Después de los 3 meses se activa $99 MXN/mes · Cancela antes si no deseas continuar · Pago seguro con Mercado Pago</p>
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-300 text-[11px] font-bold px-4 py-3 rounded-2xl max-w-lg mx-auto mt-4 leading-relaxed">
+                      ⚠️ <strong>Aviso de Renovación:</strong> Al terminar la promoción de 3 meses ($3 USD), se activará automáticamente tu plan mensual estándar a <strong>$99 MXN/mes</strong>. Cancela antes de concluir el plazo para evitar cargos adicionales.
+                    </div>
                   </div>
                 </div>
               </div>

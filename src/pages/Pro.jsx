@@ -200,10 +200,14 @@ const Pro = () => {
               <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-2">PROMO BIENVENIDA</h3>
               <p className="text-slate-400 text-xs font-semibold mb-6">El pase perfecto para probar la experiencia premium completa.</p>
               
-              <div className="flex items-end gap-1 mb-8">
+              <div className="flex items-end gap-1 mb-4">
                 <span className="text-5xl font-black text-emerald-400">$3</span>
                 <span className="text-slate-300 font-extrabold text-lg mb-1">USD</span>
                 <span className="text-slate-400 text-sm font-semibold ml-2">/ 3 meses</span>
+              </div>
+
+              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold px-3.5 py-3 rounded-2xl mb-6 text-left leading-relaxed">
+                ⚠️ <strong>Aviso de Renovación:</strong> Al expirar el periodo promocional de 3 meses, tu suscripción se renovará automáticamente al plan mensual de <strong>$99 MXN/mes</strong>, salvo cancelación previa desde tu panel de usuario.
               </div>
 
               <ul className="flex flex-col gap-4 text-xs font-semibold text-slate-300 border-t border-slate-800/80 pt-6">

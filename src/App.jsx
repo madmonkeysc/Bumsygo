@@ -1,7 +1,22 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import PageLoader from './components/PageLoader';
+
+// Scroll to top on navigation component
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant' // Instant scroll to top to avoid visual jittering
+    });
+  }, [pathname]);
+
+  return null;
+};
 
 // Lazy loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -29,6 +44,7 @@ const Pro = lazy(() => import('./pages/Pro'));
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Layout>
         <Suspense fallback={<PageLoader />}>
           <Routes>
