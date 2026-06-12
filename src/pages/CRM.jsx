@@ -330,6 +330,7 @@ const CRM = () => {
     }
 
     const newClient = {
+      id: crypto.randomUUID ? crypto.randomUUID() : 'c_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now().toString(36),
       name: regName,
       email: regEmail,
       phone: regPhone,
@@ -1229,8 +1230,16 @@ const CRM = () => {
                 />
               </div>
 
-              <button type="submit" className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-sm py-4 rounded-xl shadow-lg mt-3 uppercase tracking-wider transition-colors">
+              <button type="submit" className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-base py-4.5 rounded-2xl shadow-lg mt-3 uppercase tracking-widest transition-colors">
                 Iniciar Sesión
+              </button>
+
+              <button 
+                type="button" 
+                onClick={() => setPortal('buyer_register')} 
+                className="w-full bg-slate-950 border-2 border-pink-600/40 hover:border-pink-500 text-pink-400 hover:text-white font-black text-sm py-4 rounded-xl mt-2 uppercase tracking-wider transition-all transform hover:scale-[1.01] active:scale-95"
+              >
+                ¿Eres nuevo? Regístrate Gratis Aquí ✨
               </button>
             </form>
 
