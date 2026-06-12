@@ -922,8 +922,23 @@ const CRM = () => {
           triggerNotification('Producto, stock y archivos actualizados correctamente.');
           setEditingProduct(null);
         } catch (e) {
-          console.error("Error updating product:", e);
-          triggerNotification('Error al actualizar el producto en el servidor.', 'error');
+          console.error("Error updating product, falling back to LocalStorage:", e);
+          const updatedProducts = customProducts.map(p => p.id === editingProduct.id ? {
+            ...p,
+            name: prodName,
+            price: priceParsed,
+            category: prodCategory,
+            description: prodDescription,
+            image: prodImageUrl,
+            pdfFile: prodPdfUrl,
+            pdfName: prodPdfName,
+            isFree: isFreeVal,
+            stock: stockParsed
+          } : p);
+          setCustomProducts(updatedProducts);
+          localStorage.setItem('bumsy_crm_products', JSON.stringify(updatedProducts));
+          triggerNotification('Producto actualizado localmente (servidor no sincronizado).', 'warning');
+          setEditingProduct(null);
         }
       };
       updateProductInSupabase();

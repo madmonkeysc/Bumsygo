@@ -102,6 +102,7 @@ const Shop = () => {
             stock: p.stock
           }));
           setAllProducts(formatted);
+          localStorage.setItem('bumsy_shop_products', JSON.stringify(formatted));
         } else {
           // Seed initial catalog if empty so both modules share the same database
           const defaultProducts = [
@@ -127,14 +128,57 @@ const Shop = () => {
 
           if (insertError) throw insertError;
           
-          setAllProducts(defaultProducts.map(p => ({
+          const formatted = defaultProducts.map(p => ({
             ...p,
             isFree: p.is_free,
             downloadUrl: p.download_url
-          })));
+          }));
+          setAllProducts(formatted);
+          localStorage.setItem('bumsy_shop_products', JSON.stringify(formatted));
         }
       } catch (e) {
-        console.error('Error fetching/seeding products from Supabase:', e);
+        console.error('Error fetching/seeding products from Supabase, using LocalStorage fallback:', e);
+        const local = localStorage.getItem('bumsy_crm_products') || localStorage.getItem('bumsy_shop_products');
+        if (local) {
+          try {
+            const parsed = JSON.parse(local);
+            const formatted = parsed.map(p => ({
+              id: p.id,
+              name: p.name,
+              price: Number(p.price),
+              category: p.category,
+              image: p.image,
+              color: p.color || 'bg-slate-50',
+              rating: p.rating || 5,
+              isFree: p.isFree || p.is_free || Number(p.price) === 0 || p.category === 'Regalos',
+              downloadUrl: p.downloadUrl || p.download_url || p.pdfFile || p.pdf_file,
+              stock: p.stock
+            }));
+            setAllProducts(formatted);
+          } catch (err) {
+            console.error('Failed to parse local products:', err);
+          }
+        } else {
+          // Fallback to static array in memory if no localstorage data exists
+          const defaultProducts = [
+            { id: 'static_1', name: 'Peluche Bumsy Fox (XXL)', price: 29.99, category: 'Peluches', image: '/assets/banners/mercha.webp', description: 'Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.', stock: 15, rating: 5, color: 'bg-orange-50', isFree: false, downloadUrl: '' },
+            { id: 'static_2', name: 'Camiseta Arcoíris Uni', price: 19.99, category: 'Ropa', image: '/assets/banners/mercha.webp', description: 'Camiseta oficial con diseño de arcoíris de Bumsy Town. Algodón 100% orgánico.', stock: 8, rating: 4, color: 'bg-pink-50', isFree: false, downloadUrl: '' },
+            { id: 'static_3', name: 'Cuento: Aventuras en el Bosque', price: 14.99, category: 'Libros', image: '/assets/banners/books.webp', description: 'El cuento oficial ilustrado que narra las divertidas aventuras de Bumsy y sus amigos.', stock: 20, rating: 5, color: 'bg-green-50', isFree: false, downloadUrl: '' },
+            { id: 'static_4', name: 'Mochila Tarta Turtle', price: 34.99, category: 'Accesorios', image: '/assets/banners/mercha.webp', description: 'Mochila escolar resistente y colorida de Tarta Turtle con compartimentos especiales.', stock: 12, rating: 5, color: 'bg-emerald-50', isFree: false, downloadUrl: '' },
+            { id: 'static_5', name: 'Pack de Pegatinas Mágicas', price: 5.99, category: 'Accesorios', image: '/assets/banners/pintar.png', description: 'Paquete de 50 pegatinas de vinilo resistentes al agua con todos los personajes.', stock: 50, rating: 4, color: 'bg-yellow-50', isFree: false, downloadUrl: '' },
+            { id: 'static_6', name: 'Gorra Pipo Penguin', price: 12.99, category: 'Ropa', image: '/assets/banners/mercha.webp', description: 'Gorra ajustable oficial con bordado premium de Pipo Penguin.', stock: 30, rating: 5, color: 'bg-blue-50', isFree: false, downloadUrl: '' },
+            { id: 'static_7', name: 'Peluche Tarta Extra Suave', price: 24.99, category: 'Peluches', image: '/assets/banners/mercha.webp', description: 'Peluche coleccionable de Tarta Turtle, suave, tierno y con colores brillantes.', stock: 10, rating: 4, color: 'bg-green-50', isFree: false, downloadUrl: '' },
+            { id: 'static_8', name: 'Libro para Colorear Bumsy', price: 9.99, category: 'Libros', image: '/assets/banners/pintar.png', description: 'Libro físico con más de 60 páginas de plantillas e ilustraciones para colorear.', stock: 40, rating: 5, color: 'bg-purple-50', isFree: false, downloadUrl: '' },
+            { id: 'static_9', name: 'Coloreable Bubu Mágico', price: 0, category: 'Regalos', image: '/assets/ecommerce/bubu_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/bubu_portada.png', description: 'Plantilla digital gratuita de Bubu Mágico para descargar y pintar.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_10', name: 'Bumsy Word Search (Sopa de Letras)', price: 0, category: 'Regalos', image: '/assets/ecommerce/bumsy_word_01.webp', isFree: true, downloadUrl: '/assets/ecommerce/bumsy_word_01.png', description: 'Divertido juego de sopa de letras imprimible con vocabulario de Bumsy Town.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_11', name: 'Coloreable Especial Flamy Colors', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_colors.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_colors.png', description: 'Dibujo especial descargable de Flamy para colorear con tus mejores tonos.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_12', name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_portada.png', description: 'Precioso libro digital de colorear de Flamy y sus inseparables amigos.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_13', name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/lola_portada.png', description: 'Divertida plantilla digital de Lola Unicornio para pintar y decorar.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            { id: 'static_14', name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', isFree: true, downloadUrl: '/assets/ecommerce/pipa_portada_2.png', description: 'Nueva plantilla interactiva oficial de Pipa para colorear gratis.', stock: 999, rating: 5, color: 'bg-slate-50' }
+          ];
+          setAllProducts(defaultProducts);
+          localStorage.setItem('bumsy_shop_products', JSON.stringify(defaultProducts));
+        }
       }
     };
 
