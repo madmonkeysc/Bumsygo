@@ -23,7 +23,8 @@ const Home = () => {
       title: 'ESCRIBAMOS UNA GRAN HISTORIA JUNTOS', 
       subtitle: 'Contenidos, educación y shows en vivo alegría cada día.',
       btnText: 'YO QUIERO',
-      link: '/watch'
+      link: '/watch',
+      gradient: 'from-[#4CA5EC] to-[#1F70B8]'
     },
     { 
       id: 2, 
@@ -32,7 +33,8 @@ const Home = () => {
       title: '¡HORA DE JUGAR Y APRENDER!', 
       subtitle: 'Descubre los nuevos juegos interactivos de Bumsy Town.',
       btnText: 'JUGAR AHORA',
-      link: '/play'
+      link: '/play',
+      gradient: 'from-[#8B5CF6] to-[#6366F1]'
     },
     { 
       id: 3, 
@@ -41,7 +43,8 @@ const Home = () => {
       title: 'CONOCE A NUESTROS MEJORES AMIGOS', 
       subtitle: 'Cada personaje tiene una historia mágica para compartir contigo.',
       btnText: 'VER CATÁLOGO',
-      link: '/characters'
+      link: '/characters',
+      gradient: 'from-[#F97316] to-[#F59E0B]'
     },
     { 
       id: 4, 
@@ -50,7 +53,8 @@ const Home = () => {
       title: 'APRENDE Y JUEGA CON BUMSY', 
       subtitle: 'Descubre actividades educativas diseñadas para divertir.',
       btnText: 'NUEVOS EPISODIOS',
-      link: '/watch'
+      link: '/watch',
+      gradient: 'from-[#10B981] to-[#059669]'
     },
     { 
       id: 5, 
@@ -59,7 +63,8 @@ const Home = () => {
       title: '¡LO PRÓXIMO EN BUMSY TOWN!', 
       subtitle: 'No te pierdas los lanzamientos más esperados de la temporada.',
       btnText: 'VER NOVEDADES',
-      link: '/news'
+      link: '/news',
+      gradient: 'from-[#EC4899] to-[#F43F5E]'
     }
   ];
 
@@ -135,14 +140,14 @@ const Home = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="absolute inset-0 bg-black flex flex-col justify-end md:justify-center items-center pb-24 md:pb-0"
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className={`absolute inset-0 flex flex-col justify-end md:justify-center items-center pb-24 md:pb-0 bg-gradient-to-br ${heroSlides[currentSlide].gradient}`}
           >
             {/* Foto de fondo */}
             <motion.div 
               initial={{ scale: 1.05 }}
               animate={{ scale: 1 }}
-              transition={{ duration: 2.5, ease: "easeOut" }}
+              transition={{ duration: 3.5, ease: "easeOut" }}
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${heroSlides[currentSlide].bgImg})` }}
             ></motion.div>
@@ -155,7 +160,7 @@ const Home = () => {
                   alt="Foreground"
                   initial={{ scale: 0.8, opacity: 0, y: 30 }}
                   animate={{ scale: 1, opacity: 1, y: 0 }}
-                  transition={{ duration: 1.5, delay: 0.3, ease: "easeOut" }}
+                  transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
                   className="w-full h-auto max-w-[75vw] md:max-w-[45vw] lg:max-w-[40vw] drop-shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
                 />
               </div>
@@ -165,7 +170,7 @@ const Home = () => {
                 <motion.h1
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.5 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
                   className="text-2xl md:text-5xl lg:text-7xl font-black mb-2 md:mb-4 leading-tight tracking-tight text-white uppercase max-w-xl"
                   style={{ fontFamily: "'Poppins', sans-serif" }}
                 >
@@ -174,7 +179,7 @@ const Home = () => {
                 <motion.p
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.7 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
                   className="text-sm md:text-xl lg:text-2xl font-bold text-white/90 mb-8 md:mb-10 max-w-lg"
                   style={{ fontFamily: "'Poppins', sans-serif" }}
                 >
@@ -183,7 +188,7 @@ const Home = () => {
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.9 }}
+                  transition={{ duration: 0.4, delay: 0.5 }}
                 >
                   <Link to={heroSlides[currentSlide].link} className="inline-block bg-white text-black px-8 py-3 md:px-10 md:py-3 rounded-full font-black text-base md:text-xl shadow-xl hover:scale-105 active:scale-95 transition-all">
                     {heroSlides[currentSlide].btnText}

@@ -27,11 +27,13 @@ const Header = () => {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${
-      isScrolled 
-        ? 'bg-white/80 backdrop-blur-xl shadow-[0_10px_30px_rgba(8,112,184,0.08)] py-3 border-b border-white/40' 
-        : isTransparentHeader 
-          ? 'bg-transparent py-6' 
-          : 'bg-white/90 backdrop-blur-md py-4 shadow-sm'
+      isOpen
+        ? 'bg-white py-4 shadow-md'
+        : isScrolled 
+          ? 'bg-white/80 backdrop-blur-xl shadow-[0_10px_30px_rgba(8,112,184,0.08)] py-3 border-b border-white/40' 
+          : isTransparentHeader 
+            ? 'bg-transparent py-6' 
+            : 'bg-white/90 backdrop-blur-md py-4 shadow-sm'
     }`}>
       <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
@@ -39,7 +41,7 @@ const Header = () => {
           <img 
             src="/assets/branding/logo.webp?v=20260611_logo8" 
             alt="Bumsy Go Logo" 
-            className={`transition-all duration-300 ${isScrolled ? 'h-10' : 'h-14'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
+            className={`transition-all duration-300 ${(isScrolled || isOpen) ? 'h-10' : 'h-14'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
           />
         </Link>
 
@@ -76,8 +78,8 @@ const Header = () => {
 
         {/* Mobile Menu Toggle */}
         <button 
-          className={`lg:hidden p-2 transition-colors ${
-            (isScrolled || !isTransparentHeader) ? 'text-primary' : 'text-white'
+          className={`lg:hidden p-2 transition-colors z-50 ${
+            (isScrolled || !isTransparentHeader || isOpen) ? 'text-primary' : 'text-white'
           }`} 
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -87,7 +89,7 @@ const Header = () => {
 
       {/* Mobile Nav */}
       {isOpen && (
-        <div className="lg:hidden bg-white fixed inset-0 top-[70px] z-50 p-8 flex flex-col gap-6 animate-in slide-in-from-right overflow-y-auto">
+        <div className="lg:hidden bg-white fixed inset-0 top-[72px] z-50 p-8 flex flex-col gap-6 animate-in slide-in-from-right overflow-y-auto">
           {navLinks.map((link) => (
             <Link
               key={link.path}
