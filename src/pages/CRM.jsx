@@ -1174,7 +1174,7 @@ const CRM = () => {
                 Colecciona tus personajes favoritos, descarga las plantillas gratis para colorear con Pipa, obtén regalos de cumpleaños y guarda tus datos para envíos rápidos de tus peluches mágicos.
               </p>
 
-              <span className="bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 text-white font-black text-sm px-10 py-4.5 rounded-full flex items-center gap-3 uppercase tracking-wider shadow-lg shadow-pink-500/25 transition-all transform group-hover:scale-105 active:scale-95">
+              <span className="bg-gradient-to-r from-pink-600 to-pink-500 hover:from-pink-500 hover:to-pink-400 text-white font-black text-base px-12 py-5 md:py-6 rounded-full flex items-center gap-3 uppercase tracking-widest shadow-lg shadow-pink-500/25 transition-all transform group-hover:scale-105 active:scale-95">
                 ¡Ingresar Ahora! ✨ <ArrowRight size={16} />
               </span>
             </motion.div>
@@ -1228,7 +1228,7 @@ const CRM = () => {
               <button 
                 type="button" 
                 onClick={() => setPortal('buyer_register')} 
-                className="w-full bg-slate-950 border-2 border-pink-600/40 hover:border-pink-500 text-pink-400 hover:text-white font-black text-sm py-4.5 rounded-xl mt-2 uppercase tracking-wider transition-all transform hover:scale-[1.01] active:scale-95"
+                className="w-full bg-slate-950 border-2 border-pink-600/40 hover:border-pink-500 text-pink-400 hover:text-white font-black text-sm py-5 rounded-xl mt-2 uppercase tracking-wider transition-all transform hover:scale-[1.01] active:scale-95"
               >
                 ¿Eres nuevo? Regístrate Gratis Aquí ✨
               </button>
