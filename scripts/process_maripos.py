@@ -4,7 +4,7 @@ from PIL import Image
 from io import BytesIO
 
 def process_maripos():
-    input_path = "/home/masterking/Bumsy 2.0/public/Maripos.png"
+    input_path = "/home/masterking/Desktop/Maripos.png"
     if not os.path.exists(input_path):
         print(f"Error: Input image not found at {input_path}")
         return
@@ -26,10 +26,9 @@ def process_maripos():
         size = 512
         square_img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
 
-        # Scale the tight image to fit the square canvas, keeping aspect ratio
+        # Scale the tight image to fit the square canvas (100% fill, 0px padding)
         bt_w, bt_h = img_tight.size
-        # Leave a tiny padding of 12px (about 2%) so it is as large as possible without any clipping
-        scale = min((size - 24) / bt_w, (size - 24) / bt_h)
+        scale = min(size / bt_w, size / bt_h)
         new_w = int(bt_w * scale)
         new_h = int(bt_h * scale)
 
@@ -68,12 +67,8 @@ def process_maripos():
                 f_out.write(new_svg_content)
             print(f"Overwrote SVG favicon at {svg_path} with optimized, centered vector wrap")
         
-        # Clean up temporary file
-        try:
-            os.remove(input_path)
-            print("Cleaned up temporary Maripos.png in public folder")
-        except Exception as e:
-            print(f"Cleanup error: {e}")
+        # Clean up temporary file - disabled to preserve source
+        print("Done processing")
     else:
         print("Error: Could not determine bounding box of non-transparent pixels.")
 

@@ -343,30 +343,21 @@ const CRM = () => {
 
     const registerInSupabase = async () => {
       try {
-        const { data, error } = await supabase.from('clients').insert([newClient]).select();
+        const { error } = await supabase.from('clients').insert([newClient]);
         if (error) throw error;
-        if (data && data.length > 0) {
-          const registeredUser = {
-            id: data[0].id,
-            name: data[0].name,
-            email: data[0].email,
-            phone: data[0].phone,
-            password: data[0].password,
-            interest: data[0].interest,
-            registeredAt: data[0].registered_at,
-            notes: data[0].notes || '',
-            address: data[0].address || '',
-            birthday: data[0].birthday || ''
-          };
-          setClients([registeredUser, ...clients]);
-          setCurrentUser(registeredUser);
-          localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(registeredUser));
-          triggerNotification('¡Registro exitoso! Bienvenido al Club de Amigos Bumsy.');
-          setPortal('buyer_dashboard');
-        }
+        
+        const registeredUser = {
+          ...newClient,
+          registeredAt: new Date().toISOString()
+        };
+        setClients([registeredUser, ...clients]);
+        setCurrentUser(registeredUser);
+        localStorage.setItem('bumsy_crm_logged_user', JSON.stringify(registeredUser));
+        triggerNotification('¡Registro exitoso! Bienvenido al Club de Amigos Bumsy.');
+        setPortal('buyer_dashboard');
       } catch (e) {
         console.error("Error registering client:", e);
-        triggerNotification('Error al registrarse en el servidor. Inténtalo de nuevo.', 'error');
+        triggerNotification('Error al registrarse: ' + (e.message || JSON.stringify(e)), 'error');
       }
     };
 
@@ -1230,14 +1221,14 @@ const CRM = () => {
                 />
               </div>
 
-              <button type="submit" className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-base py-4.5 rounded-2xl shadow-lg mt-3 uppercase tracking-widest transition-colors">
+              <button type="submit" className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-base py-5 md:py-6 rounded-2xl shadow-lg mt-3 uppercase tracking-widest transition-colors">
                 Iniciar Sesión
               </button>
 
               <button 
                 type="button" 
                 onClick={() => setPortal('buyer_register')} 
-                className="w-full bg-slate-950 border-2 border-pink-600/40 hover:border-pink-500 text-pink-400 hover:text-white font-black text-sm py-4 rounded-xl mt-2 uppercase tracking-wider transition-all transform hover:scale-[1.01] active:scale-95"
+                className="w-full bg-slate-950 border-2 border-pink-600/40 hover:border-pink-500 text-pink-400 hover:text-white font-black text-sm py-4.5 rounded-xl mt-2 uppercase tracking-wider transition-all transform hover:scale-[1.01] active:scale-95"
               >
                 ¿Eres nuevo? Regístrate Gratis Aquí ✨
               </button>
@@ -1323,7 +1314,7 @@ const CRM = () => {
                 </select>
               </div>
 
-              <button type="submit" className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-sm py-4 rounded-xl shadow-lg mt-3 uppercase tracking-wider transition-colors">
+              <button type="submit" className="w-full bg-pink-600 hover:bg-pink-500 text-white font-black text-base py-5 md:py-6 rounded-2xl shadow-lg mt-3 uppercase tracking-widest transition-colors">
                 Completar Registro
               </button>
             </form>
