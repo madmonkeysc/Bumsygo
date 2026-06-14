@@ -21,7 +21,7 @@ const Home = () => {
       bgImg: '/assets/hero/bg_bumsy_go.webp', 
       fgImg: '/assets/hero/fg_bumsy_go.webp',
       title: '¡NUEVAS AVENTURAS Y VIDEOS DIVERTIDOS!', 
-      subtitle: 'Acompaña a Bumsy y sus amigos en videos mágicos llenos de música, risas y aprendizaje para toda la familia.',
+      subtitle: 'Acompaña a Bumsy y sus amigos en nuestro canal oficial de YouTube con música, risas y aprendizaje para toda la familia.',
       btnText: 'VER EN YOUTUBE 🎬',
       link: 'https://youtube.com/@BumsyGo',
       gradient: 'from-[#4CA5EC] to-[#1F70B8]'
@@ -42,7 +42,7 @@ const Home = () => {
       fgImg: '/assets/hero/fg_friends.webp',
       title: 'CONOCE A NUESTROS MEJORES AMIGOS', 
       subtitle: 'Cada personaje tiene una historia mágica para compartir contigo.',
-      btnText: 'VER CATÁLOGO',
+      btnText: '¡QUIERO CONOCERLOS! 💖',
       link: '/characters',
       gradient: 'from-[#F97316] to-[#F59E0B]'
     },
@@ -50,10 +50,10 @@ const Home = () => {
       id: 4, 
       bgImg: '/assets/hero/bg_learning.webp', 
       fgImg: '/assets/hero/fg_learning.webp',
-      title: 'APRENDE Y JUEGA CON BUMSY', 
-      subtitle: 'Descubre actividades educativas diseñadas para divertir.',
-      btnText: 'NUEVOS EPISODIOS',
-      link: '/watch',
+      title: 'CUADERNOS DE AVENTURA BUMSY GO', 
+      subtitle: 'Diviértete pintando, resolviendo acertijos y aprendiendo con los cuadernos oficiales de Bumsy Town.',
+      btnText: 'VER LIBROS Y COLOREABLES 📚',
+      link: '/shop?category=Libros',
       gradient: 'from-[#10B981] to-[#059669]'
     },
     { 
@@ -61,9 +61,9 @@ const Home = () => {
       bgImg: '/assets/hero/bg_next.webp', 
       fgImg: '/assets/hero/fg_next.webp',
       title: '¡LO PRÓXIMO EN BUMSY TOWN!', 
-      subtitle: 'No te pierdas los lanzamientos más esperados de la temporada.',
-      btnText: 'VER NOVEDADES',
-      link: '/news',
+      subtitle: 'Sé el primero en conseguir las figuras coleccionables, peluches exclusivos y juegos de Bumsy antes de que se agoten.',
+      btnText: 'RESERVAR AHORA 🛍️',
+      link: '/shop?category=Próximamente',
       gradient: 'from-[#EC4899] to-[#F43F5E]'
     }
   ];

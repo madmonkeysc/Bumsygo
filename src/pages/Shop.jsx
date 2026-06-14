@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Heart, Search, Filter, Star, Truck, ShieldCheck, RefreshCcw, ShoppingBag, Gift, Sparkles, Trash2, CreditCard } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import useSEO from '../hooks/useSEO';
 import { supabase } from '../lib/supabase';
 
 const Shop = () => {
+  const location = useLocation();
   const [activeCategory, setActiveCategory] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('category') || 'Todos';
@@ -82,17 +84,14 @@ const Shop = () => {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
-    const handleUrlChange = () => {
-      const params = new URLSearchParams(window.location.search);
-      const cat = params.get('category');
-      if (cat) {
-        setActiveCategory(cat);
-      }
-    };
-    handleUrlChange();
-    window.addEventListener('popstate', handleUrlChange);
-    return () => window.removeEventListener('popstate', handleUrlChange);
-  }, []);
+    const params = new URLSearchParams(location.search);
+    const cat = params.get('category');
+    if (cat) {
+      setActiveCategory(cat);
+    } else {
+      setActiveCategory('Todos');
+    }
+  }, [location.search]);
 
   useEffect(() => {
     const fetchProducts = async () => {
