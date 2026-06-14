@@ -10,7 +10,7 @@ import useSEO from '../hooks/useSEO';
 import { supabase } from '../lib/supabase';
 
 // --- Preset Categories for Products ---
-const CATEGORIES = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos'];
+const CATEGORIES = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos', 'Próximamente'];
 
 // --- Preset Image Options to Select From ---
 const IMAGE_PRESETS = [
@@ -185,6 +185,12 @@ const CRM = () => {
         const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: true });
         if (error) throw error;
 
+        const upcomingProducts = [
+          { id: 'static_15', name: "Figura Coleccionable Bumsy 3D", price: 49.99, category: "Próximamente", image: "/assets/banners/mercha.webp", description: "Reserva la primera figura oficial en 3D de Bumsy. Edición coleccionista pintada a mano. Lanzamiento: Otoño 2026.", status: "Activo", stock: 99, rating: 5, color: "bg-indigo-50", isFree: false },
+          { id: 'static_16', name: "Juego de Mesa: Bumsy Town Adventures", price: 24.99, category: "Próximamente", image: "/assets/banners/mercha.webp", description: "El juego de mesa familiar definitivo. Sé el primero en jugarlo reservando tu copia hoy. Lanzamiento: Invierno 2026.", status: "Activo", stock: 99, rating: 5, color: "bg-teal-50", isFree: false },
+          { id: 'static_17', name: "Peluche Lola Unicornio (Edición Brillo)", price: 29.99, category: "Próximamente", image: "/assets/banners/mercha.webp", description: "Edición especial de Lola Unicornio que brilla en la oscuridad. ¡Reserva exclusiva! Lanzamiento: Navidad 2026.", status: "Activo", stock: 99, rating: 5, color: "bg-pink-50", isFree: false }
+        ];
+
         if (data && data.length > 0) {
           const loaded = data.map(p => ({
             id: p.id,
@@ -203,8 +209,10 @@ const CRM = () => {
             pdfName: p.pdf_name,
             downloadUrl: p.download_url
           }));
-          setCustomProducts(loaded);
-          localStorage.setItem('bumsy_crm_products', JSON.stringify(loaded));
+          const missingUpcoming = upcomingProducts.filter(up => !loaded.some(f => f.id === up.id));
+          const finalProducts = [...loaded, ...missingUpcoming];
+          setCustomProducts(finalProducts);
+          localStorage.setItem('bumsy_crm_products', JSON.stringify(finalProducts));
         } else {
           const defaultProducts = [
             { id: 'static_1', name: "Peluche Bumsy Fox (XXL)", price: 29.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.", status: "Activo", stock: 15, rating: 5, color: "bg-orange-50", isFree: false },
@@ -221,7 +229,8 @@ const CRM = () => {
             { id: 'static_12', name: "Libro Portada Flamy y Amigos", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/flamy_portada.png", description: "Precioso libro digital de colorear de Flamy y sus inseparables amigos.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
             { id: 'static_13', name: "Coloreable Lola Unicornio", price: 0, category: "Regalos", image: "/assets/ecommerce/lola_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/lola_portada.png", description: "Divertida plantilla digital de Lola Unicornio para pintar y decorar.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
             { id: 'static_14', name: "Coloreable Pipa Portada 2", price: 0, category: "Regalos", image: "/assets/ecommerce/pipa_portada_2.webp", isFree: true, downloadUrl: "/assets/ecommerce/pipa_portada_2.png", description: "Nueva plantilla interactiva oficial de Pipa para colorear gratis.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
-            { id: 'custom_1', name: "Taza Mágica Bumsy (CRM)", price: 14.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Taza de cerámica premium que cambia de color al verter líquidos calientes.", status: "Activo", stock: 45, rating: 5, color: "bg-slate-50", isFree: false }
+            { id: 'custom_1', name: "Taza Mágica Bumsy (CRM)", price: 14.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Taza de cerámica premium que cambia de color al verter líquidos calientes.", status: "Activo", stock: 45, rating: 5, color: "bg-slate-50", isFree: false },
+            ...upcomingProducts
           ];
           setCustomProducts(defaultProducts);
           localStorage.setItem('bumsy_crm_products', JSON.stringify(defaultProducts));
@@ -231,7 +240,14 @@ const CRM = () => {
         console.error("Error loading/seeding products, using LocalStorage fallback:", e);
         const local = localStorage.getItem('bumsy_crm_products');
         if (local) {
-          setCustomProducts(JSON.parse(local));
+          try {
+            const parsed = JSON.parse(local);
+            const missingUpcoming = upcomingProducts.filter(up => !parsed.some(f => f.id === up.id));
+            const finalProducts = [...parsed, ...missingUpcoming];
+            setCustomProducts(finalProducts);
+          } catch (err) {
+            console.error("Failed to parse local CRM products:", err);
+          }
         } else {
           const defaultProducts = [
             { id: 'static_1', name: "Peluche Bumsy Fox (XXL)", price: 29.99, category: "Peluches", image: "/assets/banners/mercha.webp", description: "Peluche oficial gigante de Bumsy Fox, extra suave y perfecto para abrazar.", status: "Activo", stock: 15, rating: 5, color: "bg-orange-50", isFree: false },
@@ -248,7 +264,8 @@ const CRM = () => {
             { id: 'static_12', name: "Libro Portada Flamy y Amigos", price: 0, category: "Regalos", image: "/assets/ecommerce/flamy_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/flamy_portada.png", description: "Precioso libro digital de colorear de Flamy y sus inseparables amigos.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
             { id: 'static_13', name: "Coloreable Lola Unicornio", price: 0, category: "Regalos", image: "/assets/ecommerce/lola_portada.webp", isFree: true, downloadUrl: "/assets/ecommerce/lola_portada.png", description: "Divertida plantilla digital de Lola Unicornio para pintar y decorar.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
             { id: 'static_14', name: "Coloreable Pipa Portada 2", price: 0, category: "Regalos", image: "/assets/ecommerce/pipa_portada_2.webp", isFree: true, downloadUrl: "/assets/ecommerce/pipa_portada_2.png", description: "Nueva plantilla interactiva oficial de Pipa para colorear gratis.", status: "Activo", stock: 999, rating: 5, color: "bg-slate-50" },
-            { id: 'custom_1', name: "Taza Mágica Bumsy (CRM)", price: 14.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Taza de cerámica premium que cambia de color al verter líquidos calientes.", status: "Activo", stock: 45, rating: 5, color: "bg-slate-50", isFree: false }
+            { id: 'custom_1', name: "Taza Mágica Bumsy (CRM)", price: 14.99, category: "Accesorios", image: "/assets/banners/mercha.webp", description: "Taza de cerámica premium que cambia de color al verter líquidos calientes.", status: "Activo", stock: 45, rating: 5, color: "bg-slate-50", isFree: false },
+            ...upcomingProducts
           ];
           setCustomProducts(defaultProducts);
           localStorage.setItem('bumsy_crm_products', JSON.stringify(defaultProducts));
@@ -1956,13 +1973,15 @@ const CRM = () => {
                             <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
 
                             {!isGift ? (
-                              <span className={`absolute top-3 left-3 font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider ${isOutOfStock
-                                  ? 'bg-red-500/90 text-white shadow-md'
-                                  : stockLevel <= 5
-                                    ? 'bg-amber-500/90 text-slate-950 shadow-md'
-                                    : 'bg-slate-900/80 text-slate-300'
+                              <span className={`absolute top-3 left-3 font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider ${p.category === 'Próximamente'
+                                  ? 'bg-indigo-600/95 text-white shadow-md'
+                                  : isOutOfStock
+                                    ? 'bg-red-500/90 text-white shadow-md'
+                                    : stockLevel <= 5
+                                      ? 'bg-amber-500/90 text-slate-950 shadow-md'
+                                      : 'bg-slate-900/80 text-slate-300'
                                 }`}>
-                                {isOutOfStock ? 'Agotado' : `Stock: ${stockLevel} u.`}
+                                {p.category === 'Próximamente' ? 'Pre-venta 🚀' : (isOutOfStock ? 'Agotado' : `Stock: ${stockLevel} u.`)}
                               </span>
                             ) : (
                               <span className="absolute top-3 left-3 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-[9px] uppercase px-3 py-1 rounded-full tracking-wider shadow-md">
@@ -2019,6 +2038,8 @@ const CRM = () => {
                               >
                                 {isGift ? (
                                   <><Gift size={11} /> Obtener</>
+                                ) : p.category === 'Próximamente' ? (
+                                  <><ShoppingBag size={11} /> Reservar</>
                                 ) : (
                                   <><ShoppingBag size={11} /> Comprar</>
                                 )}

@@ -5,7 +5,10 @@ import useSEO from '../hooks/useSEO';
 import { supabase } from '../lib/supabase';
 
 const Shop = () => {
-  const [activeCategory, setActiveCategory] = useState('Todos');
+  const [activeCategory, setActiveCategory] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('category') || 'Todos';
+  });
   const [allProducts, setAllProducts] = useState([]);
 
   useSEO({
@@ -79,6 +82,19 @@ const Shop = () => {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get('category');
+      if (cat) {
+        setActiveCategory(cat);
+      }
+    };
+    handleUrlChange();
+    window.addEventListener('popstate', handleUrlChange);
+    return () => window.removeEventListener('popstate', handleUrlChange);
+  }, []);
+
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
         const { data, error } = await supabase
@@ -87,6 +103,12 @@ const Shop = () => {
           .order('created_at', { ascending: true });
 
         if (error) throw error;
+
+        const upcomingProducts = [
+          { id: 'static_15', name: 'Figura Coleccionable Bumsy 3D', price: 49.99, category: 'Próximamente', image: '/assets/banners/mercha.webp', description: 'Reserva la primera figura oficial en 3D de Bumsy. Edición coleccionista pintada a mano. Lanzamiento: Otoño 2026.', stock: 99, rating: 5, color: 'bg-indigo-50', is_free: false, download_url: '' },
+          { id: 'static_16', name: 'Juego de Mesa: Bumsy Town Adventures', price: 24.99, category: 'Próximamente', image: '/assets/banners/mercha.webp', description: 'El juego de mesa familiar definitivo. Sé el primero en jugarlo reservando tu copia hoy. Lanzamiento: Invierno 2026.', stock: 99, rating: 5, color: 'bg-teal-50', is_free: false, download_url: '' },
+          { id: 'static_17', name: 'Peluche Lola Unicornio (Edición Brillo)', price: 29.99, category: 'Próximamente', image: '/assets/banners/mercha.webp', description: 'Edición especial de Lola Unicornio que brilla en la oscuridad. ¡Reserva exclusiva! Lanzamiento: Navidad 2026.', stock: 99, rating: 5, color: 'bg-pink-50', is_free: false, download_url: '' }
+        ];
 
         if (data && data.length > 0) {
           const formatted = data.map(p => ({
@@ -101,8 +123,14 @@ const Shop = () => {
             downloadUrl: p.download_url || p.pdf_file,
             stock: p.stock
           }));
-          setAllProducts(formatted);
-          localStorage.setItem('bumsy_shop_products', JSON.stringify(formatted));
+          const missingUpcoming = upcomingProducts.filter(up => !formatted.some(f => f.id === up.id));
+          const finalProducts = [...formatted, ...missingUpcoming.map(p => ({
+            ...p,
+            isFree: p.is_free,
+            downloadUrl: p.download_url
+          }))];
+          setAllProducts(finalProducts);
+          localStorage.setItem('bumsy_shop_products', JSON.stringify(finalProducts));
         } else {
           // Seed initial catalog if empty so both modules share the same database
           const defaultProducts = [
@@ -119,7 +147,8 @@ const Shop = () => {
             { id: 'static_11', name: 'Coloreable Especial Flamy Colors', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_colors.webp', is_free: true, download_url: '/assets/ecommerce/flamy_colors.png', description: 'Dibujo especial descargable de Flamy para colorear con tus mejores tonos.', stock: 999, rating: 5, color: 'bg-slate-50' },
             { id: 'static_12', name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.webp', is_free: true, download_url: '/assets/ecommerce/flamy_portada.png', description: 'Precioso libro digital de colorear de Flamy y sus inseparables amigos.', stock: 999, rating: 5, color: 'bg-slate-50' },
             { id: 'static_13', name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.webp', is_free: true, download_url: '/assets/ecommerce/lola_portada.png', description: 'Divertida plantilla digital de Lola Unicornio para pintar y decorar.', stock: 999, rating: 5, color: 'bg-slate-50' },
-            { id: 'static_14', name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', is_free: true, download_url: '/assets/ecommerce/pipa_portada_2.png', description: 'Nueva plantilla interactiva oficial de Pipa para colorear gratis.', stock: 999, rating: 5, color: 'bg-slate-50' }
+            { id: 'static_14', name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', is_free: true, download_url: '/assets/ecommerce/pipa_portada_2.png', description: 'Nueva plantilla interactiva oficial de Pipa para colorear gratis.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            ...upcomingProducts
           ];
 
           const { error: insertError } = await supabase
@@ -139,6 +168,12 @@ const Shop = () => {
       } catch (e) {
         console.error('Error fetching/seeding products from Supabase, using LocalStorage fallback:', e);
         const local = localStorage.getItem('bumsy_crm_products') || localStorage.getItem('bumsy_shop_products');
+        const upcomingProductsLocalFallback = [
+          { id: 'static_15', name: 'Figura Coleccionable Bumsy 3D', price: 49.99, category: 'Próximamente', image: '/assets/banners/mercha.webp', description: 'Reserva la primera figura oficial en 3D de Bumsy. Edición coleccionista pintada a mano. Lanzamiento: Otoño 2026.', stock: 99, rating: 5, color: 'bg-indigo-50', isFree: false, downloadUrl: '' },
+          { id: 'static_16', name: 'Juego de Mesa: Bumsy Town Adventures', price: 24.99, category: 'Próximamente', image: '/assets/banners/mercha.webp', description: 'El juego de mesa familiar definitivo. Sé el primero en jugarlo reservando tu copia hoy. Lanzamiento: Invierno 2026.', stock: 99, rating: 5, color: 'bg-teal-50', isFree: false, downloadUrl: '' },
+          { id: 'static_17', name: 'Peluche Lola Unicornio (Edición Brillo)', price: 29.99, category: 'Próximamente', image: '/assets/banners/mercha.webp', description: 'Edición especial de Lola Unicornio que brilla en la oscuridad. ¡Reserva exclusiva! Lanzamiento: Navidad 2026.', stock: 99, rating: 5, color: 'bg-pink-50', isFree: false, downloadUrl: '' }
+        ];
+
         if (local) {
           try {
             const parsed = JSON.parse(local);
@@ -154,7 +189,9 @@ const Shop = () => {
               downloadUrl: p.downloadUrl || p.download_url || p.pdfFile || p.pdf_file,
               stock: p.stock
             }));
-            setAllProducts(formatted);
+            const missingUpcoming = upcomingProductsLocalFallback.filter(up => !formatted.some(f => f.id === up.id));
+            const finalProducts = [...formatted, ...missingUpcoming];
+            setAllProducts(finalProducts);
           } catch (err) {
             console.error('Failed to parse local products:', err);
           }
@@ -174,7 +211,8 @@ const Shop = () => {
             { id: 'static_11', name: 'Coloreable Especial Flamy Colors', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_colors.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_colors.png', description: 'Dibujo especial descargable de Flamy para colorear con tus mejores tonos.', stock: 999, rating: 5, color: 'bg-slate-50' },
             { id: 'static_12', name: 'Libro Portada Flamy y Amigos', price: 0, category: 'Regalos', image: '/assets/ecommerce/flamy_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/flamy_portada.png', description: 'Precioso libro digital de colorear de Flamy y sus inseparables amigos.', stock: 999, rating: 5, color: 'bg-slate-50' },
             { id: 'static_13', name: 'Coloreable Lola Unicornio', price: 0, category: 'Regalos', image: '/assets/ecommerce/lola_portada.webp', isFree: true, downloadUrl: '/assets/ecommerce/lola_portada.png', description: 'Divertida plantilla digital de Lola Unicornio para pintar y decorar.', stock: 999, rating: 5, color: 'bg-slate-50' },
-            { id: 'static_14', name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', isFree: true, downloadUrl: '/assets/ecommerce/pipa_portada_2.png', description: 'Nueva plantilla interactiva oficial de Pipa para colorear gratis.', stock: 999, rating: 5, color: 'bg-slate-50' }
+            { id: 'static_14', name: 'Coloreable Pipa Portada 2', price: 0, category: 'Regalos', image: '/assets/ecommerce/pipa_portada_2.webp', isFree: true, downloadUrl: '/assets/ecommerce/pipa_portada_2.png', description: 'Nueva plantilla interactiva oficial de Pipa para colorear gratis.', stock: 999, rating: 5, color: 'bg-slate-50' },
+            ...upcomingProductsLocalFallback
           ];
           setAllProducts(defaultProducts);
           localStorage.setItem('bumsy_shop_products', JSON.stringify(defaultProducts));
@@ -195,7 +233,7 @@ const Shop = () => {
     setTimeout(() => setNotification(null), 4000);
   };
   
-  const categories = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos'];
+  const categories = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos', 'Próximamente'];
 
   const filteredProducts = allProducts.filter(p => {
     const matchesCategory = activeCategory === 'Todos' || p.category === activeCategory;
@@ -354,13 +392,15 @@ const Shop = () => {
                     {/* Stock level badge overlay */}
                     {!product.isFree && (
                       <span className={`absolute top-4 left-4 font-black text-[10px] uppercase px-3.5 py-1.5 rounded-full tracking-wider z-20 shadow-md ${
-                        isOutOfStock 
-                          ? 'bg-red-500 text-white' 
-                          : stockVal <= 5 
-                            ? 'bg-amber-500 text-slate-950 shadow-sm' 
-                            : 'bg-slate-950 text-white'
+                        product.category === 'Próximamente'
+                          ? 'bg-indigo-600 text-white'
+                          : isOutOfStock 
+                            ? 'bg-red-500 text-white' 
+                            : stockVal <= 5 
+                              ? 'bg-amber-500 text-slate-950 shadow-sm' 
+                              : 'bg-slate-950 text-white'
                       }`}>
-                        {isOutOfStock ? 'Agotado' : `Stock: ${stockVal} u.`}
+                        {product.category === 'Próximamente' ? 'Pre-venta 🚀' : (isOutOfStock ? 'Agotado' : `Stock: ${stockVal} u.`)}
                       </span>
                     )}
 
@@ -391,8 +431,8 @@ const Shop = () => {
                            }`}
                            style={{ fontFamily: "'Poppins', sans-serif" }}
                          >
-                           <ShoppingCart size={16} /> {isOutOfStock ? 'AGOTADO' : 'AÑADIR AL CARRITO'}
-                         </button>
+                            <ShoppingCart size={16} /> {product.category === 'Próximamente' ? 'RESERVAR AHORA 🛍️' : (isOutOfStock ? 'AGOTADO' : 'AÑADIR AL CARRITO')}
+                          </button>
                        )}
                     </div>
                   </div>
