@@ -20,10 +20,10 @@ const Home = () => {
       id: 1, 
       bgImg: '/assets/hero/bg_bumsy_go.webp', 
       fgImg: '/assets/hero/fg_bumsy_go.webp',
-      title: 'ESCRIBAMOS UNA GRAN HISTORIA JUNTOS', 
-      subtitle: 'Contenidos, educación y shows en vivo alegría cada día.',
-      btnText: 'YO QUIERO',
-      link: '/watch',
+      title: '¡NUEVAS AVENTURAS Y VIDEOS DIVERTIDOS!', 
+      subtitle: 'Acompaña a Bumsy y sus amigos en videos mágicos llenos de música, risas y aprendizaje para toda la familia.',
+      btnText: 'VER EN YOUTUBE 🎬',
+      link: 'https://youtube.com/@BumsyGo',
       gradient: 'from-[#4CA5EC] to-[#1F70B8]'
     },
     { 
@@ -190,9 +190,23 @@ const Home = () => {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.4, delay: 0.5 }}
                 >
-                  <Link to={heroSlides[currentSlide].link} className="inline-block bg-white text-black px-8 py-3 md:px-10 md:py-3 rounded-full font-black text-base md:text-xl shadow-xl hover:scale-105 active:scale-95 transition-all">
-                    {heroSlides[currentSlide].btnText}
-                  </Link>
+                  {heroSlides[currentSlide].link.startsWith('http') ? (
+                    <a 
+                      href={heroSlides[currentSlide].link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block bg-white text-black px-8 py-3 md:px-10 md:py-3 rounded-full font-black text-base md:text-xl shadow-xl hover:scale-105 active:scale-95 transition-all"
+                    >
+                      {heroSlides[currentSlide].btnText}
+                    </a>
+                  ) : (
+                    <Link 
+                      to={heroSlides[currentSlide].link} 
+                      className="inline-block bg-white text-black px-8 py-3 md:px-10 md:py-3 rounded-full font-black text-base md:text-xl shadow-xl hover:scale-105 active:scale-95 transition-all"
+                    >
+                      {heroSlides[currentSlide].btnText}
+                    </Link>
+                  )}
                 </motion.div>
               </div>
             </div>
