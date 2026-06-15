@@ -183,67 +183,69 @@ const Characters = () => {
 
   return (
     <div className="min-h-screen pt-0 pb-0 overflow-hidden relative bg-white">
-      {/* Tall Premium Hero Section */}
-      <div className="relative h-[70vh] md:h-[85vh] w-full flex items-center justify-center overflow-hidden">
+      {/* 16:9 Aspect Ratio Hero Banner (Uncropped Image) */}
+      <div className="relative w-full aspect-video overflow-hidden bg-slate-950">
         {/* Background Image with subtle scale */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-10000 ease-out scale-105"
-          style={{ backgroundImage: `url('/assets/hero/characters_hero_3.jpeg')` }}
+        <img 
+          src="/assets/hero/characters_hero_3.jpeg" 
+          alt="Mundo de Personajes" 
+          className="absolute inset-0 w-full h-full object-fill"
         />
         {/* Overlay Gradients for readability (Top down for header contrast, Bottom up for page blend) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/20 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-black/50 z-10" />
         
         {/* Animated Sparkles Background */}
-        <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
+        <div className="absolute inset-0 z-10 opacity-30 pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-pink-400 rounded-full animate-ping" />
           <div className="absolute top-1/3 right-1/4 w-3.5 h-3.5 bg-yellow-300 rounded-full animate-pulse delay-75" />
           <div className="absolute bottom-1/4 left-1/3 w-3 h-3 bg-teal-300 rounded-full animate-bounce delay-150" />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-6 text-center text-white flex flex-col items-center justify-center h-full max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="mb-4 bg-pink-600/90 text-white font-black text-xs md:text-sm uppercase tracking-widest px-6 py-2.5 rounded-full shadow-lg border border-pink-500/30 flex items-center gap-2"
-          >
-            <Sparkles size={14} className="text-yellow-300 animate-pulse" /> ¿Qué personaje te encanta más?
-          </motion.div>
-          
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter uppercase mb-6 leading-none drop-shadow-md text-white"
-            style={{ fontFamily: "'Outfit', sans-serif" }}
-          >
-            Mundo de Personajes <br/>
-            <span className="bg-gradient-to-r from-pink-400 via-amber-300 to-teal-300 bg-clip-text text-transparent">BUMSY GO</span>
-          </motion.h1>
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white px-4">
+          <div className="max-w-4xl flex flex-col items-center">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="mb-2 sm:mb-4 bg-pink-600/90 text-white font-black text-[9px] sm:text-xs md:text-sm uppercase tracking-widest px-3 py-1 sm:px-6 sm:py-2.5 rounded-full shadow-lg border border-pink-500/30 flex items-center gap-1.5 sm:gap-2"
+            >
+              <Sparkles className="text-yellow-300 animate-pulse w-3 h-3 sm:w-4 sm:h-4" /> ¿Qué personaje te encanta más?
+            </motion.div>
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-lg sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter uppercase mb-2 sm:mb-6 leading-none drop-shadow-md text-white"
+              style={{ fontFamily: "'Outfit', sans-serif" }}
+            >
+              Mundo de Personajes <br/>
+              <span className="bg-gradient-to-r from-pink-400 via-amber-300 to-teal-300 bg-clip-text text-transparent">BUMSY GO</span>
+            </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-base sm:text-xl md:text-2xl text-slate-200 font-semibold mb-10 max-w-2xl leading-relaxed"
-            style={{ fontFamily: "'Poppins', sans-serif" }}
-          >
-            Cada uno de nuestros amigos tiene talentos mágicos, historias divertidas y canciones especiales listas para ti. ¡Toca el botón y conócelos a todos!
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="hidden sm:block text-sm sm:text-base md:text-lg lg:text-2xl text-slate-200 font-semibold mb-4 sm:mb-10 max-w-2xl leading-relaxed"
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              Cada uno de nuestros amigos tiene talentos mágicos, historias divertidas y canciones especiales listas para ti. ¡Toca el botón y conócelos a todos!
+            </motion.p>
 
-          <motion.button
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            onClick={() => {
-              document.getElementById('character-explorer').scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="bg-white hover:bg-pink-500 hover:text-white text-slate-950 px-10 py-4 md:px-12 md:py-4.5 rounded-full font-black text-lg md:text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 border border-white/20"
-          >
-            DESCUBRIR HISTORIAS 👇
-          </motion.button>
+            <motion.button
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              onClick={() => {
+                document.getElementById('character-explorer').scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="bg-white hover:bg-pink-500 hover:text-white text-slate-950 px-4 py-2 sm:px-10 sm:py-4 md:px-12 md:py-4.5 rounded-full font-black text-xs sm:text-lg md:text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-1.5 sm:gap-3 border border-white/20"
+            >
+              DESCUBRIR HISTORIAS 👇
+            </motion.button>
+          </div>
         </div>
       </div>
 
