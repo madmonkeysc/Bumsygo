@@ -182,13 +182,13 @@ const Characters = () => {
   });
 
   return (
-    <div className="min-h-screen pt-20 pb-0 overflow-hidden relative bg-white">
+    <div className="min-h-screen pt-0 pb-0 overflow-hidden relative bg-white">
       {/* Tall Premium Hero Section */}
-      <div className="relative h-[60vh] md:h-[75vh] w-full flex items-center justify-center overflow-hidden">
+      <div className="relative h-[70vh] md:h-[85vh] w-full flex items-center justify-center overflow-hidden">
         {/* Background Image with subtle scale */}
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-10000 ease-out scale-105"
-          style={{ backgroundImage: `url('/assets/hero/bg_friends.webp')` }}
+          style={{ backgroundImage: `url('/assets/hero/characters_hero_2.jpeg')` }}
         />
         {/* Overlay Dark/Pink Gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-slate-950/20" />
