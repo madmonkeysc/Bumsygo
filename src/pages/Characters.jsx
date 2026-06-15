@@ -188,10 +188,11 @@ const Characters = () => {
         {/* Background Image with subtle scale */}
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-10000 ease-out scale-105"
-          style={{ backgroundImage: `url('/assets/hero/characters_hero_2.jpeg')` }}
+          style={{ backgroundImage: `url('/assets/hero/characters_hero_3.jpeg')` }}
         />
-        {/* Overlay Dark/Pink Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-slate-950/20" />
+        {/* Overlay Gradients for readability (Top down for header contrast, Bottom up for page blend) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/20 to-transparent z-10" />
         
         {/* Animated Sparkles Background */}
         <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
