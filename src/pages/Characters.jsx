@@ -183,17 +183,18 @@ const Characters = () => {
 
   return (
     <div className="min-h-screen pt-0 pb-0 overflow-hidden relative bg-white">
-      {/* 16:9 Aspect Ratio Hero Banner (Uncropped Image) */}
-      <div className="relative w-full aspect-video overflow-hidden bg-slate-950">
-        {/* Background Image with subtle scale */}
-        <img 
-          src="/assets/hero/characters_hero_3.jpeg" 
-          alt="Mundo de Personajes" 
-          className="absolute inset-0 w-full h-full object-fill"
+      {/* Immersive Premium Hero Section with Overlaid Characters */}
+      <div className="relative min-h-[70vh] sm:min-h-[85vh] lg:min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-slate-900">
+        {/* Background Wallpaper */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-10000 ease-out scale-105"
+          style={{ backgroundImage: `url('/assets/hero/bumsy_wall.png')` }}
         />
-        {/* Overlay Gradients for readability (Top down for header contrast, Bottom up for page blend) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-black/50 z-10" />
-        
+        {/* Top-down dark overlay for header text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/10 to-transparent z-10" />
+        {/* Bottom fade gradient to blend into white */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent z-10" />
+
         {/* Animated Sparkles Background */}
         <div className="absolute inset-0 z-10 opacity-30 pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-pink-400 rounded-full animate-ping" />
@@ -201,39 +202,44 @@ const Characters = () => {
           <div className="absolute bottom-1/4 left-1/3 w-3 h-3 bg-teal-300 rounded-full animate-bounce delay-150" />
         </div>
 
-        {/* Content */}
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white px-4">
-          <div className="max-w-4xl flex flex-col items-center">
+        {/* Hero Content Grid */}
+        <div className="relative z-20 container mx-auto px-6 pt-24 pb-12 sm:py-20 flex flex-col lg:flex-row items-center justify-between gap-10 h-full max-w-7xl">
+          {/* Left Side: Text and Buttons */}
+          <div className="flex-1 text-center lg:text-left text-white flex flex-col items-center lg:items-start max-w-2xl">
+            {/* Hook Badge */}
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="mb-2 sm:mb-4 bg-pink-600/90 text-white font-black text-[9px] sm:text-xs md:text-sm uppercase tracking-widest px-3 py-1 sm:px-6 sm:py-2.5 rounded-full shadow-lg border border-pink-500/30 flex items-center gap-1.5 sm:gap-2"
+              className="mb-4 bg-pink-600/90 text-white font-black text-xs md:text-sm uppercase tracking-widest px-6 py-2.5 rounded-full shadow-lg border border-pink-500/30 flex items-center gap-2"
             >
-              <Sparkles className="text-yellow-300 animate-pulse w-3 h-3 sm:w-4 sm:h-4" /> ¿Qué personaje te encanta más?
+              <Sparkles className="text-yellow-300 animate-pulse w-4 h-4" /> ¿Qué personaje te encanta más?
             </motion.div>
             
+            {/* Main Title */}
             <motion.h1
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-lg sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter uppercase mb-2 sm:mb-6 leading-none drop-shadow-md text-white"
+              className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter uppercase mb-6 leading-none drop-shadow-md text-white font-serif"
               style={{ fontFamily: "'Outfit', sans-serif" }}
             >
               Mundo de Personajes <br/>
               <span className="bg-gradient-to-r from-pink-400 via-amber-300 to-teal-300 bg-clip-text text-transparent">BUMSY GO</span>
             </motion.h1>
 
+            {/* Description */}
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="hidden sm:block text-sm sm:text-base md:text-lg lg:text-2xl text-slate-200 font-semibold mb-4 sm:mb-10 max-w-2xl leading-relaxed"
+              className="text-base sm:text-lg lg:text-xl text-slate-100 font-semibold mb-8 max-w-xl leading-relaxed drop-shadow-sm"
               style={{ fontFamily: "'Poppins', sans-serif" }}
             >
               Cada uno de nuestros amigos tiene talentos mágicos, historias divertidas y canciones especiales listas para ti. ¡Toca el botón y conócelos a todos!
             </motion.p>
 
+            {/* CTA Button (hidden on mobile, shown on lg screens) */}
             <motion.button
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -241,7 +247,47 @@ const Characters = () => {
               onClick={() => {
                 document.getElementById('character-explorer').scrollIntoView({ behavior: 'smooth' });
               }}
-              className="bg-white hover:bg-pink-500 hover:text-white text-slate-950 px-4 py-2 sm:px-10 sm:py-4 md:px-12 md:py-4.5 rounded-full font-black text-xs sm:text-lg md:text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-1.5 sm:gap-3 border border-white/20"
+              className="hidden lg:flex bg-white hover:bg-pink-500 hover:text-white text-slate-950 px-10 py-4.5 rounded-full font-black text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 items-center gap-3 border border-white/20"
+            >
+              DESCUBRIR HISTORIAS 👇
+            </motion.button>
+          </div>
+
+          {/* Right Side / Mobile Bottom: Foreground Characters Image */}
+          <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md lg:max-w-xl">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1,
+                y: [0, -12, 0]
+              }}
+              transition={{ 
+                duration: 5,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut",
+                opacity: { duration: 0.8, delay: 0.5 },
+                scale: { duration: 0.8, delay: 0.5 }
+              }}
+              className="w-full relative flex justify-center"
+            >
+              <img 
+                src="/assets/hero/bumsy_personajes.png" 
+                alt="Personajes Bumsy" 
+                className="w-4/5 sm:w-full max-h-[35vh] sm:max-h-[45vh] lg:max-h-[55vh] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+              />
+            </motion.div>
+
+            {/* CTA Button (shown on mobile, hidden on lg screens) */}
+            <motion.button
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              onClick={() => {
+                document.getElementById('character-explorer').scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex lg:hidden mt-8 bg-white hover:bg-pink-500 hover:text-white text-slate-950 px-8 py-3.5 rounded-full font-black text-base shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 items-center gap-2 border border-white/20"
             >
               DESCUBRIR HISTORIAS 👇
             </motion.button>
