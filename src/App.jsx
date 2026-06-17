@@ -40,6 +40,7 @@ const Terms = lazy(() => import('./pages/Terms'));
 const Copyright = lazy(() => import('./pages/Copyright'));
 const CRM = lazy(() => import('./pages/CRM'));
 const Pro = lazy(() => import('./pages/Pro'));
+const IdaraWorld = lazy(() => import('./pages/IdaraWorld'));
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/copyright" element={<Copyright />} />
             <Route path="/crm" element={<CRM />} />
+            <Route path="/idara" element={<IdaraWorld />} />
           </Routes>
         </Suspense>
       </Layout>

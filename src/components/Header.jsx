@@ -7,7 +7,8 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
-  const isTransparentHeader = location.pathname === '/' || location.pathname === '/business' || location.pathname === '/watch' || location.pathname === '/shop' || location.pathname === '/pro' || location.pathname === '/meet-and-play' || location.pathname === '/characters';
+  const isTransparentHeader = location.pathname === '/' || location.pathname === '/business' || location.pathname === '/watch' || location.pathname === '/shop' || location.pathname === '/pro' || location.pathname === '/meet-and-play' || location.pathname === '/characters' || location.pathname === '/idara';
+  const isIdaraPage = location.pathname === '/idara';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,8 +40,8 @@ const Header = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
           <img 
-            src="/assets/branding/logo.webp?v=20260611_logo8" 
-            alt="Bumsy Go Logo" 
+            src={isIdaraPage ? "/assets/idara/logo_idara.png" : "/assets/branding/logo.webp?v=20260611_logo8"} 
+            alt={isIdaraPage ? "Idara y el loco Dael Logo" : "Bumsy Go Logo"} 
             className={`transition-all duration-300 ${(isScrolled || isOpen) ? 'h-10' : 'h-14'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
           />
         </Link>
