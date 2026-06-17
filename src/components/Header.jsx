@@ -42,7 +42,11 @@ const Header = () => {
           <img 
             src={isIdaraPage ? "/assets/idara/logo_idara.png" : "/assets/branding/logo.webp?v=20260611_logo8"} 
             alt={isIdaraPage ? "Idara y el loco Dael Logo" : "Bumsy Go Logo"} 
-            className={`transition-all duration-300 ${(isScrolled || isOpen) ? 'h-10' : 'h-14'} object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
+            className={`transition-all duration-300 ${
+              isIdaraPage
+                ? (isScrolled || isOpen) ? 'h-16 md:h-20' : 'h-24 md:h-28'
+                : (isScrolled || isOpen) ? 'h-10' : 'h-14'
+            } object-contain drop-shadow-md group-hover:scale-110 active:scale-95`}
           />
         </Link>
 

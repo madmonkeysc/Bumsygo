@@ -105,11 +105,11 @@ const IdaraWorld = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter uppercase mb-6 leading-none drop-shadow-md text-white"
+              className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter uppercase mb-6 leading-none drop-shadow-md text-white font-black"
               style={{ fontFamily: "'Outfit', sans-serif" }}
             >
-              El Mundo de <br/>
-              <span className="bg-gradient-to-r from-yellow-300 via-amber-200 to-cyan-300 bg-clip-text text-transparent">Idara y el Loco Dael</span>
+              Idara Play <br/>
+              <span className="bg-gradient-to-r from-yellow-300 via-amber-200 to-cyan-300 bg-clip-text text-transparent font-black">y el Loco Dael</span>
             </motion.h1>
 
             {/* Subtitle / Paragraph */}
