@@ -31,6 +31,7 @@ const Footer = () => {
               <ul className="space-y-4 font-medium text-slate-500 text-lg">
                 <li><Link to="/characters" className="hover:text-slate-900 transition-colors">Personajes</Link></li>
                 <li><Link to="/watch" className="hover:text-slate-900 transition-colors">Videos</Link></li>
+                <li><Link to="/idara" className="hover:text-slate-900 transition-colors">Idara Play</Link></li>
                 <li><Link to="/meet-and-play" className="hover:text-slate-900 transition-colors">Conoce y Juega</Link></li>
                 <li><Link to="/news" className="hover:text-slate-900 transition-colors">Noticias</Link></li>
               </ul>
