@@ -112,23 +112,62 @@ const Home = () => {
     return () => clearInterval(charTimer);
   }, [characters.length]);
 
+  const [currentNewsIdx, setCurrentNewsIdx] = useState(0);
+  const [visibleNewsCount, setVisibleNewsCount] = useState(3);
+
   const news = [
+    { 
+      title: 'Bumsy en el Mundo: ¡Lanzamiento en países de habla hispana!', 
+      date: 'Abril 2026', 
+      image: '/assets/banners/news_world.jpeg' 
+    },
     { 
       title: 'Colaboración global: Bumsy x Idara Play', 
       date: 'Abril 2026', 
-      image: '/assets/banners/news_idara.webp' 
-    },
-    { 
-      title: '¡Bumsy Town ya disponible en países de habla hispana!', 
-      date: 'Marzo 2026', 
-      image: '/assets/banners/news_world.webp' 
+      image: '/assets/banners/news_idara.jpeg' 
     },
     { 
       title: 'Temporada 1 de "Cuentos Mágicos"', 
       date: 'Marzo 2026', 
-      image: '/assets/banners/news_cuentos.webp' 
+      image: '/assets/banners/news_cuentos.jpeg' 
+    },
+    { 
+      title: 'Aventura en la Escuela con Bumsy', 
+      date: 'Marzo 2026', 
+      image: '/assets/banners/news_skul.jpeg' 
     },
   ];
+
+  const maxNewsIndex = news.length - visibleNewsCount;
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setVisibleNewsCount(1);
+      } else if (window.innerWidth < 1024) {
+        setVisibleNewsCount(2);
+      } else {
+        setVisibleNewsCount(3);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (currentNewsIdx > maxNewsIndex) {
+      setCurrentNewsIdx(Math.max(0, maxNewsIndex));
+    }
+  }, [visibleNewsCount, maxNewsIndex, currentNewsIdx]);
+
+  const nextNews = () => {
+    setCurrentNewsIdx((prev) => (prev >= maxNewsIndex ? 0 : prev + 1));
+  };
+  
+  const prevNews = () => {
+    setCurrentNewsIdx((prev) => (prev <= 0 ? maxNewsIndex : prev - 1));
+  };
 
   return (
     <div className="flex flex-col overflow-hidden">
@@ -669,21 +708,71 @@ const Home = () => {
             <p className="text-xl md:text-2xl font-bold opacity-80 max-w-3xl">Entérate de las últimas novedades, lanzamientos y sorpresas en el universo Bumsy.</p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            {news.map((item, idx) => (
-              <div key={idx} className="bg-white shadow-xl hover:-translate-y-2 transition-transform duration-300 flex flex-col border border-gray-100">
-                <div className="w-full">
-                  <img src={item.image} alt={item.title} className="w-full h-auto block hover:brightness-105 transition-all duration-500" />
-                </div>
-                <div className="p-10">
-                  <div className="text-sm font-bold text-primary/60 mb-3 uppercase tracking-widest">{item.date}</div>
-                  <h3 className="text-3xl font-black text-primary mb-6 leading-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.title}</h3>
-                  <button className="text-primary font-bold flex items-center gap-2 hover:text-accent transition-colors mt-auto text-xl uppercase">
-                    Leer completa <ArrowRight size={22} />
-                  </button>
-                </div>
+          <div className="relative px-2 md:px-12">
+            <div className="relative overflow-hidden w-full">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out -mx-4"
+                style={{ transform: `translateX(-${currentNewsIdx * (100 / visibleNewsCount)}%)` }}
+              >
+                {news.map((item, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`flex-shrink-0 px-4 transition-all duration-300 ${
+                      visibleNewsCount === 1 ? 'w-full' : visibleNewsCount === 2 ? 'w-1/2' : 'w-1/3'
+                    }`}
+                  >
+                    <div className="bg-white shadow-xl hover:-translate-y-2 transition-transform duration-300 flex flex-col border border-gray-100 rounded-3xl overflow-hidden h-full">
+                      <div className="w-full aspect-[16/9] overflow-hidden bg-gray-50">
+                        <img src={item.image} alt={item.title} className="w-full h-full object-cover hover:scale-105 transition-all duration-500" />
+                      </div>
+                      <div className="p-8 flex flex-col flex-grow">
+                        <div className="text-sm font-bold text-primary/60 mb-2 uppercase tracking-widest">{item.date}</div>
+                        <h3 className="text-2xl font-black text-primary mb-6 leading-tight flex-grow" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.title}</h3>
+                        <Link 
+                          to="/news"
+                          className="text-primary font-bold flex items-center gap-2 hover:text-accent transition-colors text-lg uppercase mt-auto"
+                        >
+                          Leer completa <ArrowRight size={20} />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Controls */}
+            {maxNewsIndex > 0 && (
+              <>
+                <button 
+                  onClick={prevNews}
+                  className="absolute left-0 md:left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white text-primary hover:text-accent rounded-full shadow-lg border border-gray-100 flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button 
+                  onClick={nextNews}
+                  className="absolute right-0 md:right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white text-primary hover:text-accent rounded-full shadow-lg border border-gray-100 flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </>
+            )}
+
+            {/* Dots Indicators */}
+            {maxNewsIndex > 0 && (
+              <div className="flex justify-center gap-2 mt-8">
+                {[...Array(maxNewsIndex + 1)].map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentNewsIdx(idx)}
+                    className={`h-2.5 rounded-full transition-all duration-300 ${
+                      idx === currentNewsIdx ? 'w-8 bg-primary' : 'w-2.5 bg-primary/25'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
