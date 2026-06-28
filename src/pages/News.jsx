@@ -60,10 +60,10 @@ A través de este programa, los docentes tendrán acceso gratuito a cuadernos de
   ];
 
   return (
-    <div className="pb-24 pt-20 bg-white">
+    <div className="pb-24 bg-white">
       {/* Header Section */}
       <section 
-        className="py-24 text-white relative overflow-hidden bg-primary"
+        className="pt-40 pb-28 text-white relative overflow-hidden bg-primary"
         style={{ 
           backgroundImage: "url('/assets/banners/fondo_verde.png')", 
           backgroundSize: 'cover', 
@@ -85,7 +85,7 @@ A través de este programa, los docentes tendrán acceso gratuito a cuadernos de
               </div>
               <h1 className="text-6xl md:text-8xl font-black mb-8 leading-none uppercase tracking-tighter" style={{ fontFamily: "'Poppins', sans-serif" }}>Noticias Bumsy</h1>
               <p className="text-xl md:text-3xl font-bold opacity-90 max-w-2xl leading-relaxed mb-10">
-                ¡El periódico oficial de Bumsy Town! Entérate antes que nadie de los lanzamientos, colaboraciones musicales y sorpresas de la pandilla.
+                ¡El diario oficial de Bumsy Town! Abre las puertas a lanzamientos exclusivos, canciones pegadizas y aventuras mágicas de toda la pandilla.
               </p>
               <button 
                 onClick={() => document.getElementById('news-feed').scrollIntoView({ behavior: 'smooth' })}
@@ -108,7 +108,7 @@ A través de este programa, los docentes tendrán acceso gratuito a cuadernos de
       </section>
 
       {/* Main News Feed - SHARP STYLE as requested */}
-      <section id="news-feed" className="container mx-auto px-6 py-32">
+      <section id="news-feed" className="container mx-auto px-6 pt-48 pb-48">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           {articles.map((article, i) => (
             <motion.div 
