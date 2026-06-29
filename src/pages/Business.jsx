@@ -50,9 +50,15 @@ const Business = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <button className="bg-[#FCF200] hover:bg-[#EDE400] text-black px-12 py-6 rounded-full font-black text-2xl shadow-[0_20px_40px_rgba(252,242,0,0.25)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4 uppercase tracking-tight">
-                <Briefcase size={28} /> CONTACTAR AHORA
-              </button>
+              <a 
+                href="https://tidycal.com/humbertocarosilva/alianzas-creativas-bumsy-go"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="bg-[#FCF200] hover:bg-[#EDE400] text-black px-12 py-6 rounded-full font-black text-2xl shadow-[0_20px_40px_rgba(252,242,0,0.25)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4 uppercase tracking-tight">
+                  <Briefcase size={28} /> CONTACTAR AHORA
+                </button>
+              </a>
               <button className="bg-white/20 backdrop-blur-md border-4 border-white text-white px-12 py-6 rounded-full font-black text-2xl hover:bg-white/35 transition-all uppercase tracking-tight hover:scale-105 active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)]">
                 DOSSIER 2026
               </button>
@@ -152,9 +158,14 @@ const Business = () => {
                     Forjamos alianzas con marcas y empresas de todo el mundo para impulsar sinergias comerciales en diversas industrias, incluidas instituciones públicas, productos de consumo, tecnología y más.
                   </p>
                 </div>
-                <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-2 text-black font-black text-lg group-hover:text-accent transition-colors cursor-pointer">
+                <a 
+                  href="https://tidycal.com/humbertocarosilva/alianzas-creativas-bumsy-go"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-2 text-black font-black text-lg group-hover:text-accent transition-colors"
+                >
                   Descubrir más <ChevronRight size={20} className="group-hover:translate-x-1.5 transition-transform" />
-                </div>
+                </a>
               </motion.div>
 
               {/* Pillar 3: Merchandise */}
@@ -174,9 +185,14 @@ const Business = () => {
                     Diseñados por equipos y socios galardonados, nuestros productos y mercancías basados en contenido brindan a los fanáticos oportunidades únicas para disfrutar de su contenido favorito.
                   </p>
                 </div>
-                <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-2 text-black font-black text-lg group-hover:text-accent transition-colors cursor-pointer">
+                <a 
+                  href="https://tidycal.com/humbertocarosilva/licenciamiento-bumsy-go"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-2 text-black font-black text-lg group-hover:text-accent transition-colors"
+                >
                   Descubrir más <ChevronRight size={20} className="group-hover:translate-x-1.5 transition-transform" />
-                </div>
+                </a>
               </motion.div>
             </div>
           </div>
@@ -197,9 +213,15 @@ const Business = () => {
                   Estamos buscando siempre aliados estratégicos que compartan nuestra visión de divertir y educar a la próxima generación.
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-6">
-                   <button className="bg-[#FCF200] hover:bg-[#EDE400] text-black px-12 py-5 rounded-full font-black text-xl hover:scale-105 active:scale-95 transition-all uppercase tracking-wider shadow-lg">
-                     AGENDAR REUNIÓN
-                   </button>
+                   <a 
+                     href="https://tidycal.com/humbertocarosilva/alianzas-creativas-bumsy-go"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                   >
+                     <button className="bg-[#FCF200] hover:bg-[#EDE400] text-black px-12 py-5 rounded-full font-black text-xl hover:scale-105 active:scale-95 transition-all uppercase tracking-wider shadow-lg">
+                       AGENDAR REUNIÓN
+                     </button>
+                   </a>
                    <button className="bg-white/10 hover:bg-white/20 text-white border-4 border-white/20 px-12 py-5 rounded-full font-black text-xl hover:scale-105 active:scale-95 transition-all uppercase tracking-wider">
                      DESCARGAR MEDIA KIT
                    </button>

@@ -170,28 +170,53 @@ A través de este programa, los docentes tendrán acceso gratuito a cuadernos de
              </p>
              <div className="space-y-8">
                 {[
-                  { title: 'Licenciamiento de Marca', icon: <Zap size={28} /> },
-                  { title: 'Alianzas Estratégicas', icon: <Share2 size={28} /> },
-                  { title: 'Contenido Co-branded', icon: <Globe size={28} /> }
+                  { 
+                    title: 'Licenciamiento de Marca', 
+                    icon: <Zap size={28} />, 
+                    url: 'https://tidycal.com/humbertocarosilva/licenciamiento-bumsy-go' 
+                  },
+                  { 
+                    title: 'Alianzas Estratégicas', 
+                    icon: <Share2 size={28} />, 
+                    url: 'https://tidycal.com/humbertocarosilva/alianzas-creativas-bumsy-go' 
+                  },
+                  { 
+                    title: 'Contenido Co-branded', 
+                    icon: <Globe size={28} />, 
+                    url: 'https://tidycal.com/humbertocarosilva/alianzas-creativas-bumsy-go' 
+                  }
                 ].map((item, i) => (
-                  <motion.div 
+                  <a 
                     key={i} 
-                    whileHover={{ x: 20 }}
-                    className="flex items-center gap-8 p-8 rounded-[40px] bg-white shadow-sm hover:shadow-xl transition-all cursor-pointer border border-primary/5"
+                    href={item.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="block"
                   >
-                    <div className="text-accent">{item.icon}</div>
-                    <span className="text-2xl font-black text-primary uppercase tracking-tight">{item.title}</span>
-                  </motion.div>
+                    <motion.div 
+                      whileHover={{ x: 20 }}
+                      className="flex items-center gap-8 p-8 rounded-[40px] bg-white shadow-sm hover:shadow-xl transition-all cursor-pointer border border-primary/5"
+                    >
+                      <div className="text-accent">{item.icon}</div>
+                      <span className="text-2xl font-black text-primary uppercase tracking-tight">{item.title}</span>
+                    </motion.div>
+                  </a>
                 ))}
              </div>
           </div>
           <div className="lg:w-1/2 bg-white rounded-[80px] p-20 text-center shadow-2xl border-4 border-primary/5 relative">
-             <div className="absolute -top-10 -left-10 w-24 h-24 bg-secondary rounded-full flex items-center justify-center text-4xl shadow-xl animate-bounce">🤝</div>
              <h3 className="text-4xl font-black text-primary mb-8 uppercase tracking-tighter">¿Quieres trabajar con nosotros?</h3>
              <p className="text-2xl text-primary/40 font-bold mb-12 leading-relaxed">Explora las oportunidades de negocio y únete a la familia de The Bumsy Company.</p>
-             <button className="bg-primary text-white px-12 py-6 rounded-full font-black text-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest">
-                CONSULTAR COLABORACIÓN
-             </button>
+             <a 
+               href="https://tidycal.com/humbertocarosilva/alianzas-creativas-bumsy-go" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               className="inline-block"
+             >
+               <button className="bg-primary text-white px-12 py-6 rounded-full font-black text-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest">
+                  CONSULTAR COLABORACIÓN
+               </button>
+             </a>
           </div>
         </div>
       </section>
