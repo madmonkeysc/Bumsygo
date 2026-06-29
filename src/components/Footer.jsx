@@ -39,16 +39,15 @@ const Footer = () => {
             <div>
               <h4 className="font-bold text-slate-900 text-lg mb-8 uppercase tracking-widest" style={{ fontFamily: "'Poppins', sans-serif" }}>Compañía</h4>
               <ul className="space-y-4 font-medium text-slate-500 text-lg">
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Nuestra Historia</a></li>
-                <li><a href="#" className="hover:text-accent transition-colors font-bold text-slate-800">Negocios</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Prensa</a></li>
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Carreras</a></li>
+                <li><Link to="/our-story" className="hover:text-slate-900 transition-colors">Nuestra Historia</Link></li>
+                <li><Link to="/business" className="hover:text-accent transition-colors font-bold text-slate-800">Negocios</Link></li>
+                <li><Link to="/news" className="hover:text-slate-900 transition-colors">Prensa</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold text-slate-900 text-lg mb-8 uppercase tracking-widest" style={{ fontFamily: "'Poppins', sans-serif" }}>Soporte</h4>
               <ul className="space-y-4 font-medium text-slate-500 text-lg">
-                <li><a href="#" className="hover:text-slate-900 transition-colors">Consultas</a></li>
+                <li><Link to="/inquiries" className="hover:text-slate-900 transition-colors">Consultas</Link></li>
                 <li><Link to="/privacy" className="hover:text-slate-900 transition-colors">Privacidad</Link></li>
                 <li><Link to="/terms" className="hover:text-slate-900 transition-colors">Términos</Link></li>
                 <li><Link to="/copyright" className="hover:text-slate-900 transition-colors">Copyright</Link></li>
@@ -70,9 +69,9 @@ const Footer = () => {
               <p className="text-slate-500 font-medium text-xl">Llevando aprendizaje y diversión a más de 150 países.</p>
             </div>
           </div>
-          <button className="relative z-10 bg-slate-900 text-white px-12 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:bg-slate-800 hover:-translate-y-1 transition-all whitespace-nowrap" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <Link to="/global-network" className="relative z-10 bg-gradient-to-r from-pink-500 via-rose-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white px-12 py-5 rounded-2xl font-black text-lg shadow-2xl hover:-translate-y-1 hover:scale-[1.02] active:scale-95 transition-all text-center whitespace-nowrap" style={{ fontFamily: "'Poppins', sans-serif" }}>
             Explorar Red Global
-          </button>
+          </Link>
         </div>
 
         {/* Bottom Bar */}

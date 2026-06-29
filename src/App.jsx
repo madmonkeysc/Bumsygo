@@ -41,6 +41,9 @@ const Copyright = lazy(() => import('./pages/Copyright'));
 const CRM = lazy(() => import('./pages/CRM'));
 const Pro = lazy(() => import('./pages/Pro'));
 const IdaraWorld = lazy(() => import('./pages/IdaraWorld'));
+const OurStory = lazy(() => import('./pages/OurStory'));
+const GlobalNetwork = lazy(() => import('./pages/GlobalNetwork'));
+const Inquiries = lazy(() => import('./pages/Inquiries'));
 
 function App() {
   return (
@@ -71,6 +74,9 @@ function App() {
             <Route path="/copyright" element={<Copyright />} />
             <Route path="/crm" element={<CRM />} />
             <Route path="/idara" element={<IdaraWorld />} />
+            <Route path="/our-story" element={<OurStory />} />
+            <Route path="/global-network" element={<GlobalNetwork />} />
+            <Route path="/inquiries" element={<Inquiries />} />
           </Routes>
         </Suspense>
       </Layout>
