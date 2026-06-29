@@ -23,7 +23,7 @@ const IdaraWorld = () => {
   useSEO({
     title: 'El Mundo de Idara y el Loco Dael',
     description: 'Descubre el canal de Idara y el Loco Dael: aventuras, retos, adivinanzas y travesuras divertidas.',
-    image: '/assets/idara/idara_play.png'
+    image: '/assets/idara/idara_play.webp'
   });
 
   const handleSubscribe = (e) => {
@@ -72,7 +72,7 @@ const IdaraWorld = () => {
         {/* Background Wallpaper */}
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-10000 ease-out scale-105"
-          style={{ backgroundImage: `url('/assets/hero/bumsy_wall.png')` }}
+          style={{ backgroundImage: `url('/assets/hero/bumsy_wall.webp')` }}
         />
         {/* Overlay Dark/Pink Vignette for header & logo readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-pink-900/10 to-transparent z-10" />
@@ -155,7 +155,8 @@ const IdaraWorld = () => {
               className="w-full relative flex justify-center"
             >
               <img 
-                src="/assets/idara/idara_play.png" 
+                fetchPriority="high"
+                src="/assets/idara/idara_play.webp" 
                 alt="Idara Play Show" 
                 className="w-4/5 sm:w-full max-h-[35vh] sm:max-h-[45vh] lg:max-h-[55vh] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.35)]"
               />
@@ -200,7 +201,7 @@ const IdaraWorld = () => {
             >
               <div className="w-44 h-44 rounded-full bg-pink-100 overflow-hidden flex items-center justify-center mb-6 border-4 border-pink-200 shadow-inner">
                 <img 
-                  src="/assets/idara/super_idara.png" 
+                  src="/assets/idara/super_idara.webp" 
                   alt="Super Idara" 
                   className="w-[85%] h-[85%] object-contain mt-2 scale-110"
                 />
@@ -220,7 +221,7 @@ const IdaraWorld = () => {
             >
               <div className="w-44 h-44 rounded-full bg-cyan-100 overflow-hidden flex items-center justify-center mb-6 border-4 border-cyan-200 shadow-inner">
                 <img 
-                  src="/assets/idara/loco_toalla.png" 
+                  src="/assets/idara/loco_toalla.webp" 
                   alt="El Loco Dael" 
                   className="w-[85%] h-[85%] object-contain mt-2 scale-110"
                 />

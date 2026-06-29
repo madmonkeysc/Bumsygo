@@ -188,7 +188,7 @@ const Characters = () => {
         {/* Background Wallpaper */}
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-10000 ease-out scale-105"
-          style={{ backgroundImage: `url('/assets/hero/bumsy_wall.png')` }}
+          style={{ backgroundImage: `url('/assets/hero/bumsy_wall.webp')` }}
         />
         {/* Top-down dark overlay for header text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/10 to-transparent z-10" />
@@ -273,7 +273,8 @@ const Characters = () => {
               className="w-full relative flex justify-center"
             >
               <img 
-                src="/assets/hero/bumsy_personajes.png" 
+                fetchPriority="high"
+                src="/assets/hero/bumsy_personajes.webp" 
                 alt="Personajes Bumsy" 
                 className="w-4/5 sm:w-full max-h-[35vh] sm:max-h-[45vh] lg:max-h-[55vh] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
               />

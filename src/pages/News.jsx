@@ -65,7 +65,7 @@ A través de este programa, los docentes tendrán acceso gratuito a cuadernos de
       <section 
         className="pt-40 pb-28 text-white relative overflow-hidden bg-primary"
         style={{ 
-          backgroundImage: "url('/assets/banners/fondo_verde.png')", 
+          backgroundImage: "url('/assets/banners/fondo_verde.webp')", 
           backgroundSize: 'cover', 
           backgroundPosition: 'center' 
         }}
@@ -100,7 +100,7 @@ A través de este programa, los docentes tendrán acceso gratuito a cuadernos de
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 className="w-full max-w-lg"
               >
-                <img loading="lazy" src="/assets/banners/dragona_news.png" alt="Dragona News" className="w-full h-auto drop-shadow-2xl" />
+                <img fetchPriority="high" src="/assets/banners/dragona_news.webp" alt="Dragona News" className="w-full h-auto drop-shadow-2xl" />
               </motion.div>
             </div>
           </motion.div>
