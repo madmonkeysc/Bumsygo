@@ -5,7 +5,7 @@ import Footer from './Footer';
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const isTransparentHeader = location.pathname === '/' || location.pathname === '/business' || location.pathname === '/watch' || location.pathname === '/shop' || location.pathname === '/pro' || location.pathname === '/meet-and-play' || location.pathname === '/characters' || location.pathname === '/idara' || location.pathname === '/news';
+  const isTransparentHeader = location.pathname === '/' || location.pathname === '/business' || location.pathname === '/watch' || location.pathname === '/shop' || location.pathname === '/pro' || location.pathname === '/meet-and-play' || location.pathname === '/characters' || location.pathname === '/idara' || location.pathname === '/news' || location.pathname === '/global-network' || location.pathname === '/inquiries' || location.pathname === '/our-story';
 
   return (
     <div className="min-h-screen flex flex-col">

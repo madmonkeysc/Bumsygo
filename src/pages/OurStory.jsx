@@ -45,31 +45,36 @@ const OurStory = () => {
   return (
     <div className="pb-24 bg-white overflow-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden bg-gradient-to-r from-orange-400 via-pink-500 to-indigo-600">
+      <section className="relative min-h-[65vh] flex items-center justify-center overflow-hidden bg-slate-900 pt-32 pb-16">
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-overlay"
-          style={{ backgroundImage: "url('/assets/hero/bumsy_wall.webp')" }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/assets/hero/3.jpeg')" }}
         />
-        <div className="absolute inset-0 bg-black/10" />
         <div className="container mx-auto px-6 relative z-10 text-center text-white flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="max-w-4xl"
+            className="max-w-4xl flex flex-col items-center"
           >
-            <span className="bg-white/20 backdrop-blur-md text-white font-black text-xs md:text-sm uppercase tracking-widest px-6 py-2.5 rounded-full shadow-lg border border-white/30 inline-flex items-center gap-2 mb-6">
+            <span className="bg-white/20 backdrop-blur-md text-white font-black text-xs md:text-sm uppercase tracking-widest px-6 py-2.5 rounded-full shadow-lg border border-white/30 inline-flex items-center gap-2 mb-8">
               <Sparkles size={16} className="text-yellow-300 animate-pulse" /> EL CORAZÓN DE BUMSY GO
             </span>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-none mb-6 drop-shadow-lg" style={{ fontFamily: "'Outfit', sans-serif" }}>
-              Nuestra Historia
-            </h1>
-            <p className="text-lg md:text-2xl font-bold opacity-90 max-w-2xl mx-auto leading-relaxed mb-8" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            
+            <motion.img
+              src="/assets/hero/nuestra_historia_ida_fg.png"
+              alt="Nuestra Historia"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
+              className="h-28 sm:h-36 md:h-44 lg:h-52 w-auto object-contain mb-8 drop-shadow-[0_10px_25px_rgba(0,0,0,0.5)]"
+            />
+            
+            <p className="text-lg md:text-2xl font-bold opacity-90 max-w-2xl mx-auto leading-relaxed mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
               Cómo convertimos una simple idea en un universo educativo de amor, música y aventuras seguras para niños de todo el mundo.
             </p>
           </motion.div>
         </div>
-        <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent z-10" />
       </section>
 
       {/* Main Philosophy Introduction */}

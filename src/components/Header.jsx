@@ -7,7 +7,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
-  const isTransparentHeader = location.pathname === '/' || location.pathname === '/business' || location.pathname === '/watch' || location.pathname === '/shop' || location.pathname === '/pro' || location.pathname === '/meet-and-play' || location.pathname === '/characters' || location.pathname === '/idara' || location.pathname === '/news';
+  const isTransparentHeader = location.pathname === '/' || location.pathname === '/business' || location.pathname === '/watch' || location.pathname === '/shop' || location.pathname === '/pro' || location.pathname === '/meet-and-play' || location.pathname === '/characters' || location.pathname === '/idara' || location.pathname === '/news' || location.pathname === '/global-network' || location.pathname === '/inquiries' || location.pathname === '/our-story';
   const isIdaraPage = location.pathname === '/idara';
 
   useEffect(() => {
