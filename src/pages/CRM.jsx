@@ -1426,6 +1426,8 @@ const CRM = () => {
   const totalSalesRevenue = sales.reduce((sum, item) => sum + item.price, 0).toFixed(2);
   const totalUnitsSold = sales.length;
 
+  const lowerSalesSearch = salesSearch.toLowerCase();
+
   return (
     <div className="pt-24 min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none relative overflow-hidden">
 
@@ -2793,8 +2795,8 @@ const CRM = () => {
                       </thead>
                       <tbody>
                         {sales.filter(s =>
-                          s.buyerName.toLowerCase().includes(salesSearch.toLowerCase()) ||
-                          s.productName.toLowerCase().includes(salesSearch.toLowerCase())
+                          s.buyerName.toLowerCase().includes(lowerSalesSearch) ||
+                          s.productName.toLowerCase().includes(lowerSalesSearch)
                         ).map(sale => (
                           <tr key={sale.id} className="border-b border-slate-850 hover:bg-slate-900/30 transition-colors">
                             <td className="p-4 font-mono text-[10px] text-slate-500 font-bold">
