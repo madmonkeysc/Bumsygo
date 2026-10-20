@@ -234,9 +234,10 @@ const Shop = () => {
   
   const categories = ['Todos', 'Peluches', 'Ropa', 'Libros', 'Accesorios', 'Regalos', 'Próximamente'];
 
+  const lowerSearchTerm = searchTerm.toLowerCase();
   const filteredProducts = allProducts.filter(p => {
     const matchesCategory = activeCategory === 'Todos' || p.category === activeCategory;
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = p.name.toLowerCase().includes(lowerSearchTerm);
     return matchesCategory && matchesSearch;
   });
 
